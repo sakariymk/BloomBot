@@ -1,6 +1,6 @@
 Velkommen til vårt prosjekt!
 
-Therese  Siil
+Therese Siil
 Solveig Nygård
 Haris Malik
 Sakariye Mahamed Kahiye
