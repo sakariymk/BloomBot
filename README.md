@@ -1,7 +1,7 @@
 Velkommen til vårt prosjekt!
 
-Solveig Nygård
 Therese Siil
+Solveig Nygård
 Haris Malik
 Sakariye Mahamed Kahiye
 Viktoria Maria Gritsenko-Hofton
