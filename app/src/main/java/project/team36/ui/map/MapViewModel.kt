@@ -6,9 +6,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 data class MapUiState(
-    val centerLng: Double = -98.0,
-    val centerLat: Double = 39.5,
-    val zoom: Double = 2.0
+    val centerLng: Double = 9.30,
+    val centerLat: Double = 63.59,
+    val zoom: Double = 4.3
 )
 
 
