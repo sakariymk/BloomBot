@@ -9,7 +9,7 @@ class PlantDataSource(private val context: Context) {
         val plants = mutableListOf<PlanteInfo>()
 
         context.assets.open("planter.csv").bufferedReader().useLines { lines ->
-            lines.drop(1).forEach { line ->  // drop(1), ikke drop(10)
+            lines.drop(1).forEach { line ->
                 val tokens = line.split(",")
                 if (tokens.size >= 10) {
                     plants.add(mapToPlant(tokens))
