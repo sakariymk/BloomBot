@@ -39,7 +39,7 @@ fun SearchBar(
     OutlinedTextField(
         value = query,
         onValueChange = onQueryChanged,
-        label = { Text("Search") },
+        label = { Text("Søk") },
         singleLine = true,
         modifier = modifier
             .fillMaxWidth()
@@ -73,11 +73,9 @@ fun SearchBar(
                 val filteredSuggestions = suggestions.filter { it.type !is SearchSuggestionType.Category }
 
                 filteredSuggestions.forEachIndexed { index, suggestion ->
-                    // Get distance in kilometers if possible
                     val addressText = suggestion.fullAddress
                         ?: listOfNotNull(
                             suggestion.address?.region,
-                            suggestion.address?.country
                         ).joinToString(", ")
 
                     Row(

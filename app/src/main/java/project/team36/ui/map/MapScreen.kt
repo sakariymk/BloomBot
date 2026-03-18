@@ -1,17 +1,22 @@
 package project.team36.ui.map
 
 import android.Manifest
+import android.R.attr.text
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mapbox.geojson.Point
@@ -22,8 +27,12 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.mapbox.maps.extension.compose.MapEffect
+import com.mapbox.maps.extension.compose.annotation.generated.PointAnnotation
+import com.mapbox.maps.extension.compose.annotation.rememberIconImage
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
 import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
 import com.mapbox.maps.plugin.locationcomponent.location
+import project.team36.R
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -52,9 +61,11 @@ fun MapScreen(
 
 
     Box(modifier = modifier.fillMaxSize()) {
+        //dette er selve kartet
         MapboxMap(
             modifier = modifier.fillMaxSize(),
-            mapViewportState = mapViewportState
+            mapViewportState = mapViewportState,
+            scaleBar = {} //disabler den scale bar
         ) {
             if (locationPermissionState.status.isGranted) {
                 @Suppress("COMPOSE_APPLIER_CALL_MISMATCH")
@@ -65,6 +76,31 @@ fun MapScreen(
                         puckBearingEnabled = false
                     }
                     mapViewportState.transitionToFollowPuckState()
+                }
+            }
+
+            //viser pin på valgt lokasjon
+            uiState.selectedResult?.coordinate?.let { coord ->
+                val marker = rememberIconImage(
+                    key = R.drawable.map_marker,
+                    painter = painterResource(id = R.drawable.map_marker)
+                )
+                PointAnnotation(point = coord) {
+                    iconImage = marker
+                }
+            }
+
+            //Går gjennom savedPlaces lista og putter pins på kartet
+            uiState.savedPlaces.forEach { place ->
+
+                place.coordinate?.let { coord ->
+                    val savedMarker = rememberIconImage(
+                        key = R.drawable.map_marker,
+                        painter = painterResource(id = R.drawable.map_marker)
+                    )
+                    PointAnnotation(point = coord) {
+                        iconImage = savedMarker
+                    }
                 }
             }
         }
@@ -79,7 +115,7 @@ fun MapScreen(
                 query = uiState.searchQuery,
                 onQueryChanged = { viewModel.onSearchQueryChanged(it) },
                 suggestions = uiState.suggestions,
-                onSuggestionClicked = { viewModel.onSuggestionClicked(it) },
+                onSuggestionClicked = { viewModel.handleSuggestionSelection(it, mapViewportState) },
                 modifier = Modifier
                     .padding( start = 16.dp, end = 16.dp)
                     .wrapContentHeight()
@@ -87,5 +123,17 @@ fun MapScreen(
         }
 
 
+        //Boks som spør om brukeren vil legge til lokasjonen i mine steder
+        // kun vises showSaveDialog er true, fra viewmodel
+        if (uiState.showSaveDialog) {
+            AlertDialog(
+                onDismissRequest = { viewModel.dismissSaveDialog() },
+                title = { Text("Lagre sted?") },
+
+                confirmButton = { TextButton(onClick = {viewModel.confirmSavePlace()}) { Text("Ja") } },
+
+                dismissButton = {TextButton(onClick = {viewModel.dismissSaveDialog()}) { Text("Nei") }}
+            )
+        }
     }
 }
