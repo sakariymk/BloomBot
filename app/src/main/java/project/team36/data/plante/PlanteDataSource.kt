@@ -28,7 +28,7 @@ class PlantDataSource(private val context: Context) {
             isIndoor = tokens[4].trim().toBoolean(),
             minTemp = tokens[5].trim().toInt(),
             waterPerWeek = tokens[6].trim().toFloat(),
-            plantingMonth = Season.valueOf(tokens[7].trim().uppercase()),
+            plantingMonth = Month.valueOf(tokens[7].trim().uppercase()),
             minZone = Zone.valueOf(zones[0].trim().uppercase()),
             maxZone = Zone.valueOf(zones[1].trim().uppercase()),
             humidityLevel =tokens[9].trim().toInt(),
