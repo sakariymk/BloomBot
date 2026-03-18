@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -39,6 +40,7 @@ android {
 }
 
 dependencies {
+    // MapBox API
     implementation("com.mapbox.maps:android:11.19.0")
     implementation("com.mapbox.extension:maps-compose:11.19.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
@@ -62,8 +64,15 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    //Ktor
     implementation("io.ktor:ktor-client-android:3.4.1")
     implementation("io.ktor:ktor-client-content-negotiation:3.4.1")
     implementation("io.ktor:ktor-serialization-kotlinx-json:3.4.1")
     implementation("io.ktor:ktor-client-cio:3.4.1")
+
+    //Room database
+    implementation("androidx.room:room-runtime:2.8.4")
+    ksp("androidx.room:room-compiler:2.8.4")
+    implementation("androidx.room:room-ktx:2.8.4")
 }
