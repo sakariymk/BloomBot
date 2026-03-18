@@ -4,8 +4,8 @@ Legg inn LightType med hver type dividert med ";",
 Boolean for frostresistance,
 Boolean for Innendørsplante,
 Int for minimumstemperatur,
-Float for vann per uke i milliliter,
+Float for vann per uke,
 Se Seasons enum klasse med hver type divider med ";",
 Se Zone enum klasse og velg minimums og maksimums zone med ";" immelom,
 Int for humidity
-Eksempel1,soil;clay,shade;partial;full,true,true,5,0.5,spring,H3,70
+Eksempel1,soil;clay,shade;partial;full,true,true,5,0.5,spring,H3,70,unbothered
