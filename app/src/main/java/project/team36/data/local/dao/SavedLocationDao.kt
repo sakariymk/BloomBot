@@ -12,5 +12,5 @@ interface SavedLocationDao {
     suspend fun insert(location: SavedLocation)
 
     @Query("SELECT * from saved_location")
-    fun getAll(): Flow<List<SavedLocation>>
+    suspend fun getAll(): List<SavedLocation>
 }
