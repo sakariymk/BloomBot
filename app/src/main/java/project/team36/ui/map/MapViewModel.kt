@@ -11,9 +11,6 @@ import com.mapbox.search.result.SearchSuggestion
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import com.mapbox.maps.extension.compose.annotation.generated.PointAnnotation
-import com.mapbox.maps.extension.compose.annotation.rememberIconImage
-import com.mapbox.maps.extension.observable.model.Response
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.search.result.SearchResult
 import com.mapbox.search.SearchSelectionCallback
@@ -46,15 +43,6 @@ class MapViewModel : ViewModel() {
         SearchEngineSettings()
     )
 
-
-    fun updateCameraPosition(lng: Double, lat: Double, zoom: Double) {
-        _uiState.value = _uiState.value.copy(
-            centerLng = lng,
-            centerLat = lat,
-            zoom = zoom
-        )
-    }
-
     fun onSearchQueryChanged(query: String) {
         _uiState.value = _uiState.value.copy(searchQuery = query)
 
@@ -64,11 +52,11 @@ class MapViewModel : ViewModel() {
                 SearchOptions(limit = 10),
                 object : SearchSuggestionsCallback {
                     override fun onSuggestions(
-                        list: List<SearchSuggestion>,
+                        suggestions: List<SearchSuggestion>,
                         responseInfo: ResponseInfo
                     ) {
-                        _uiState.value = _uiState.value.copy(suggestions = list)
-                        list.forEachIndexed { index, suggestion ->
+                        _uiState.value = _uiState.value.copy(suggestions = suggestions)
+                        suggestions.forEachIndexed { index, suggestion ->
                             Log.d(
                                 "Suggestion[$index]", """
                                 Name: ${suggestion.name}
@@ -89,6 +77,7 @@ class MapViewModel : ViewModel() {
     }
 
 
+    //når brukeren klikker på en suggestion i søket
     fun handleSuggestionSelection(
         suggestion: SearchSuggestion,
         mapViewportState: MapViewportState,
@@ -103,7 +92,8 @@ class MapViewModel : ViewModel() {
                 _uiState.value = _uiState.value.copy(
                     selectedResult = result,
                     showSaveDialog = true, //trigger den boksen i UI
-                    searchQuery = result.name //viser adressenavnet inni searchbar
+                    searchQuery = result.name, //viser adressenavnet inni searchbar
+                    suggestions = emptyList() //gjør at søkelisten går vekk etter man har søkt
                 )
 
                 //kameraet flyr til valgt lokasjon
