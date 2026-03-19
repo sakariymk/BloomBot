@@ -82,8 +82,8 @@ fun MapScreen(
             //viser pin på valgt lokasjon
             uiState.selectedResult?.coordinate?.let { coord ->
                 val marker = rememberIconImage(
-                    key = R.drawable.map_marker,
-                    painter = painterResource(id = R.drawable.map_marker)
+                    key = R.drawable.plant_map_marker,
+                    painter = painterResource(id = R.drawable.plant_map_marker)
                 )
                 PointAnnotation(point = coord) {
                     iconImage = marker
@@ -95,8 +95,8 @@ fun MapScreen(
 
                 place.coordinate?.let { coord ->
                     val savedMarker = rememberIconImage(
-                        key = R.drawable.map_marker,
-                        painter = painterResource(id = R.drawable.map_marker)
+                        key = R.drawable.plant_map_marker,
+                        painter = painterResource(id = R.drawable.plant_map_marker)
                     )
                     PointAnnotation(point = coord) {
                         iconImage = savedMarker
