@@ -20,11 +20,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.mapbox.search.result.SearchSuggestion
 import com.mapbox.search.result.SearchSuggestionType
+
 
 
 @SuppressLint("DefaultLocale")
@@ -34,12 +37,13 @@ fun SearchBar(
     onQueryChanged: (String) -> Unit,
     suggestions: List<SearchSuggestion>,
     onSuggestionClicked: (SearchSuggestion) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    keyboardController: SoftwareKeyboardController? = LocalSoftwareKeyboardController.current
 ) {
     OutlinedTextField(
         value = query,
         onValueChange = onQueryChanged,
-        label = { Text("Search") },
+        label = { Text("Søk") },
         singleLine = true,
         modifier = modifier
             .fillMaxWidth()
@@ -73,17 +77,18 @@ fun SearchBar(
                 val filteredSuggestions = suggestions.filter { it.type !is SearchSuggestionType.Category }
 
                 filteredSuggestions.forEachIndexed { index, suggestion ->
-                    // Get distance in kilometers if possible
                     val addressText = suggestion.fullAddress
                         ?: listOfNotNull(
                             suggestion.address?.region,
-                            suggestion.address?.country
                         ).joinToString(", ")
 
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { onSuggestionClicked(suggestion) }
+                            .clickable {
+                                keyboardController?.hide()
+                                onSuggestionClicked(suggestion)
+                            }
                             .padding(vertical = 12.dp, horizontal = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -105,7 +110,7 @@ fun SearchBar(
                             Text(
                                 text = addressText,
                                 fontSize = 14.sp,
-                                color = Color.Gray,
+                                color = Color.Black,
                                 modifier = Modifier.padding(top = 4.dp)
                             )
                         }
