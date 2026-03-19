@@ -18,6 +18,12 @@ import com.mapbox.search.ApiType
 import com.mapbox.search.ResponseInfo
 import com.mapbox.search.SearchEngine
 
+
+//egen dataklasse for en lagret lokasjon
+data class SavedPlace(
+    val result: SearchResult,
+    val customName: String //custom navn som brukeren har gitt til stedet
+)
 data class MapUiState(
     val centerLng: Double = 9.30,
     val centerLat: Double = 63.59,
@@ -26,11 +32,14 @@ data class MapUiState(
     val suggestions: List<SearchSuggestion> = emptyList(),
 
     val selectedResult: SearchResult? = null, //lagrer søkeresultat som brukeren har valgt
-    val savedPlaces: List<SearchResult> = emptyList(), //liste med lagrede steder
+    val savedPlaces: List<SavedPlace> = emptyList(), //liste med lagrede steder
 
     //kontrollerer om "Legg til mine steder?" boksen er synlig på skjermen
-    val showSaveDialog: Boolean = false
+    val showSaveDialog: Boolean = false,
 
+    val placeNameInput: String = "",
+
+    val selectedSavedPlace: SavedPlace? = null
 )
 
 
@@ -49,7 +58,7 @@ class MapViewModel : ViewModel() {
         if (query.length >= 2) {
             searchEngine.search(
                 query,
-                SearchOptions(limit = 10),
+                SearchOptions(limit = 6),
                 object : SearchSuggestionsCallback {
                     override fun onSuggestions(
                         suggestions: List<SearchSuggestion>,
@@ -118,9 +127,16 @@ class MapViewModel : ViewModel() {
     //hvis brukeren trykker "ja" på om de vil lagre stedet
     fun confirmSavePlace() {
         val result = _uiState.value.selectedResult ?: return
+        val name = _uiState.value.placeNameInput
+            .ifEmpty { result.name }
+
+        val savedPlace = SavedPlace(
+            result = result,
+            customName = name
+        )
 
         _uiState.value = _uiState.value.copy(
-            savedPlaces = _uiState.value.savedPlaces + result, //legger til resultatet i savedPlaces
+            savedPlaces = _uiState.value.savedPlaces + savedPlace, //legger til resultatet i savedPlaces
             showSaveDialog = false //lukker den dialog boksen
         )
     }
@@ -129,5 +145,14 @@ class MapViewModel : ViewModel() {
     fun dismissSaveDialog() {
         _uiState.value = _uiState.value.copy(
             showSaveDialog = false)
+    }
+
+    //når brukeren trykker på en lagret plass/pin
+    fun onSavedPlaceClicked(place: SavedPlace) {
+        _uiState.value = _uiState.value.copy(selectedSavedPlace = place)
+    }
+
+    fun dismissPlaceInfo() {
+        _uiState.value = _uiState.value.copy(selectedSavedPlace = null)
     }
 }

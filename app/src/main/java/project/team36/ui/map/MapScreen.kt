@@ -1,5 +1,6 @@
 package project.team36.ui.map
 
+import PlaceInfoCard
 import android.Manifest
 import android.R.attr.text
 import androidx.compose.foundation.layout.Box
@@ -9,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -16,8 +19,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mapbox.geojson.Point
 import com.mapbox.maps.extension.compose.MapboxMap
@@ -34,7 +39,7 @@ import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
 import com.mapbox.maps.plugin.locationcomponent.location
 import project.team36.R
 
-@OptIn(ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
@@ -93,13 +98,17 @@ fun MapScreen(
             //Går gjennom savedPlaces lista og putter pins på kartet
             uiState.savedPlaces.forEach { place ->
 
-                place.coordinate?.let { coord ->
+                place.result.coordinate.let { coord ->
                     val savedMarker = rememberIconImage(
                         key = R.drawable.plant_map_marker,
                         painter = painterResource(id = R.drawable.plant_map_marker)
                     )
                     PointAnnotation(point = coord) {
                         iconImage = savedMarker
+                        interactionsState.onClicked {
+                            viewModel.onSavedPlaceClicked(place)
+                            true
+                        }
                     }
                 }
             }
@@ -136,4 +145,14 @@ fun MapScreen(
             )
         }
     }
+
+
+    //viser planteinfocard når pin blir trykket på av brukeren
+    uiState.selectedSavedPlace?.let { place ->
+        PlaceInfoCard(
+            place = place,
+            onDismiss = { viewModel.dismissPlaceInfo() }
+        )
+    }
+
 }
