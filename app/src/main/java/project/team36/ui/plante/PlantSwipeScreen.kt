@@ -2,8 +2,8 @@ package project.team36.ui.plante
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.dp
 /**
  * FIL: PlantSwipeScreen.kt
  * TYPE: VANLIG FIL (Composable)
- * BESKRIVELSE: Viser bunken med plantekort og knapper for å navigere.
  */
 
 @Composable
@@ -24,11 +23,12 @@ fun PlantSwipeScreen(
     viewModel: PlantSwipeViewModel,
     modifier: Modifier = Modifier
 ) {
-    // Observerer listen med planter fra ViewModel
     val plants by viewModel.uiState.collectAsState()
 
     Box(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(bottom = 16.dp),
         contentAlignment = Alignment.Center
     ) {
         if (plants.isNotEmpty()) {
@@ -36,39 +36,44 @@ fun PlantSwipeScreen(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Viser den øverste planten i lista
-                Box(modifier = Modifier.weight(1f)) {
+                // Selve kortet
+                Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
                     PlantCard(plante = plants[0])
                 }
 
-                // Knapper for å etterligne Tinder-sveip
+                // Handlingsknapper under kortet
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 32.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                        .padding(horizontal = 32.dp, vertical = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    // NEI-knapp
-                    LargeFloatingActionButton(
+                    // Hopp over-knapp (kaller dislike i viewmodel for å fjerne fra toppen)
+                    OutlinedButton(
                         onClick = { viewModel.onDislike() },
-                        containerColor = Color(0xFFFFCDD2) // Lys rød
+                        modifier = Modifier.height(50.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red)
                     ) {
-                        Icon(Icons.Default.Close, contentDescription = "Nei", tint = Color.Red)
+                        Icon(Icons.Default.Clear, contentDescription = "Hopp over")
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Hopp over")
                     }
 
-                    // JA-knapp
-                    LargeFloatingActionButton(
+                    // Legg til-knapp (kaller like i viewmodel)
+                    Button(
                         onClick = { viewModel.onLike() },
-                        containerColor = Color(0xFFC8E6C9) // Lys grønn
+                        modifier = Modifier.height(50.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)) // Mørk grønn
                     ) {
-                        Icon(Icons.Default.Favorite, contentDescription = "Liker", tint = Color(0xFF2E7D32))
+                        Icon(Icons.Default.Add, contentDescription = "Legg til")
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Legg til")
                     }
                 }
             }
         } else {
-            // Vises når bunken er tom
             Text(
-                text = "Ingen flere planter i nærheten!",
+                text = "Ingen flere planter å vise!",
                 style = MaterialTheme.typography.headlineSmall,
                 color = Color.Gray
             )

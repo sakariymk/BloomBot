@@ -8,33 +8,30 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.*
-import androidx.compose.runtime.* // Viktig for remember, getValue, setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+
+// --- DINE EGNE FILER MÅ IMPORTERES HER ---
 import project.team36.data.plante.PlantDataSource
 import project.team36.data.plante.PlantRepository
 import project.team36.ui.map.MapScreen
 import project.team36.ui.map.MapViewModel
 import project.team36.ui.plante.PlantSwipeScreen
-import project.team36.ui.plante.PlantSwipeViewModel
+import project.team36.ui.plante.PlantSwipeViewModel // <--- DENNE FIKSER DE TO ØVERSTE FEILENE
 import project.team36.ui.theme.Team36Theme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Initialiser data-lagene
         val dataSource = PlantDataSource(this)
         val repository = PlantRepository(dataSource)
 
         setContent {
             Team36Theme {
-                // Disse importene er kritiske for at 'by remember' skal fungere:
-                // import androidx.compose.runtime.getValue
-                // import androidx.compose.runtime.setValue
                 var currentScreen by remember { mutableStateOf("map") }
 
-                // Initialiser ViewModels
                 val swipeViewModel = remember { PlantSwipeViewModel(repository) }
                 val mapViewModel: MapViewModel = viewModel()
 
@@ -62,7 +59,6 @@ class MainActivity : ComponentActivity() {
                     ) {
                         when (currentScreen) {
                             "map" -> {
-                                // Vi sender inn modifier og viewModel slik MapScreen forventer
                                 MapScreen(
                                     modifier = Modifier,
                                     viewModel = mapViewModel
