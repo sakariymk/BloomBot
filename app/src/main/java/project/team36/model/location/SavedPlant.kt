@@ -10,7 +10,7 @@ import project.team36.model.plante.SoilType
 import project.team36.model.plante.Zone
 
 @Entity(
-    tableName = "saved_plant",
+    tableName = "saved_plants",
     foreignKeys = [ForeignKey(
         entity = SavedLocation::class,
         parentColumns = ["id"],

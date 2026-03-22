@@ -1,7 +1,7 @@
 package project.team36.data.local
 
 import androidx.room.TypeConverter
-import io.ktor.util.date.Month
+import project.team36.model.plante.Month
 import project.team36.model.plante.LightType
 import project.team36.model.plante.SoilType
 import project.team36.model.plante.Zone
