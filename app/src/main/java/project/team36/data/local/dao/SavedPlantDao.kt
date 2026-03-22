@@ -9,5 +9,5 @@ import project.team36.model.location.SavedPlant
 interface SavedPlantDao {
     @Insert
     suspend fun insert(plant: SavedPlant)
-    //TODO
+    //TODO get plants for location and get all plants
 }

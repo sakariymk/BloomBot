@@ -14,6 +14,9 @@ import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Test
 import project.team36.model.location.SavedLocation
+import project.team36.model.location.SavedPlant
+import project.team36.model.plante.LightType
+import project.team36.model.plante.SoilType
 
 @RunWith(AndroidJUnit4::class)
 class AppDatabaseTest : TestCase() {
@@ -45,8 +48,24 @@ class AppDatabaseTest : TestCase() {
         assertTrue(locations.any {it.name == "Hjem"})
     }
 
-    @Test
-    fun writeAndReadPlant() = runBlocking {
-
-    }
+    // For mye specs og usikker på siste versjon av disse, så lager test senere
+//    @Test
+//    fun writeAndReadPlant() = runBlocking {
+//        val location = SavedLocation(name = "Hjem", lat = 59.8, lon = 10.9, address = "Solveien 61")
+//        val locationId = locationDao.insert(location)
+//
+//        val plant = SavedPlant(
+//            locationId = locationId,
+//            name = "Prestekrage",
+//            soil = SoilType.SOIL,
+//            light = LightType.FULL,
+//            isFrostResistant = false,
+//            isIndoor = false,
+//            waterPerWeek = 1.0,
+//            plantingMonth = ....
+//        )
+        //plantDao.insert(plant)
+    //    val plants = plantDao.getPlantsForLocation(locationId)
+    //    assertTrue(plants.any { it.name == "Prestekrage" })
+//    }
 }
