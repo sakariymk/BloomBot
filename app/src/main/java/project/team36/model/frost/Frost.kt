@@ -25,3 +25,39 @@ data class Point(
     @SerialName("@type") val type: String? = null,
     val coordinates: List<Double>
 )
+
+@Serializable
+data class TimeSeries (
+    val sourceId : String,
+    val elementId : String,
+    val validFrom : String? = null,
+    val validTo : String? = null,
+    val unit : String? = null
+)
+
+@Serializable
+data class TimeSeriesResponse (
+    val data : List <TimeSeries>
+)
+
+@Serializable
+data class Observation (
+    val sourceId : String,
+    val referenceTime: String,
+    val observations : List <ObservationValue>
+)
+
+
+@Serializable
+data class ObservationValue (
+    val elementId : String,
+    val value : Double,
+    val unit : String,
+    val timeOffset : String ? = null
+
+)
+
+@Serializable
+data class ObservationResponse (
+    val data : List <Observation>
+)
