@@ -16,5 +16,5 @@ interface SavedLocationDao {
 
     //For å lagre locations som kan vises på kartet
     @Query("SELECT * FROM saved_location")
-    suspend fun getAllLocations(): Flow<List<SavedLocation>>
+    fun getAllLocations(): Flow<List<SavedLocation>>
 }

@@ -15,11 +15,11 @@ import project.team36.model.location.SavedPlant
         SavedLocation::class,
         SavedPlant::class
     ],
-    version = 1
+    version = 1,
+    exportSchema = false
 )
 
 @TypeConverters(Converters::class)
-
 abstract class AppDatabase : RoomDatabase() {
     abstract fun savedLocationDao(): SavedLocationDao
     abstract fun savedPlantDao(): SavedPlantDao

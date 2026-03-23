@@ -3,6 +3,7 @@ package project.team36.model.location
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import io.ktor.util.date.Month
 import project.team36.model.plante.LightType
@@ -16,7 +17,8 @@ import project.team36.model.plante.Zone
         parentColumns = ["id"],
         childColumns = ["locationId"],
         onDelete = ForeignKey.CASCADE
-    )]
+    )],
+    indices = [Index(value = ["locationId"])]
 )
 data class SavedPlant(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
