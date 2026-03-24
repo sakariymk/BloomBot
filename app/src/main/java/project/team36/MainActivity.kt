@@ -8,7 +8,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import project.team36.ui.map.MapScreen
+import project.team36.ui.myplants.MyPlantsScreen
+import project.team36.ui.myplants.MyPlantsViewModel
 import project.team36.ui.theme.Team36Theme
 
 class MainActivity : ComponentActivity() {
@@ -17,7 +20,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Team36Theme {
-                MapScreen()
+                //MapScreen()
+                MyPlantsScreen(mapViewModel = viewModel())
                 }
             }
         }
