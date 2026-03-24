@@ -37,7 +37,8 @@ fun PlaceInfoCard(
     place: SavedPlace,
     onDismiss: () -> Unit,
     onEdit: (String) -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    navController: NavHostController //DENNE GIR ERROR; IGNORER!
 ) {
     var showEditDialog by rememberSaveable { mutableStateOf((false)) }
     var editedName by rememberSaveable { mutableStateOf(place.customName)}
@@ -102,7 +103,7 @@ fun PlaceInfoCard(
                 //TODO: Fikse navigasjon til "Mine planter" screen
                 //"Se mine planter" knapp
                 Button(
-                    onClick = {},
+                    onClick = { navController.navigate("myPlants")}, //KOMMER FEIL, IGNORER DEN
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .padding(6.dp)

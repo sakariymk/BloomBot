@@ -160,7 +160,8 @@ fun MapScreen(
             onDelete = {
                 savedPlacesViewModel.removePlace(place)
                 viewModel.dismissPlaceInfo()
-            }
+            },
+            navController = navController //KOMMER FEIL, IGNORER DEN
         )
     }
 
