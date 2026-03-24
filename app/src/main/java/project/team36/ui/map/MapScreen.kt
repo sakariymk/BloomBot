@@ -142,7 +142,6 @@ fun MapScreen(
                 title = { Text("Lagre sted?") },
 
                 confirmButton = { TextButton(onClick = {viewModel.confirmSavePlace(savedPlacesViewModel)}) { Text("Ja") } },
-
                 dismissButton = {TextButton(onClick = {viewModel.dismissSaveDialog()}) { Text("Nei") }}
             )
         }
@@ -153,7 +152,15 @@ fun MapScreen(
     uiState.selectedSavedPlace?.let { place ->
         PlaceInfoCard(
             place = place,
-            onDismiss = { viewModel.dismissPlaceInfo() }
+            onDismiss = { viewModel.dismissPlaceInfo() },
+            onEdit = { newName ->
+                savedPlacesViewModel.updatePlace(place, newName)
+                viewModel.dismissPlaceInfo()
+            },
+            onDelete = {
+                savedPlacesViewModel.removePlace(place)
+                viewModel.dismissPlaceInfo()
+            }
         )
     }
 

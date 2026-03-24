@@ -22,4 +22,10 @@ class SavedPlacesViewModel : ViewModel() {
     fun removePlace(place: SavedPlace) {
         _savedPlaces.value = _savedPlaces.value - place
     }
+
+    fun updatePlace(place: SavedPlace, newName: String) {
+        _savedPlaces.value = _savedPlaces.value.map {
+            if (it == place) it.copy(customName = newName) else it
+        }
+    }
 }
