@@ -1,16 +1,11 @@
 package project.team36.ui.myplants
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -23,17 +18,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import project.team36.ui.map.SavedPlace
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyPlantsScreen (
     viewModel: MyPlantsViewModel = viewModel(),
-    mapViewModel: MapViewModel
-
+    mapViewModel: MapViewModel,
+    navController: NavController
 ) {
 
     // for å få tak i liste over lagrede steder fra MapViewModel
@@ -46,6 +40,28 @@ fun MyPlantsScreen (
             TopAppBar(
                 title = { Text("Mine pølser") }
             )
+        },
+        bottomBar = {
+            NavigationBar{
+                NavigationBarItem(
+                    selected = false,
+                    onClick = { navController.navigate("map")},
+                    icon = { }, //fyller ut med icon senere!
+                    label = { Text("Kart")}
+                )
+                NavigationBarItem(
+                    selected = false,
+                    onClick = { navController.navigate("myPlants") },
+                    icon = { }, //fyller ut med icon senere!
+                    label = { Text("Mine planter")}
+                )
+                NavigationBarItem(
+                    selected = false,
+                    onClick = { navController.navigate("findPlants") },
+                    icon = { }, //fyller ut med icon senere!
+                    label = { Text("Oppdag planter")}
+                )
+            }
         }
     ) { innerPadding ->
         LazyColumn(
@@ -86,14 +102,13 @@ fun PlaceDropdown(
 
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = { expanded = it } // åpner/lukker menyen
+        onExpandedChange = { expanded = !expanded } // åpner/lukker menyen
     ) {
         TextField(
             value = selectedPlace?.customName ?: "Velg sted",
             onValueChange = {},
             readOnly = true,
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier.menuAnchor()
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
         )
         ExposedDropdownMenu(
             expanded = expanded,
