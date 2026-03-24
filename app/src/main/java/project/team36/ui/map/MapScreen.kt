@@ -43,14 +43,16 @@ import project.team36.R
 @Composable
 fun MapScreen(
     modifier: Modifier = Modifier,
-    viewModel: MapViewModel = viewModel()
+    viewModel: MapViewModel = viewModel(),
+    savedPlacesViewModel: SavedPlacesViewModel
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val savedPlaces by savedPlacesViewModel.savedPlaces.collectAsStateWithLifecycle() // NYTT: hent savedPlaces herfra
 
+    //få lokasjon permissions
     val locationPermissionState = rememberPermissionState(
         Manifest.permission.ACCESS_FINE_LOCATION
     )
-
     LaunchedEffect(Unit) {
         locationPermissionState.launchPermissionRequest()
     }
@@ -96,7 +98,7 @@ fun MapScreen(
             }
 
             //Går gjennom savedPlaces lista og putter pins på kartet
-            uiState.savedPlaces.forEach { place ->
+            savedPlaces.forEach { place ->
 
                 place.result.coordinate.let { coord ->
                     val savedMarker = rememberIconImage(
