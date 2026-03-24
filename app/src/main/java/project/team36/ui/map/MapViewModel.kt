@@ -17,7 +17,6 @@ import com.mapbox.search.SearchSelectionCallback
 import com.mapbox.search.ApiType
 import com.mapbox.search.ResponseInfo
 import com.mapbox.search.SearchEngine
-import project.team36.ui.map.SavedPlacesViewModel
 
 
 //egen dataklasse for en lagret lokasjon
@@ -38,9 +37,7 @@ data class MapUiState(
 )
 
 
-class MapViewModel(
-    private val savedPlacesViewModel: SavedPlacesViewModel
-) : ViewModel() {
+class MapViewModel() : ViewModel() {
     private val _uiState = MutableStateFlow(MapUiState())
     val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()
 
@@ -122,7 +119,7 @@ class MapViewModel(
     }
 
     //hvis brukeren trykker "ja" på om de vil lagre stedet
-    fun confirmSavePlace() {
+    fun confirmSavePlace(savedPlacesViewModel: SavedPlacesViewModel) {
         val result = _uiState.value.selectedResult ?: return
         val name = _uiState.value.placeNameInput.ifEmpty { result.name }
             .ifEmpty { result.name }

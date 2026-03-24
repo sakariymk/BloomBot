@@ -141,7 +141,7 @@ fun MapScreen(
                 onDismissRequest = { viewModel.dismissSaveDialog() },
                 title = { Text("Lagre sted?") },
 
-                confirmButton = { TextButton(onClick = {viewModel.confirmSavePlace()}) { Text("Ja") } },
+                confirmButton = { TextButton(onClick = {viewModel.confirmSavePlace(savedPlacesViewModel)}) { Text("Ja") } },
 
                 dismissButton = {TextButton(onClick = {viewModel.dismissSaveDialog()}) { Text("Nei") }}
             )
