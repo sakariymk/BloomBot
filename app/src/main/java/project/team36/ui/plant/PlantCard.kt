@@ -1,4 +1,4 @@
-package project.team36.ui.plante
+package project.team36.ui.plant
 
 import androidx.compose.foundation.BorderStroke // <--- DENNE FIKSER BORDERSTROKE-FEILEN
 import androidx.compose.foundation.background
@@ -16,18 +16,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import project.team36.data.plant.PlantRepository
 import project.team36.model.plante.LightType
-import project.team36.model.plante.PlanteInfo
+import project.team36.model.plante.PlantInfo
+
 
 @Composable
 fun PlantCard(
-    plante: PlanteInfo,
-    modifier: Modifier = Modifier
+    plant: PlantInfo,
+    modifier: Modifier = Modifier,
+    plantRepository: PlantRepository
 ) {
-    val sunScore = if (LightType.FULL in plante.light) 10 else if (LightType.PARTIAL in plante.light) 6 else 2
-    val waterScore = (plante.waterPerWeek * 2).toInt().coerceIn(1, 10)
-    val hardinessScore = plante.minZone.name.removePrefix("H").toIntOrNull() ?: 1
-    val humidityScore = plante.humidityLevel.coerceIn(1, 10)
+    val sunScore = if (LightType.FULL in plant.light) 10 else if (LightType.PARTIAL in plant.light) 6 else 2
+    val waterScore = (plant.waterPerWeek * 2).toInt().coerceIn(1, 10)
+    val zoneScore = plant.I
+
+    val plants = plantRepository.InitiatePlants()
 
     val overallScore = (sunScore + waterScore + hardinessScore + humidityScore) / 4
 

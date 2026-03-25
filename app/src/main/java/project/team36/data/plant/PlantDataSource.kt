@@ -1,4 +1,4 @@
-package project.team36.data.plante
+package project.team36.data.plant
 
 import android.content.Context
 import project.team36.model.plante.*
@@ -19,20 +19,19 @@ class PlantDataSource(private val context: Context) {
         return plants
     }
     private fun mapToPlant(tokens: List<String>): PlantInfo {
-        val zones = tokens[7].trim().split(";")
         val name = tokens[0].trim().lowercase().replace(" ", "_")
         return PlantInfo(
             name = tokens[0].trim(),
             soil = tokens[1].trim().split(";").map { SoilType.valueOf(it.trim().uppercase()) }.toSet(),
             light = tokens[2].trim().split(";").map { LightType.valueOf(it.trim().uppercase()) }.toSet(),
             isFrostResistant = tokens[3].trim().toBoolean(),
-            isIndoor = tokens[4].trim().toBoolean(),
-            waterPerWeek = tokens[5].trim().toFloat(),
-            plantingMonth = Month.valueOf(tokens[6].trim().uppercase()),
-            minZone = Zone.valueOf(zones[0].trim().uppercase()),
-            maxZone = Zone.valueOf(zones[1].trim().uppercase()),
-            growthdays = tokens[8].trim().toInt(),
+            waterPerWeek = tokens[4].trim().toFloat(),
+            plantingMonth = tokens[5].trim().toInt(),
+            climateZone = tokens[6].trim().toInt(),
+            hasBeenWatered = tokens[7].trim().toBoolean(),
+            daysSinceWatered = tokens[8].trim().toInt(),
+            maxDaysWithoutWater = tokens[9].trim().toInt(),
             imageRes = context.resources.getIdentifier(name, "drawable", context.packageName),
-            beskrivelse = context.assets.open("descriptions/$name.txt").bufferedReader().readText(),
+            description = context.assets.open("descriptions/$name.txt").bufferedReader().readText(),
         )
     }}
