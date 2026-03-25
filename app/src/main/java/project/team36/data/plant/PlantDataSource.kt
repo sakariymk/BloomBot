@@ -26,7 +26,7 @@ class PlantDataSource(private val context: Context) {
             light = tokens[2].trim().split(";").map { LightType.valueOf(it.trim().uppercase()) }.toSet(),
             isFrostResistant = tokens[3].trim().toBoolean(),
             waterPerWeek = tokens[4].trim().toFloat(),
-            plantingMonth = tokens[5].trim().toInt(),
+            plantingMonth = tokens[5].trim().split(";").mapNotNull { it.trim().toIntOrNull() }.toSet(),
             climateZone = tokens[6].trim().toInt(),
             hasBeenWatered = tokens[7].trim().toBoolean(),
             daysSinceWatered = tokens[8].trim().toInt(),

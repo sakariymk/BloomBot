@@ -13,7 +13,7 @@ data class PlantInfo(
     val light: Set<LightType>,
     val isFrostResistant: Boolean,
     val waterPerWeek: Float,
-    val plantingMonth: Int,
+    val plantingMonth: Set<Int>,
     val climateZone: Int,
     val hasBeenWatered: Boolean,
     val daysSinceWatered: Int,
