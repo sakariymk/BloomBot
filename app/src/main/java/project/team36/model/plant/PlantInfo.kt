@@ -1,4 +1,4 @@
-package project.team36.model.plante
+package project.team36.model.plant
 
 import kotlinx.serialization.Serializable
 

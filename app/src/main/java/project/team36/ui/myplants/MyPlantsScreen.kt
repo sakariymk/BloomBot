@@ -39,7 +39,7 @@ fun MyPlantsScreen (
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Mine pølser") }
+                title = { Text("Mine planter") }
             )
         },
         bottomBar = {
@@ -61,6 +61,12 @@ fun MyPlantsScreen (
                     onClick = { navController.navigate("findPlants") },
                     icon = { }, //fyller ut med icon senere!
                     label = { Text("Oppdag planter")}
+                )
+                NavigationBarItem(
+                    selected = false,
+                    onClick = { navController.navigate("swipe") },
+                    icon = { }, //fyller ut med icon senere!
+                    label = { Text("test")}
                 )
             }
         }

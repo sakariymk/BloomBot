@@ -1,4 +1,4 @@
-package project.team36.ui.plant
+package project.team36.ui.plante
 
 import androidx.compose.foundation.BorderStroke // <--- DENNE FIKSER BORDERSTROKE-FEILEN
 import androidx.compose.foundation.background
@@ -16,22 +16,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import project.team36.data.plant.PlantRepository
-import project.team36.model.plante.LightType
-import project.team36.model.plante.PlantInfo
-
+import project.team36.model.plant.LightType
+import project.team36.model.plant.PlantInfo
 
 @Composable
 fun PlantCard(
     plant: PlantInfo,
-    modifier: Modifier = Modifier,
-    plantRepository: PlantRepository
+    modifier: Modifier = Modifier
 ) {
     val sunScore = if (LightType.FULL in plant.light) 10 else if (LightType.PARTIAL in plant.light) 6 else 2
-    val waterScore = (plant.waterPerWeek * 2).toInt().coerceIn(1, 10)
-    val zoneScore = plant.I
-
-    val plants = plantRepository.InitiatePlants()
+    val waterScore = (10 - plant.maxDaysWithoutWater).coerceIn(1, 10)
+    val hardinessScore = plant.climateZone.coerceIn(1, 10)
+    val humidityScore = 5
 
     val overallScore = (sunScore + waterScore + hardinessScore + humidityScore) / 4
 
@@ -62,7 +58,7 @@ fun PlantCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = plante.name,
+                text = plant.name,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
@@ -75,7 +71,7 @@ fun PlantCard(
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "Masse informasjon om planten her, ikke vann den når den er vannet fra før av også motsatt, div div lorem ipsum dolorus",
+                text = plant.description,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 8.dp)

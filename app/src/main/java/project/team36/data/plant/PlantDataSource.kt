@@ -1,7 +1,9 @@
 package project.team36.data.plant
 
 import android.content.Context
-import project.team36.model.plante.*
+import project.team36.model.plant.LightType
+import project.team36.model.plant.PlantInfo
+import project.team36.model.plant.SoilType
 
 class PlantDataSource(private val context: Context) {
 
@@ -11,7 +13,7 @@ class PlantDataSource(private val context: Context) {
         context.assets.open("planter.csv").bufferedReader().useLines { lines ->
             lines.drop(1).forEach { line ->
                 val tokens = line.split(",")
-                if (tokens.size >= 11) {
+                if (tokens.size >= 10) {
                     plants.add(mapToPlant(tokens))
                 }
             }

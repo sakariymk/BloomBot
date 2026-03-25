@@ -4,9 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+
 import project.team36.ui.findplants.FindPlantsScreen
 import project.team36.ui.findplants.FindPlantsViewModel
 import project.team36.ui.map.MapScreen
@@ -30,19 +31,21 @@ fun AppNavHost(
     ){
         composable("map") {
             MapScreen(
-                modifier,
+                modifier = modifier,
                 viewModel = mapViewModel,
                 navController = navController,
                 savedPlacesViewModel = savedPlacesViewModel
-            ) }
+            )
+        }
         composable ("myPlants"){
             MyPlantsScreen(
                 mapViewModel = mapViewModel,
                 navController = navController,
                 savedPlacesViewModel = savedPlacesViewModel
-            ) }
+            )
+        }
         composable ("findPlants") {
-            FindPlantsScreen (
+            FindPlantsScreen(
                 viewModel = findPlantsViewModel,
                 navController = navController
             )

@@ -97,7 +97,7 @@ fun MapScreen(
             }
         }
     ) {
-        innerPadding ->
+            innerPadding ->
         Box(modifier = modifier
             .fillMaxSize()
             .padding(innerPadding)) {
@@ -119,35 +119,35 @@ fun MapScreen(
                     }
                 }
 
-            //viser pin på valgt lokasjon
-            uiState.selectedResult?.coordinate?.let { coord ->
-                val marker = rememberIconImage(
-                    key = R.drawable.plant_map_marker,
-                    painter = painterResource(id = R.drawable.plant_map_marker)
-                )
-                PointAnnotation(point = coord) {
-                    iconImage = marker
-                }
-            }
-
-            //Går gjennom savedPlaces lista og putter pins på kartet
-            savedPlaces.forEach { place ->
-
-                place.result.coordinate.let { coord ->
-                    val savedMarker = rememberIconImage(
+                //viser pin på valgt lokasjon
+                uiState.selectedResult?.coordinate?.let { coord ->
+                    val marker = rememberIconImage(
                         key = R.drawable.plant_map_marker,
                         painter = painterResource(id = R.drawable.plant_map_marker)
                     )
                     PointAnnotation(point = coord) {
-                        iconImage = savedMarker
-                        interactionsState.onClicked {
-                            viewModel.onSavedPlaceClicked(place)
-                            true
+                        iconImage = marker
+                    }
+                }
+
+                //Går gjennom savedPlaces lista og putter pins på kartet
+                savedPlaces.forEach { place ->
+
+                    place.result.coordinate.let { coord ->
+                        val savedMarker = rememberIconImage(
+                            key = R.drawable.plant_map_marker,
+                            painter = painterResource(id = R.drawable.plant_map_marker)
+                        )
+                        PointAnnotation(point = coord) {
+                            iconImage = savedMarker
+                            interactionsState.onClicked {
+                                viewModel.onSavedPlaceClicked(place)
+                                true
+                            }
                         }
                     }
                 }
             }
-        }
 
             Column(
                 modifier = Modifier
@@ -167,35 +167,35 @@ fun MapScreen(
             }
 
 
-        //Boks som spør om brukeren vil legge til lokasjonen i mine steder
-        // kun vises showSaveDialog er true, fra viewmodel
-        if (uiState.showSaveDialog) {
-            AlertDialog(
-                onDismissRequest = { viewModel.dismissSaveDialog() },
-                title = { Text("Lagre sted?") },
+            //Boks som spør om brukeren vil legge til lokasjonen i mine steder
+            // kun vises showSaveDialog er true, fra viewmodel
+            if (uiState.showSaveDialog) {
+                AlertDialog(
+                    onDismissRequest = { viewModel.dismissSaveDialog() },
+                    title = { Text("Lagre sted?") },
 
-                confirmButton = { TextButton(onClick = {viewModel.confirmSavePlace(savedPlacesViewModel)}) { Text("Ja") } },
-                dismissButton = {TextButton(onClick = {viewModel.dismissSaveDialog()}) { Text("Nei") }}
+                    confirmButton = { TextButton(onClick = {viewModel.confirmSavePlace(savedPlacesViewModel)}) { Text("Ja") } },
+                    dismissButton = {TextButton(onClick = {viewModel.dismissSaveDialog()}) { Text("Nei") }}
+                )
+            }
+        }
+
+
+        //viser planteinfocard når pin blir trykket på av brukeren
+        uiState.selectedSavedPlace?.let { place ->
+            PlaceInfoCard(
+                place = place,
+                onDismiss = { viewModel.dismissPlaceInfo() },
+                onEdit = { newName ->
+                    savedPlacesViewModel.updatePlace(place, newName)
+                    viewModel.dismissPlaceInfo()
+                },
+                onDelete = {
+                    savedPlacesViewModel.removePlace(place)
+                    viewModel.dismissPlaceInfo()
+                },
+                navController = navController as NavHostController
             )
         }
-        }
-
-
-    //viser planteinfocard når pin blir trykket på av brukeren
-    uiState.selectedSavedPlace?.let { place ->
-        PlaceInfoCard(
-            place = place,
-            onDismiss = { viewModel.dismissPlaceInfo() },
-            onEdit = { newName ->
-                savedPlacesViewModel.updatePlace(place, newName)
-                viewModel.dismissPlaceInfo()
-            },
-            onDelete = {
-                savedPlacesViewModel.removePlace(place)
-                viewModel.dismissPlaceInfo()
-            },
-            navController = navController as NavHostController
-        )
-    }
     }
 }
