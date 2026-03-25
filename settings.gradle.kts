@@ -25,7 +25,7 @@ dependencyResolutionManagement {
 
             credentials {
                 username = "mapbox"
-                password = "***FJERNET***"
+                password = providers.gradleProperty("MAPBOX_DOWNLOADS_TOKEN").get()
     }
 
 

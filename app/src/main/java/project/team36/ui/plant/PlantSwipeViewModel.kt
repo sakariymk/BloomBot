@@ -1,14 +1,13 @@
-package project.team36.ui.plante
+package project.team36.ui.plant
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import project.team36.data.plante.PlantRepository
-import project.team36.data.plante.PlantDataSource
-import project.team36.model.plante.PlantInfo
+import project.team36.data.plant.PlantRepository
+import project.team36.model.plant.PlantInfo
 
-class PlantSwipeViewModel(private val dtsource: PlantDataSource) : ViewModel() {
+class PlantSwipeViewModel(private val repository: PlantRepository) : ViewModel() {
 
     private val _uiState = MutableStateFlow<List<PlantInfo>>(emptyList())
     val uiState: StateFlow<List<PlantInfo>> = _uiState.asStateFlow()
@@ -18,7 +17,7 @@ class PlantSwipeViewModel(private val dtsource: PlantDataSource) : ViewModel() {
     }
 
     private fun loadPlants() {
-        _uiState.value = dtsource.fetchPlants()
+        _uiState.value = repository.InitiatePlants()
     }
 
     fun onLike() {

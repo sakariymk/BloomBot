@@ -1,3 +1,72 @@
+ class MapViewModelFactory(
+     private val repository: HybridAiRepository
+ ) : ViewModelProvider.Factory {
+     override fun <T : ViewModel> create(modelClass: Class<T>): T {
+         if (modelClass.isAssignableFrom(MapViewModel::class.java)) {
+             @Suppress("UNCHECKED_CAST")
+             return MapViewModel(repository) as T
+         }
+         throw IllegalArgumentException("Ukjent ViewModel klasse")
+     }
+ }
+
+
+ override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val dataSource = PlantDataSource(this)
+        val plantRepository = PlantRepository(dataSource)
+
+        val contentType = "application/json".toMediaType()
+        val jsonConfig = Json {
+            ignoreUnknownKeys = true
+            encodeDefaults = true
+            coerceInputValues = true
+        }
+
+        val okHttpClient = OkHttpClient.Builder()
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
+            .writeTimeout(60, TimeUnit.SECONDS)
+            .build()
+
+        val claudeRetrofit = Retrofit.Builder()
+            .baseUrl("https://api.anthropic.com/")
+            .client(okHttpClient)
+            .addConverterFactory(jsonConfig.asConverterFactory(contentType))
+            .build()
+        val claudeApi = claudeRetrofit.create(ClaudeApi::class.java)
+
+        val metRetrofit = Retrofit.Builder()
+            .baseUrl("https://api.met.no/")
+            .build()
+        val metWeatherApi = metRetrofit.create(MetWeatherApi::class.java)
+
+        val claudeKey = "***FJERNET***"
+        val frostClientId = "08b40da1-9456-4846-988a-e5283cf731cb"
+
+        val hybridAiRepository = HybridAiRepository(
+            claudeApi = claudeApi,
+            metWeatherApi = metWeatherApi,
+            plantDataSource = dataSource,
+            frostClientId = frostClientId,
+            claudeApiKey = claudeKey
+        )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 package project.team36.model.ai
 
 import kotlinx.serialization.Serializable

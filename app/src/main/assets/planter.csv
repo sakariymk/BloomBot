@@ -1,11 +1,4 @@
-Navn i rentekst, bruk dette navnet for bilde postfix og bildebeskrivelse
-bilde skal ligge i res/drawable mens beskrivelse skal ligge i assets,
-Legg inn SoilType med hver type dividert med ;",
-Legg inn LightType med hver type dividert med ";",
-Boolean for frostresistance,
-Boolean for Innendørsplante,
-Float for vann per uke,
-Se måned enum klasse med hver type divider med ";",w
-Se Zone enum klasse og velg minimums og maksimums zone med ";" mellom,
-Int for dager til blomst / høsting,
-unbothered,soil;clay,shade;partial;full,true,true,0.5,jan;feb;mar,H3;H7,40
+Navn,Jord,Lys,Frostsikker,Inneplante,VannPerUke,Plantemåned,Sone,Vekstdager
+Julestjerne,LOAM;SAND,PARTIAL,false,true,1.5,11,1,30
+Tulipan,CHALK;LOAM;SAND,FULL;PARTIAL,true,false,2.0,10,1;8,150
+Pelargonia,LOAM;SAND,FULL,false,false,1.0,5,1;3,60

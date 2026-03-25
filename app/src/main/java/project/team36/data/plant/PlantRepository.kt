@@ -1,6 +1,6 @@
-package project.team36.data.plante
+package project.team36.data.plant
 
-import project.team36.model.plante.PlantInfo
+import project.team36.model.plant.PlantInfo
 
 class PlantRepository(private val dataSource: PlantDataSource) {
     private var cachedPlants: List<PlantInfo> = emptyList()

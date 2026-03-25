@@ -1,4 +1,4 @@
-package project.team36.ui.plante
+package project.team36.ui.plant
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -12,15 +12,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-
-/**
- * FIL: PlantSwipeScreen.kt
- * TYPE: VANLIG FIL (Composable)
- */
+import androidx.navigation.NavController
+import project.team36.ui.plant.PlantSwipeViewModel
+import project.team36.ui.plant.PlantCard
 
 @Composable
 fun PlantSwipeScreen(
     viewModel: PlantSwipeViewModel,
+    navController: NavController,
     modifier: Modifier = Modifier
 ) {
     val plants by viewModel.uiState.collectAsState()
@@ -31,14 +30,15 @@ fun PlantSwipeScreen(
             .padding(bottom = 16.dp),
         contentAlignment = Alignment.Center
     ) {
-        if (plants != null) {
+        // VIKTIG FIKS: Sjekker at listen faktisk har innhold, ikke bare at den ikke er null!
+        if (plants.isNotEmpty()) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // Selve kortet
                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                    PlantCard(plante = plants[0])
+                    PlantCard(plant = plants[0])
                 }
 
                 // Handlingsknapper under kortet
@@ -72,6 +72,7 @@ fun PlantSwipeScreen(
                 }
             }
         } else {
+            // Denne teksten vises hvis CSV-filen er lest til slutten, eller hvis det var en feil i CSV-filen
             Text(
                 text = "Ingen flere planter å vise!",
                 style = MaterialTheme.typography.headlineSmall,
