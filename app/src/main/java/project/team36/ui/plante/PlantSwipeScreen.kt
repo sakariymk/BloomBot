@@ -31,7 +31,7 @@ fun PlantSwipeScreen(
             .padding(bottom = 16.dp),
         contentAlignment = Alignment.Center
     ) {
-        if (plants.isNotEmpty()) {
+        if (plants != null) {
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally

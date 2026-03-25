@@ -9,7 +9,7 @@ enum class Month { JAN, FEB, MAR, APR, MAY, JUN, JUL, AUG, SEP, OCT, NOV, DEC }
 enum class Zone { H1, H2, H3, H4, H5, H6, H7, H8}
 
 @Serializable
-data class PlanteInfo(
+data class PlantInfo(
     val name: String,
     val soil: Set<SoilType>,
     val light: Set<LightType>,

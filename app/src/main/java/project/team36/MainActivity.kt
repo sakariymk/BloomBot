@@ -42,7 +42,7 @@ class MapViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MapViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return MapViewModel(repository) as T
+            return MapViewModel() as T
         }
         throw IllegalArgumentException("Ukjent ViewModel klasse")
     }
@@ -103,7 +103,7 @@ class MainActivity : ComponentActivity() {
             Team36Theme {
                 var currentScreen by remember { mutableStateOf("map") }
 
-                val swipeViewModel = remember { PlantSwipeViewModel(plantRepository) }
+                val swipeViewModel = remember { PlantSwipeViewModel(dataSource) }
 
                 // Bruker fabrikken for å sikre at ViewModel får tilgang til AI-motoren
                 val mapViewModel: MapViewModel = viewModel(
@@ -133,7 +133,7 @@ class MainActivity : ComponentActivity() {
                         color = MaterialTheme.colorScheme.background
                     ) {
                         when (currentScreen) {
-                            "map" -> MapScreen(modifier = Modifier, viewModel = mapViewModel)
+                            //"map" -> MapScreen(modifier = Modifier, viewModel = mapViewModel)
                             "swipe" -> PlantSwipeScreen(viewModel = swipeViewModel)
                         }
                     }

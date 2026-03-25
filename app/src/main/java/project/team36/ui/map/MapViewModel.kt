@@ -1,61 +1,43 @@
 package project.team36.ui.map
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import android.util.Log
 import com.mapbox.maps.dsl.cameraOptions
 import com.mapbox.maps.extension.compose.animation.viewport.MapViewportState
-import com.mapbox.maps.plugin.animation.MapAnimationOptions
-import com.mapbox.search.ApiType
-import com.mapbox.search.ResponseInfo
-import com.mapbox.search.SearchEngine
 import com.mapbox.search.SearchEngineSettings
 import com.mapbox.search.SearchOptions
-import com.mapbox.search.SearchSelectionCallback
 import com.mapbox.search.SearchSuggestionsCallback
-import com.mapbox.search.result.SearchResult
 import com.mapbox.search.result.SearchSuggestion
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-import project.team36.data.ai.HybridAiRepository
+import com.mapbox.maps.plugin.animation.MapAnimationOptions
+import com.mapbox.search.result.SearchResult
+import com.mapbox.search.SearchSelectionCallback
+import com.mapbox.search.ApiType
+import com.mapbox.search.ResponseInfo
+import com.mapbox.search.SearchEngine
 
-// egen dataklasse for en lagret lokasjon
+
+//egen dataklasse for en lagret lokasjon
 data class SavedPlace(
     val result: SearchResult,
-    val customName: String // custom navn som brukeren har gitt til stedet
+    val customName: String //custom navn som brukeren har gitt til stedet
 )
-
 data class MapUiState(
     val centerLng: Double = 9.30,
     val centerLat: Double = 63.59,
     val zoom: Double = 4.3,
     val searchQuery: String = "",
     val suggestions: List<SearchSuggestion> = emptyList(),
-
-    val selectedResult: SearchResult? = null, // lagrer søkeresultat som brukeren har valgt
-    val savedPlaces: List<SavedPlace> = emptyList(), // liste med lagrede steder
-
-    // kontrollerer om "Legg til mine steder?" boksen er synlig på skjermen
-    val showSaveDialog: Boolean = false,
-
+    val selectedResult: SearchResult? = null, //lagrer søkeresultat som brukeren har valgt
+    val showSaveDialog: Boolean = false, //kontrollerer om "Legg til mine steder?" boksen er synlig på skjermen
     val placeNameInput: String = "",
-
-    val selectedSavedPlace: SavedPlace? = null,
-
-    // NYE VARIABLER FOR AI:
-    val isFetchingRecommendation: Boolean = false, // Viser en spinner når AI "tenker"
-    val aiRecommendation: String? = null           // Selve teksten fra Claude
+    val selectedSavedPlace: SavedPlace? = null
 )
 
 
-class MapViewModel(
-    // NB: I en ferdig app bruker man gjerne Hilt/Koin for å injisere denne.
-    // Inntil videre må du passe på at denne blir sendt inn når ViewModellen opprettes!
-    private val hybridAiRepository: HybridAiRepository?
-) : ViewModel() {
-
+class MapViewModel() : ViewModel() {
     private val _uiState = MutableStateFlow(MapUiState())
     val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()
 
@@ -97,11 +79,13 @@ class MapViewModel(
         }
     }
 
-    // når brukeren klikker på en suggestion i søket
+
+    //når brukeren klikker på en suggestion i søket
     fun handleSuggestionSelection(
         suggestion: SearchSuggestion,
         mapViewportState: MapViewportState,
     ) {
+
         searchEngine.select(suggestion, object : SearchSelectionCallback {
             override fun onResult(
                 suggestion: SearchSuggestion,
@@ -110,12 +94,12 @@ class MapViewModel(
             ) {
                 _uiState.value = _uiState.value.copy(
                     selectedResult = result,
-                    showSaveDialog = true, // trigger den boksen i UI
-                    searchQuery = result.name, // viser adressenavnet inni searchbar
-                    suggestions = emptyList() // gjør at søkelisten går vekk etter man har søkt
+                    showSaveDialog = true, //trigger den boksen i UI
+                    searchQuery = result.name, //viser adressenavnet inni searchbar
+                    suggestions = emptyList() //gjør at søkelisten går vekk etter man har søkt
                 )
 
-                // kameraet flyr til valgt lokasjon
+                //kameraet flyr til valgt lokasjon
                 val camera = cameraOptions {
                     center(result.coordinate)
                     zoom(14.0)
@@ -124,83 +108,40 @@ class MapViewModel(
                     .duration(2500L)
                     .build()
                 mapViewportState.flyTo(camera, animationOptions)
+
             }
 
+            //tomme funksjoner bare fordi SearchSelectionCallback krever å implementere disse(siden den er et interface)
             override fun onResults(suggestion: SearchSuggestion, results: List<SearchResult>, responseInfo: ResponseInfo) {}
             override fun onError(e: Exception) {}
             override fun onSuggestions(suggestions: List<SearchSuggestion>, responseInfo: ResponseInfo) {}
         })
     }
 
-    // hvis brukeren trykker "ja" på om de vil lagre stedet
-    fun confirmSavePlace() {
+    //hvis brukeren trykker "ja" på om de vil lagre stedet
+    fun confirmSavePlace(savedPlacesViewModel: SavedPlacesViewModel) {
         val result = _uiState.value.selectedResult ?: return
-        val name = _uiState.value.placeNameInput
+        val name = _uiState.value.placeNameInput.ifEmpty { result.name }
             .ifEmpty { result.name }
 
-        val savedPlace = SavedPlace(
-            result = result,
-            customName = name
-        )
+        val savedPlace = SavedPlace( result = result, customName = name)
 
-        _uiState.value = _uiState.value.copy(
-            savedPlaces = _uiState.value.savedPlaces + savedPlace, // legger til resultatet i savedPlaces
-            showSaveDialog = false // lukker den dialog boksen
-        )
+        savedPlacesViewModel.addPlace(savedPlace)
+
+        _uiState.value = _uiState.value.copy(showSaveDialog = false, placeNameInput = "")
     }
 
-    // hvis brukeren trykker "nei" på om de vil lagre stedet
+    //hvis brukeren trykker "nei" på om de vil lagre stedet
     fun dismissSaveDialog() {
-        _uiState.value = _uiState.value.copy(showSaveDialog = false)
+        _uiState.value = _uiState.value.copy(showSaveDialog = false, placeNameInput = "")
     }
 
-    // når brukeren trykker på en lagret plass/pin
+    //når brukeren trykker på en lagret plass/pin
     fun onSavedPlaceClicked(place: SavedPlace) {
         _uiState.value = _uiState.value.copy(selectedSavedPlace = place)
     }
 
     fun dismissPlaceInfo() {
         _uiState.value = _uiState.value.copy(selectedSavedPlace = null)
-    }
-
-    // --- NYE FUNKSJONER FOR AI ---
-
-    fun getPlantRecommendationForSelectedPlace() {
-        val place = _uiState.value.selectedSavedPlace ?: return
-
-        if (hybridAiRepository == null) {
-            _uiState.value = _uiState.value.copy(aiRecommendation = "AI Repository er ikke satt opp i ViewModellen ennå!")
-            return
-        }
-
-        // Start loading-indikator
-        _uiState.value = _uiState.value.copy(isFetchingRecommendation = true, aiRecommendation = null)
-
-        viewModelScope.launch {
-            try {
-                // Hent koordinatene fra Mapbox SearchResult
-                val lat = place.result.coordinate.latitude()
-                val lon = place.result.coordinate.longitude()
-
-                // Kall på vår Hybrid AI
-                val recommendation = hybridAiRepository.getPlantRecommendations(lat, lon)
-
-                // Oppdater UI med svaret og skru av loading
-                _uiState.value = _uiState.value.copy(
-                    isFetchingRecommendation = false,
-                    aiRecommendation = recommendation
-                )
-            } catch (e: Exception) {
-                // Håndter feil
-                _uiState.value = _uiState.value.copy(
-                    isFetchingRecommendation = false,
-                    aiRecommendation = "Klarte ikke hente anbefaling: ${e.message}"
-                )
-            }
-        }
-    }
-
-    fun dismissAiRecommendation() {
-        _uiState.value = _uiState.value.copy(aiRecommendation = null)
     }
 }

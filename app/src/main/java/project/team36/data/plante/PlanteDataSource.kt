@@ -5,8 +5,8 @@ import project.team36.model.plante.*
 
 class PlantDataSource(private val context: Context) {
 
-    fun fetchPlants(): List<PlanteInfo> {
-        val plants = mutableListOf<PlanteInfo>()
+    fun fetchPlants(): List<PlantInfo> {
+        val plants = mutableListOf<PlantInfo>()
 
         context.assets.open("planter.csv").bufferedReader().useLines { lines ->
             lines.drop(1).forEach { line ->
@@ -18,10 +18,10 @@ class PlantDataSource(private val context: Context) {
         }
         return plants
     }
-    private fun mapToPlant(tokens: List<String>): PlanteInfo {
+    private fun mapToPlant(tokens: List<String>): PlantInfo {
         val zones = tokens[7].trim().split(";")
         val name = tokens[0].trim().lowercase().replace(" ", "_")
-        return PlanteInfo(
+        return PlantInfo(
             name = tokens[0].trim(),
             soil = tokens[1].trim().split(";").map { SoilType.valueOf(it.trim().uppercase()) }.toSet(),
             light = tokens[2].trim().split(";").map { LightType.valueOf(it.trim().uppercase()) }.toSet(),

@@ -1,11 +1,11 @@
-Navn i rentekst,
+Navn i rentekst, bruk dette navnet for bilde postfix og bildebeskrivelse
+bilde skal ligge i res/drawable mens beskrivelse skal ligge i assets,
 Legg inn SoilType med hver type dividert med ;",
 Legg inn LightType med hver type dividert med ";",
 Boolean for frostresistance,
 Boolean for Innendørsplante,
-Int for minimumstemperatur,
-Float for vann per uke i milliliter,
-Se Seasons enum klasse med hver type divider med ";",
-Se Zone enum klasse og velg minimums og maksimums zone med ";" immelom,
-Int for humidity
-Eksempel1,soil;clay,shade;partial;full,true,true,5,0.5,spring,H3,70
+Float for vann per uke,
+Se måned enum klasse med hver type divider med ";",w
+Se Zone enum klasse og velg minimums og maksimums zone med ";" mellom,
+Int for dager til blomst / høsting,
+unbothered,soil;clay,shade;partial;full,true,true,0.5,jan;feb;mar,H3;H7,40

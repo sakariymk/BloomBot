@@ -5,19 +5,20 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import project.team36.data.plante.PlantRepository
-import project.team36.model.plante.PlanteInfo
+import project.team36.data.plante.PlantDataSource
+import project.team36.model.plante.PlantInfo
 
-class PlantSwipeViewModel(private val repository: PlantRepository) : ViewModel() {
+class PlantSwipeViewModel(private val dtsource: PlantDataSource) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<List<PlanteInfo>>(emptyList())
-    val uiState: StateFlow<List<PlanteInfo>> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow<List<PlantInfo>>(emptyList())
+    val uiState: StateFlow<List<PlantInfo>> = _uiState.asStateFlow()
 
     init {
         loadPlants()
     }
 
     private fun loadPlants() {
-        _uiState.value = repository.getAllPlants()
+        _uiState.value = dtsource.fetchPlants()
     }
 
     fun onLike() {

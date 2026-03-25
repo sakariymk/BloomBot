@@ -17,11 +17,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import project.team36.model.plante.LightType
-import project.team36.model.plante.PlanteInfo
+import project.team36.model.plante.PlantInfo
 
 @Composable
 fun PlantCard(
-    plante: PlanteInfo,
+    plante: PlantInfo,
     modifier: Modifier = Modifier
 ) {
     val sunScore = if (LightType.FULL in plante.light) 10 else if (LightType.PARTIAL in plante.light) 6 else 2
