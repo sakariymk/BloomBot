@@ -30,20 +30,14 @@ data class MapUiState(
     val zoom: Double = 4.3,
     val searchQuery: String = "",
     val suggestions: List<SearchSuggestion> = emptyList(),
-
     val selectedResult: SearchResult? = null, //lagrer søkeresultat som brukeren har valgt
-    val savedPlaces: List<SavedPlace> = emptyList(), //liste med lagrede steder
-
-    //kontrollerer om "Legg til mine steder?" boksen er synlig på skjermen
-    val showSaveDialog: Boolean = false,
-
+    val showSaveDialog: Boolean = false, //kontrollerer om "Legg til mine steder?" boksen er synlig på skjermen
     val placeNameInput: String = "",
-
     val selectedSavedPlace: SavedPlace? = null
 )
 
 
-class MapViewModel : ViewModel() {
+class MapViewModel() : ViewModel() {
     private val _uiState = MutableStateFlow(MapUiState())
     val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()
 
@@ -125,26 +119,21 @@ class MapViewModel : ViewModel() {
     }
 
     //hvis brukeren trykker "ja" på om de vil lagre stedet
-    fun confirmSavePlace() {
+    fun confirmSavePlace(savedPlacesViewModel: SavedPlacesViewModel) {
         val result = _uiState.value.selectedResult ?: return
-        val name = _uiState.value.placeNameInput
+        val name = _uiState.value.placeNameInput.ifEmpty { result.name }
             .ifEmpty { result.name }
 
-        val savedPlace = SavedPlace(
-            result = result,
-            customName = name
-        )
+        val savedPlace = SavedPlace( result = result, customName = name)
 
-        _uiState.value = _uiState.value.copy(
-            savedPlaces = _uiState.value.savedPlaces + savedPlace, //legger til resultatet i savedPlaces
-            showSaveDialog = false //lukker den dialog boksen
-        )
+        savedPlacesViewModel.addPlace(savedPlace)
+
+        _uiState.value = _uiState.value.copy(showSaveDialog = false, placeNameInput = "")
     }
 
     //hvis brukeren trykker "nei" på om de vil lagre stedet
     fun dismissSaveDialog() {
-        _uiState.value = _uiState.value.copy(
-            showSaveDialog = false)
+        _uiState.value = _uiState.value.copy(showSaveDialog = false, placeNameInput = "")
     }
 
     //når brukeren trykker på en lagret plass/pin

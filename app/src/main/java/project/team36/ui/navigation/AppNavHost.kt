@@ -1,0 +1,51 @@
+package project.team36.ui.navigation
+
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.NavHost
+import project.team36.ui.findplants.FindPlantsScreen
+import project.team36.ui.findplants.FindPlantsViewModel
+import project.team36.ui.map.MapScreen
+import project.team36.ui.map.MapViewModel
+import project.team36.ui.map.SavedPlacesViewModel
+import project.team36.ui.myplants.MyPlantsScreen
+
+@Composable
+fun AppNavHost(
+    modifier: Modifier = Modifier,
+    navController: NavHostController = rememberNavController()
+) {
+    val mapViewModel: MapViewModel = viewModel()
+    val findPlantsViewModel: FindPlantsViewModel = viewModel()
+    val savedPlacesViewModel: SavedPlacesViewModel = viewModel()
+
+    NavHost(
+        navController = navController,
+        startDestination = "map",
+        modifier = modifier
+    ){
+        composable("map") {
+            MapScreen(
+                modifier,
+                viewModel = mapViewModel,
+                navController = navController,
+                savedPlacesViewModel = savedPlacesViewModel
+            ) }
+        composable ("myPlants"){
+            MyPlantsScreen(
+                mapViewModel = mapViewModel,
+                navController = navController,
+                savedPlacesViewModel = savedPlacesViewModel
+            ) }
+        composable ("findPlants") {
+            FindPlantsScreen (
+                viewModel = findPlantsViewModel,
+                navController = navController
+            )
+        }
+    }
+}
