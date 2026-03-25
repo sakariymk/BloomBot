@@ -14,12 +14,18 @@ import project.team36.ui.map.MapScreen
 import project.team36.ui.map.MapViewModel
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.myplants.MyPlantsScreen
+import project.team36.ui.plant.PlantSwipeViewModel
 
 @Composable
 fun AppNavHost(
     modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController,
+    mapViewModel: MapViewModel,
+    findPlantsViewModel: FindPlantsViewModel,
+    savedPlacesViewModel: SavedPlacesViewModel,
+    swipeViewModel: PlantSwipeViewModel
 ) {
+    //TODO - fiks viewmodels i alle screens også
     val mapViewModel: MapViewModel = viewModel()
     val findPlantsViewModel: FindPlantsViewModel = viewModel()
     val savedPlacesViewModel: SavedPlacesViewModel = viewModel()

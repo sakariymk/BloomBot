@@ -1,5 +1,6 @@
 package project.team36.ui.plant
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -15,74 +16,145 @@ import project.team36.model.plant.PlantInfo
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.ui.tooling.preview.Preview
 import project.team36.R
+import project.team36.model.plant.LightType
+import project.team36.model.plant.SoilType
 
 @Composable
-fun PlantCard(plant: PlantInfo, modifier: Modifier = Modifier) {
-    Card(
-        modifier = modifier
+fun PlantCard(plant: PlantInfo) {
+    var expanded by remember { mutableStateOf(false) }
+
+    OutlinedCard(
+        modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            .padding(8.dp)
+            .animateContentSize()
     ) {
-        Column {
-            val imageId = if (plant.imageRes != 0) plant.imageRes else R.drawable.ic_launcher_background
+        Column (
+            modifier = Modifier.fillMaxWidth(),
+        ) {
 
-            Image(
-                painter = painterResource(id = imageId),
-                contentDescription = "Bilde av ${plant.name}",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp),
-                contentScale = ContentScale.Crop
-            )
+            val imageId = if (plant.imageRes != 0) plant.imageRes else R.drawable.defaultplant
 
-            Column(modifier = Modifier.padding(16.dp)) {
+            if (!expanded) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = plant.name,
-                        style = MaterialTheme.typography.headlineMedium
+                    Image(
+                        painter = painterResource(id = imageId),
+                        contentDescription = "Bilde av ${plant.name}",
+                        modifier = Modifier
+                            .size(80.dp)
+                            .padding(8.dp),
+                        contentScale = ContentScale.Crop
                     )
-                    if (plant.isFrostResistant) {
-                        Badge { Text("Tåler frost") }
-                    }
+                    Text(plant.name)
                 }
+            }
 
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(text = "Klimasone: H${plant.climateZone}", style = MaterialTheme.typography.bodyLarge)
-                Text(text = "Vannbehov: ${plant.waterPerWeek}L/uke", style = MaterialTheme.typography.bodyMedium)
-
-                Text(
-                    text = if (plant.hasBeenWatered) "Status: Vannet" else "Status: Trenger vann",
-                    color = if (plant.hasBeenWatered) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.labelLarge
+            if (expanded) {
+                Image(
+                    painter = painterResource(id = imageId),
+                    contentDescription = "Bilde av ${plant.name}",
+                    modifier = Modifier
+                        .fillMaxWidth(0.3f)
+                        .align(Alignment.CenterHorizontally),
+                    contentScale = ContentScale.Crop
                 )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(text = "Jordtyper:", style = MaterialTheme.typography.labelSmall)
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    items(plant.soil.toList()) { soil ->
-                        SuggestionChip(onClick = {}, label = { Text(soil.name) })
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = plant.name,
+                            style = MaterialTheme.typography.headlineMedium
+                        )
+                        if (plant.isFrostResistant) {
+                            Badge { Text("Tåler frost") }
+                        }
                     }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(text = "Klimasone: H${plant.climateZone}", style = MaterialTheme.typography.bodyLarge)
+                    Text(text = "Vannbehov: ${plant.waterPerWeek} ganger per uke", style = MaterialTheme.typography.bodyMedium)
+
+                    Text(
+                        text = if (plant.hasBeenWatered) "Status: Vannet" else "Status: Trenger vann",
+                        color = if (plant.hasBeenWatered) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.labelLarge
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(text = "Jordtyper:", style = MaterialTheme.typography.labelSmall)
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        items(plant.soil.toList()) { soil ->
+                            SuggestionChip(onClick = {}, label = { Text(soil.name) })
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = plant.description,
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 3
+                    )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = plant.description,
-                    style = MaterialTheme.typography.bodySmall,
-                    maxLines = 3
+            }
+            IconButton(
+                onClick = { expanded = !expanded },
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .size(36.dp)
+            ) {
+                Icon(
+                    imageVector = if (expanded) Icons.Default.ExpandLess
+                    else Icons.Default.ExpandMore,
+                    contentDescription = if (expanded) "Lukk" else "Åpne"
                 )
             }
+
         }
+    }
+}
+
+
+@Preview
+@Composable
+fun PlantCardPreview() {
+    MaterialTheme {
+        PlantCard(
+            plant = PlantInfo(
+                name = "Tulipan",
+                soil = setOf(SoilType.LOAM, SoilType.CLAY),
+                light = setOf(LightType.FULL),
+                isFrostResistant = false,
+                waterPerWeek = 2.0f,
+                plantingMonth = setOf(4, 5),
+                climateZone = 3,
+                hasBeenWatered = false,
+                daysSinceWatered = 0,
+                maxDaysWithoutWater = 7,
+                imageRes = R.drawable.defaultplant,
+                description = "En klassisk hageplante med vakre blomster."
+            )
+        )
     }
 }
 
