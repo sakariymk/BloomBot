@@ -9,8 +9,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
-import project.team36.ui.map.MapScreen
-import project.team36.ui.map.SavedPlacesViewModel
+
+
+import project.team36.ui.navigation.AppNavHost
 import project.team36.ui.theme.Team36Theme
 
 class MainActivity : ComponentActivity() {
@@ -19,26 +20,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Team36Theme {
-                val savedPlacesViewModel: SavedPlacesViewModel = viewModel() //MapScreen og MyPlantsScreen skal dele på denne
-                MapScreen(savedPlacesViewModel = savedPlacesViewModel)
+                //MapScreen()
+                AppNavHost()
                 }
             }
         }
     }
-
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    Team36Theme {
-        Greeting("Android")
-    }
-}
