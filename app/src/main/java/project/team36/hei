@@ -1,0 +1,288 @@
+package project.team36.model.ai
+
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
+
+@Serializable
+data class ClaudeRequest(
+    val model: String = "claude-3-haiku-20240307", // Denne modellen har alle tilgang til
+    val max_tokens: Int = 1024,
+    val system: String? = null,
+    val messages: List<ClaudeMessage>,
+    val tools: List<ClaudeTool>? = null
+)
+
+@Serializable
+data class ClaudeMessage(
+    val role: String,
+    val content: List<ContentBlock>
+)
+
+@Serializable
+data class ContentBlock(
+    val type: String,
+    val text: String? = null,
+    val id: String? = null,
+    val name: String? = null,
+    val input: JsonElement? = null,
+    val tool_use_id: String? = null,
+    val content: String? = null
+)
+
+@Serializable
+data class ClaudeTool(
+    val name: String,
+    val description: String,
+    val input_schema: ToolInputSchema
+)
+
+@Serializable
+data class ToolInputSchema(
+    val type: String,
+    val properties: Map<String, PropertyDefinition>,
+    val required: List<String>
+)
+
+@Serializable
+data class PropertyDefinition(
+    val type: String,
+    val description: String
+)
+
+@Serializable
+data class ClaudeResponse(
+    val id: String? = null,
+    val role: String? = null,
+    val content: List<ContentBlock> = emptyList(),
+    val stop_reason: String? = null
+)
+
+
+
+                val toolBlock = response.content.first { it.type == "tool_use" }
+                val toolId = toolBlock.id ?: ""
+                val toolName = toolBlock.name ?: ""
+
+                // Hent koordinater fra Claudes ønske (eller bruk de vi har)
+                val inputJson = toolBlock.input?.jsonObject
+                val rLat = inputJson?.get("latitude")?.jsonPrimitive?.double ?: lat
+                val rLon = inputJson?.get("longitude")?.jsonPrimitive?.double ?: lon
+
+                println("DEBUG: Claude bruker verktøy: $toolName")
+
+                val resultText = when (toolName) {
+                    "get_current_frost_status" -> {
+                        val station = getNearestStation(rLat, rLon, frostClientId)
+                        if (station != null) {
+                            "Temperatur på stasjon ${station.name}: ${getTemperatures(station.id, frostClientId)}°C"
+                        } else "Fant ingen målestasjon i nærheten."
+                    }
+                    "weatherforecast" -> {
+                        val metRes = metWeatherApi.getWeather(rLat, rLon)
+                        if (metRes.isSuccessful) {
+                            metRes.body()?.string()?.take(800) ?: "Værdata var tom."
+                        } else "Kunne ikke hente værdata fra MET."
+                    }
+                    else -> "Ukjent verktøy ble forespurt."
+                }
+
+                // Legg til assistentens svar og verktøy-resultatet i samtalen
+                conversation.add(ClaudeMessage(role = "assistant", content = response.content))
+                conversation.add(
+                    ClaudeMessage(
+                        role = "user",
+                        content = listOf(
+                            ContentBlock(
+                                type = "tool_result",
+                                tool_use_id = toolId,
+                                content = resultText
+                            )
+                        )
+                    )
+                )
+
+                // ANDRE KALL: Send dataene tilbake til Claude for endelig svar
+                response = claudeApi.sendMessage(
+                    apiKey = claudeApiKey,
+                    request = ClaudeRequest(
+                        model = "claude-sonnet-4-6",
+                        system = systemPrompt,
+                        messages = conversation
+                    )
+                )
+            }
+
+            // Returner det endelige tekstsvaret
+            response.content.firstOrNull { it.type == "text" }?.text ?: "AI-en ga et svar uten tekst."
+
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string() ?: ""
+            "AI-feil (${e.code()}): $errorBody"
+        } catch (e: Exception) {
+            "Noe gikk galt: ${e.message}"
+        }
+    }
+}
+
+
+
+
+package project.team36.data.ai
+
+import kotlinx.serialization.json.*
+import project.team36.data.klima.MetWeatherApi
+import project.team36.data.klima.frost.getNearestStation
+import project.team36.data.klima.frost.getTemperatures
+import project.team36.data.plante.PlantDataSource
+import project.team36.model.ai.*
+import retrofit2.HttpException
+
+class HybridAiRepository(
+    private val claudeApi: ClaudeApi,
+    private val metWeatherApi: MetWeatherApi,
+    private val plantDataSource: PlantDataSource,
+    private val frostClientId: String,
+    private val claudeApiKey: String
+) {
+
+    private val frostTool = ClaudeTool(
+        name = "get_current_frost_status",
+        description = "Henter nåværende temperatur (der og da) for en spesifikk geografisk lokasjon. Bruk denne for å sjekke status på eksisterende planter.",
+        input_schema = ToolInputSchema(
+            type = "object",
+            properties = mapOf(
+                "latitude" to PropertyDefinition("number", "Breddegrad (f.eks. 59.91)"),
+                "longitude" to PropertyDefinition("number", "Lengdegrad (f.eks. 10.75)")
+            ),
+            required = listOf("latitude", "longitude")
+        )
+    )
+
+    private val weatherTool = ClaudeTool(
+        name = "weatherforecast",
+        description = "Henter værmelding for en spesifikk geografisk lokasjon.",
+        input_schema = ToolInputSchema(
+            type = "object",
+            properties = mapOf(
+                "latitude" to PropertyDefinition("number", "Breddegrad"),
+                "longitude" to PropertyDefinition("number", "Lengdegrad")
+            ),
+            required = listOf("latitude", "longitude")
+        )
+    )
+
+    suspend fun getPlantRecommendations(lat: Double, lon: Double): String {
+
+        val plants = try {
+            plantDataSource.fetchPlants()
+        } catch (e: Exception) {
+            return "Feil under lesing av lokale planter: ${e.message}"
+        }
+
+        val plantsText = plants.take(10).joinToString("\n") {
+            "- ${it.name}: Sone ${it.minZone}-${it.maxZone}, Frostsikker: ${it.isFrostResistant}"
+        }
+
+        val allTools = listOf(frostTool, weatherTool)
+
+        val systemPrompt = """
+            Du er en hageekspert. Brukeren er på koordinatene Lat: $lat, Lon: $lon.
+            Bruk verktøyene du har fått for å hente været.
+            - Bruk 'weatherforecast' hvis brukeren vil ha fremtidsvarsel for nye planter.
+            - Bruk 'get_current_frost_status' for å sjekke om det er frost der og da.
+            Sammenlign deretter været med denne plantedatabasen og gi en kort anbefaling:
+            $plantsText
+        """.trimIndent()
+
+        val conversation = mutableListOf(
+            ClaudeMessage(
+                role = "user",
+                content = listOf(ContentBlock(type = "text", text = "Hva bør jeg plante her, og hvordan er været?"))
+            )
+        )
+
+        // 1. FØRSTE CLAUDE-KALL: Her fanger vi opp om Claude krasjer!
+        var response: ClaudeResponse
+        try {
+            response = claudeApi.sendMessage(
+                apiKey = claudeApiKey,
+                request = ClaudeRequest(
+                    system = systemPrompt,
+                    messages = conversation,
+                    tools = allTools
+                )
+            )
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string() ?: "Ingen detaljer"
+            return "Feil fra Claude (Første kall): HTTP ${e.code()} - $errorBody"
+        } catch (e: Exception) {
+            return "Nettverkskrasj mot Claude: ${e.message}"
+        }
+
+        if (response.stop_reason == "tool_use") {
+            val toolBlock = response.content.first { it.type == "tool_use" }
+            val toolName = toolBlock.name ?: ""
+            val toolId = toolBlock.id ?: ""
+
+            val inputJson = toolBlock.input?.jsonObject
+            val requestedLat = inputJson?.get("latitude")?.jsonPrimitive?.double ?: lat
+            val requestedLon = inputJson?.get("longitude")?.jsonPrimitive?.double ?: lon
+
+            var toolResultText = ""
+
+            if (toolName == "get_current_frost_status") {
+                // 2. FROST API-KALL: Her fanger vi opp om Frost-koden deres krasjer!
+                try {
+                    val station = getNearestStation(requestedLat, requestedLon, frostClientId)
+                    if (station != null) {
+                        val temp = getTemperatures(station.id, frostClientId)
+                        toolResultText = "Nåværende temperatur på ${station.name} er $temp grader."
+                    } else {
+                        toolResultText = "Fant ingen målestasjon i nærheten."
+                    }
+                } catch (e: Exception) {
+                    toolResultText = "Frost API feilet (Sjekk URL/Keys i Frost.kt): ${e.message}"
+                }
+            } else if (toolName == "weatherforecast") {
+                // 3. MET API-KALL
+                try {
+                    val metResponse = metWeatherApi.getWeather(lat = requestedLat, lon = requestedLon)
+                    if (metResponse.isSuccessful) {
+                        val json = metResponse.body()?.string() ?: ""
+                        toolResultText = "Værdata fra MET (forkortet JSON): ${json.take(1000)}"
+                    } else {
+                        toolResultText = "Feilkode fra MET API: ${metResponse.code()}"
+                    }
+                } catch (e: Exception) {
+                    toolResultText = "Klarte ikke hente værdata fra MET: ${e.message}"
+                }
+            }
+
+            conversation.add(ClaudeMessage(role = "assistant", content = response.content))
+            conversation.add(
+                ClaudeMessage(
+                    role = "user",
+                    content = listOf(ContentBlock(type = "tool_result", tool_use_id = toolId, content = toolResultText))
+                )
+            )
+
+            // 4. ANDRE CLAUDE-KALL: Fanger feil her også
+            try {
+                response = claudeApi.sendMessage(
+                    apiKey = claudeApiKey,
+                    request = ClaudeRequest(
+                        system = systemPrompt,
+                        messages = conversation
+                    )
+                )
+            } catch (e: HttpException) {
+                val errorBody = e.response()?.errorBody()?.string() ?: "Ingen detaljer"
+                return "Feil fra Claude (Andre kall): HTTP ${e.code()} - $errorBody"
+            } catch (e: Exception) {
+                return "Nettverkskrasj mot Claude del 2: ${e.message}"
+            }
+        }
+
+        return response.content.firstOrNull { it.type == "text" }?.text ?: "Beklager, klarte ikke generere et svar."
+    }
+}

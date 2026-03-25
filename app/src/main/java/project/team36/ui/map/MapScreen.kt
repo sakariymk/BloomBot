@@ -1,40 +1,27 @@
 package project.team36.ui.map
 
-import PlaceInfoCard
 import android.Manifest
-import android.R.attr.text
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.mapbox.geojson.Point
-import com.mapbox.maps.extension.compose.MapboxMap
-import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.mapbox.geojson.Point
 import com.mapbox.maps.extension.compose.MapEffect
+import com.mapbox.maps.extension.compose.MapboxMap
+import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
 import com.mapbox.maps.extension.compose.annotation.generated.PointAnnotation
 import com.mapbox.maps.extension.compose.annotation.rememberIconImage
-import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
 import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
 import com.mapbox.maps.plugin.locationcomponent.location
 import project.team36.R
@@ -64,13 +51,12 @@ fun MapScreen(
         }
     }
 
-
     Box(modifier = modifier.fillMaxSize()) {
-        //dette er selve kartet
+        // dette er selve kartet
         MapboxMap(
             modifier = modifier.fillMaxSize(),
             mapViewportState = mapViewportState,
-            scaleBar = {} //disabler den scale bar
+            scaleBar = {} // disabler den scale bar
         ) {
             if (locationPermissionState.status.isGranted) {
                 @Suppress("COMPOSE_APPLIER_CALL_MISMATCH")
@@ -84,7 +70,7 @@ fun MapScreen(
                 }
             }
 
-            //viser pin på valgt lokasjon
+            // viser pin på valgt lokasjon
             uiState.selectedResult?.coordinate?.let { coord ->
                 val marker = rememberIconImage(
                     key = R.drawable.plant_map_marker,
@@ -95,9 +81,8 @@ fun MapScreen(
                 }
             }
 
-            //Går gjennom savedPlaces lista og putter pins på kartet
+            // Går gjennom savedPlaces lista og putter pins på kartet
             uiState.savedPlaces.forEach { place ->
-
                 place.result.coordinate.let { coord ->
                     val savedMarker = rememberIconImage(
                         key = R.drawable.plant_map_marker,
@@ -116,7 +101,7 @@ fun MapScreen(
 
         Column(
             modifier = Modifier
-                .align (Alignment.TopCenter)
+                .align(Alignment.TopCenter)
                 .padding(top = 48.dp)
                 .fillMaxWidth()
         ) {
@@ -126,33 +111,48 @@ fun MapScreen(
                 suggestions = uiState.suggestions,
                 onSuggestionClicked = { viewModel.handleSuggestionSelection(it, mapViewportState) },
                 modifier = Modifier
-                    .padding( start = 16.dp, end = 16.dp)
+                    .padding(start = 16.dp, end = 16.dp)
                     .wrapContentHeight()
             )
         }
 
-
-        //Boks som spør om brukeren vil legge til lokasjonen i mine steder
-        // kun vises showSaveDialog er true, fra viewmodel
+        // Boks som spør om brukeren vil legge til lokasjonen i mine steder
         if (uiState.showSaveDialog) {
             AlertDialog(
                 onDismissRequest = { viewModel.dismissSaveDialog() },
                 title = { Text("Lagre sted?") },
-
-                confirmButton = { TextButton(onClick = {viewModel.confirmSavePlace()}) { Text("Ja") } },
-
-                dismissButton = {TextButton(onClick = {viewModel.dismissSaveDialog()}) { Text("Nei") }}
+                confirmButton = { TextButton(onClick = { viewModel.confirmSavePlace() }) { Text("Ja") } },
+                dismissButton = { TextButton(onClick = { viewModel.dismissSaveDialog() }) { Text("Nei") } }
             )
         }
     }
 
-
-    //viser planteinfocard når pin blir trykket på av brukeren
+    // Viser planteinfocard når pin blir trykket på av brukeren
     uiState.selectedSavedPlace?.let { place ->
         PlaceInfoCard(
             place = place,
-            onDismiss = { viewModel.dismissPlaceInfo() }
+            isFetchingRecommendation = uiState.isFetchingRecommendation,
+            onDismiss = { viewModel.dismissPlaceInfo() },
+            onGetRecommendationClicked = { viewModel.getPlantRecommendationForSelectedPlace() }
         )
     }
 
+    // Viser resultatet fra Claude når det er klart!
+    uiState.aiRecommendation?.let { recommendationText ->
+        AlertDialog(
+            onDismissRequest = { viewModel.dismissAiRecommendation() },
+            title = { Text("AI Planteanbefaling") },
+            text = {
+                val scrollState = rememberScrollState()
+                Box(modifier = Modifier.verticalScroll(scrollState).padding(8.dp)) {
+                    Text(text = recommendationText, fontSize = 15.sp)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { viewModel.dismissAiRecommendation() }) {
+                    Text("Lukk")
+                }
+            }
+        )
+    }
 }
