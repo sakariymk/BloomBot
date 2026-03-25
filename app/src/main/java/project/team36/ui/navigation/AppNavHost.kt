@@ -11,8 +11,8 @@ import project.team36.ui.findplants.FindPlantsScreen
 import project.team36.ui.findplants.FindPlantsViewModel
 import project.team36.ui.map.MapScreen
 import project.team36.ui.map.MapViewModel
+import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.myplants.MyPlantsScreen
-import project.team36.ui.myplants.MyPlantsViewModel
 
 @Composable
 fun AppNavHost(
@@ -20,8 +20,8 @@ fun AppNavHost(
     navController: NavHostController = rememberNavController()
 ) {
     val mapViewModel: MapViewModel = viewModel()
-    val myPlantsViewModel: MyPlantsViewModel = viewModel()
     val findPlantsViewModel: FindPlantsViewModel = viewModel()
+    val savedPlacesViewModel: SavedPlacesViewModel = viewModel()
 
     NavHost(
         navController = navController,
@@ -32,13 +32,14 @@ fun AppNavHost(
             MapScreen(
                 modifier,
                 viewModel = mapViewModel,
-                navController = navController
+                navController = navController,
+                savedPlacesViewModel = savedPlacesViewModel
             ) }
         composable ("myPlants"){
             MyPlantsScreen(
-                viewModel = myPlantsViewModel,
                 mapViewModel = mapViewModel,
-                navController = navController
+                navController = navController,
+                savedPlacesViewModel = savedPlacesViewModel
             ) }
         composable ("findPlants") {
             FindPlantsScreen (
