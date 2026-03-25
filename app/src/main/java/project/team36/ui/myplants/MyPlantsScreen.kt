@@ -21,19 +21,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import project.team36.ui.map.SavedPlace
+import project.team36.ui.map.SavedPlacesViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyPlantsScreen (
-    viewModel: MyPlantsViewModel = viewModel(),
     mapViewModel: MapViewModel,
-    navController: NavController
+    navController: NavController,
+    savedPlacesViewModel: SavedPlacesViewModel
 ) {
 
     // for å få tak i liste over lagrede steder fra MapViewModel
+    var selectedPlace by remember { mutableStateOf<SavedPlace?>(null) }
+    val savedPlaces by savedPlacesViewModel.savedPlaces.collectAsState()
     val uiState by mapViewModel.uiState.collectAsState()
-    val savedPlaces = uiState.savedPlaces
-    var selectedPlace by remember { mutableStateOf<SavedPlace?>(null) } // hardkodet, byttes ut når viewmodel er utviklet
 
     Scaffold(
         topBar = {
@@ -70,9 +71,9 @@ fun MyPlantsScreen (
         ) {
             item {
                 PlaceDropdown(
+                    selectedPlace = selectedPlace,
                     savedPlaces = savedPlaces,
-                    selectedPlace = null,
-                    onPlaceSelected = { selectedPlace = it }
+                    onPlaceSelected = { selectedPlace = it },
                 )
             }
 
