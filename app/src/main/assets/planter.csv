@@ -3,9 +3,10 @@ bilde skal ligge i res/drawable mens beskrivelse skal ligge i assets,
 Legg inn SoilType med hver type dividert med ;",
 Legg inn LightType med hver type dividert med ";",
 Boolean for frostresistance,
-Boolean for Innendørsplante,
-Float for vann per uke,
-Se måned enum klasse med hver type divider med ";",w
-Se Zone enum klasse og velg minimums og maksimums zone med ";" mellom,
-Int for dager til blomst / høsting,
-unbothered,soil;clay,shade;partial;full,true,true,0.5,jan;feb;mar,H3;H7,40
+Float for vanninger per uke,
+Legg inn to ints, en for startmåned og en for sluttmåned dividert med ";".
+Legg inn et tall opp til 8 for klimasone,
+Boolean for har blit vannet,
+Int for dager siden vanning,
+Int for maximum dager uten vann,
+unbothered,soil;clay,shade;partial;full,true,0.5,3;6,4,true,3,5

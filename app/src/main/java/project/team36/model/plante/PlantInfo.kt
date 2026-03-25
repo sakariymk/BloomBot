@@ -4,9 +4,7 @@ import kotlinx.serialization.Serializable
 
 enum class SoilType { SOIL, CHALK, CLAY, LOAM, SAND }
 enum class LightType { SHADE, PARTIAL, FULL }
-enum class Month { JAN, FEB, MAR, APR, MAY, JUN, JUL, AUG, SEP, OCT, NOV, DEC }
 
-enum class Zone { H1, H2, H3, H4, H5, H6, H7, H8}
 
 @Serializable
 data class PlantInfo(
@@ -14,12 +12,13 @@ data class PlantInfo(
     val soil: Set<SoilType>,
     val light: Set<LightType>,
     val isFrostResistant: Boolean,
-    val isIndoor: Boolean,
     val waterPerWeek: Float,
-    val plantingMonth: Month,
-    val minZone: Zone,
-    val maxZone: Zone,
-    val growthdays: Int,
+    val plantingMonth: Set<Int>,
+    val climateZone: Int,
+    val hasBeenWatered: Boolean,
+    val daysSinceWatered: Int,
+    val maxDaysWithoutWater: Int,
     val imageRes: Int,
-    val beskrivelse: String,
+    val description: String,
+
     )
