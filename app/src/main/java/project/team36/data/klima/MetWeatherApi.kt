@@ -34,7 +34,7 @@ interface MetWeatherApi {
         @Query("lon") lon: Double,
 
         // MET har et strengt krav om at alle anrop må identifisere seg med en User-Agent.
-        // Jeg har hardkodet vår Team36-identifikator her for å sikre at vi ikke blir blokkert.
+        //.
         @Header("User-Agent") userAgent: String = "Team36PlantApp/1.0 (test@example.com)"
 
         // Jeg velger å hente tilbake en rå ResponseBody fordi MET sender mye data,
