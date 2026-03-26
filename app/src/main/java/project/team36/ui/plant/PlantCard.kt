@@ -28,6 +28,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.tooling.preview.Preview
 import project.team36.R
 import project.team36.model.plant.LightType
@@ -38,7 +39,8 @@ fun PlantCard(
     plant: PlantInfo,
     showPlantStatus: Boolean = false, //kort som vises på MinePlanter
     showAddButton: Boolean = false, //Kort som vises på VelgPlanter
-    onAddPlant: (() -> Unit)? = null
+    onAddPlant: (() -> Unit)? = null,
+    onDeletePlant: (() -> Unit)? = null
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -149,6 +151,19 @@ fun PlantCard(
                                 .align(Alignment.End)
                                 .padding(top = 8.dp)
                         ) { Text("Legg til") }
+                    }
+
+                    if (onDeletePlant != null) {
+                        Button(
+                            onClick = { onDeletePlant() },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.Red,
+                                contentColor = Color.Black
+                            ),
+                            modifier = Modifier
+                                .align(Alignment.End)
+                                .padding(top = 8.dp)
+                        ) { Text("Slett") }
                     }
                 }
 

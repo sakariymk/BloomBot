@@ -89,12 +89,19 @@ fun MyPlantsScreen(
             }
 
             items(plantsForSelectedPlace) { plant: PlantInfo ->
-                PlantCard(plant = plant)
+                PlantCard(
+                    plant = plant,
+                    onDeletePlant = {
+                        selectedPlace?.let {
+                            savedPlacesViewModel.removePlantFromPlace(it, plant)
+                        }
+                    }
+                )
             }
 
             item {
                 Button(
-                    // ENDRET: åpner dialog i stedet for å legge til direkte
+                    //åpner dialog i stedet for å legge til direkte
                     onClick = {
                         if (selectedPlace != null) myPlantsViewModel.openPlantPicker()
                     },

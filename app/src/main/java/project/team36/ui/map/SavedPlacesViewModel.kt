@@ -36,4 +36,10 @@ class SavedPlacesViewModel : ViewModel() {
             if (it.id == place.id) it.copy(plants = it.plants + plant) else it
         }
     }
+
+    fun removePlantFromPlace(place: SavedPlace, plant: PlantInfo) {
+        _savedPlaces.value = _savedPlaces.value.map {
+            if (it.id == place.id) it.copy(plants = it.plants - plant) else it
+        }
+    }
 }
