@@ -13,75 +13,104 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import project.team36.model.plant.PlantInfo
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import project.team36.R
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.ui.text.style.TextAlign
+import project.team36.model.plant.LightType
 
 @Composable
-fun PlantCard(plant: PlantInfo, modifier: Modifier = Modifier) {
+fun PlantCard(
+    plante: PlantInfo,
+    modifier: Modifier = Modifier
+) {
+    val sunScore = if (LightType.FULL in plante.light) 10 else if (LightType.PARTIAL in plante.light) 6 else 2
+
+    val waterScore = (plante.waterPerWeek * 2).toInt().coerceIn(1, 10)
+
+    val hardinessScore = plante.climateZone.coerceIn(1, 10)
+
+    val frostScore = if (plante.isFrostResistant) 10 else 2
+
+    val overallScore = (sunScore + waterScore + hardinessScore + frostScore) / 4
+
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            .padding(16.dp),
+        shape = RoundedCornerShape(32.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        border = BorderStroke(4.dp, Color.Black)
     ) {
-        Column {
-            val imageId = if (plant.imageRes != 0) plant.imageRes else R.drawable.ic_launcher_background
-
-            Image(
-                painter = painterResource(id = imageId),
-                contentDescription = "Bilde av ${plant.name}",
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp),
-                contentScale = ContentScale.Crop
+                    .height(150.dp)
+                    .background(Color.LightGray),
+                contentAlignment = Alignment.Center
+            ) {
+                if (plante.imageRes != 0) {
+                    Image(
+                        painter = painterResource(id = plante.imageRes),
+                        contentDescription = plante.name,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Icon(Icons.Default.Info, contentDescription = "Bilde mangler", tint = Color.Gray)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = plante.name,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
             )
 
-            Column(modifier = Modifier.padding(16.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = plant.name,
-                        style = MaterialTheme.typography.headlineMedium
-                    )
-                    if (plant.isFrostResistant) {
-                        Badge { Text("Tåler frost") }
-                    }
-                }
+            Spacer(modifier = Modifier.height(8.dp))
 
-                Spacer(modifier = Modifier.height(8.dp))
+            HorizontalDivider(thickness = 4.dp, color = Color.Black)
 
-                Text(text = "Klimasone: H${plant.climateZone}", style = MaterialTheme.typography.bodyLarge)
-                Text(text = "Vannbehov: ${plant.waterPerWeek}L/uke", style = MaterialTheme.typography.bodyMedium)
+            Spacer(modifier = Modifier.height(12.dp))
 
-                Text(
-                    text = if (plant.hasBeenWatered) "Status: Vannet" else "Status: Trenger vann",
-                    color = if (plant.hasBeenWatered) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.labelLarge
-                )
+            Text(
+                text = plante.description,
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(horizontal = 8.dp),
+                maxLines = 4
+            )
 
-                Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-                Text(text = "Jordtyper:", style = MaterialTheme.typography.labelSmall)
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    items(plant.soil.toList()) { soil ->
-                        SuggestionChip(onClick = {}, label = { Text(soil.name) })
-                    }
-                }
+            SegmentedProgressBar(label = "Solbehov", value = sunScore)
+            SegmentedProgressBar(label = "Vannmengde", value = waterScore)
+            SegmentedProgressBar(label = "Hardførhet (Sone)", value = hardinessScore)
+            SegmentedProgressBar(label = "Frosttålelig", value = frostScore)
 
-                Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-                Text(
-                    text = plant.description,
-                    style = MaterialTheme.typography.bodySmall,
-                    maxLines = 3
-                )
-            }
+            Text(text = "Totalvurdering:", fontSize = 16.sp)
+            Text(
+                text = "$overallScore/10",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
