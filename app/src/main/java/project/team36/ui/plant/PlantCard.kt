@@ -39,6 +39,7 @@ fun PlantCard(plant: PlantInfo) {
             .fillMaxWidth()
             .padding(8.dp)
             .animateContentSize()
+            .height(if (expanded) 400.dp else 100.dp)
     ) {
         Column (
             modifier = Modifier.fillMaxWidth(),

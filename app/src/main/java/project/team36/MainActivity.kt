@@ -37,9 +37,9 @@ import project.team36.ui.map.MapScreen
 import project.team36.ui.map.MapViewModel
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.navigation.AppNavHost
-import project.team36.ui.plant.PlantSwipeViewModel
+//import project.team36.ui.plant.PlantSwipeViewModel
 import project.team36.ui.theme.Team36Theme
-import project.team36.ui.plant.PlantSwipeScreen
+//import project.team36.ui.plant.PlantSwipeScreen
 
 class MapViewModelFactory(
     private val repository: HybridAiRepository
@@ -104,7 +104,7 @@ class MainActivity : ComponentActivity() {
                 // Initialiserer ViewModels
                 val savedPlacesViewModel: SavedPlacesViewModel = viewModel()
                 val findPlantsViewModel: FindPlantsViewModel = viewModel()
-                val swipeViewModel = remember { PlantSwipeViewModel(plantRepository) }
+                //val swipeViewModel = remember { PlantSwipeViewModel(plantRepository) }
                 val mapViewModel: MapViewModel = viewModel(
                     factory = MapViewModelFactory(hybridAiRepository)
                 )
@@ -113,47 +113,9 @@ class MainActivity : ComponentActivity() {
                     navController = navController,
                     mapViewModel = mapViewModel,
                     findPlantsViewModel = findPlantsViewModel,
-                    savedPlacesViewModel = savedPlacesViewModel,
-                    swipeViewModel = swipeViewModel
+                    savedPlacesViewModel = savedPlacesViewModel
+                    //swipeViewModel = swipeViewModel
                 )
-//                // Hovedflaten for appen
-//                Surface(
-//                    modifier = Modifier.fillMaxSize(),
-//                    color = MaterialTheme.colorScheme.background
-//                ) {
-//                    // Dette er RUTE-KARTET som NavController manglet!
-//                    NavHost(
-//                        navController = navController,
-//                        startDestination = "map"
-//                    ) {
-//                        composable("map") {
-//                            MapScreen(
-//                                modifier = Modifier,
-//                                viewModel = mapViewModel,
-//                                savedPlacesViewModel = savedPlacesViewModel,
-//                                navController = navController
-//                            )
-//                        }
-//                        composable("myPlants") {
-//                            MyPlantsScreen(
-//                                mapViewModel = mapViewModel,
-//                                navController = navController,
-//                                savedPlacesViewModel = savedPlacesViewModel
-//                            )
-//                        }
-//                        composable("findPlants") {
-//                            FindPlantsScreen(
-//                                viewModel = findPlantsViewModel,
-//                                navController = navController
-//                            )
-//                        }
-//                        composable("swipe") {
-//                            PlantSwipeScreen(
-//                                viewModel = swipeViewModel,
-//                                navController = navController)
-//                        }
-//                    }
-//                }
             }
         }
     }

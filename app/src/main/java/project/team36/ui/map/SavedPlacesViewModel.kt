@@ -11,7 +11,8 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class SavedPlacesViewModel : ViewModel() {
 
-    private val _savedPlaces = MutableStateFlow<List<SavedPlace>>(emptyList())
+    private val _savedPlaces = MutableStateFlow<List<SavedPlace>>(emptyList()
+    )
     val savedPlaces : StateFlow<List<SavedPlace>> = _savedPlaces.asStateFlow()
 
 

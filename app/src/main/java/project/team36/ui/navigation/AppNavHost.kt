@@ -14,7 +14,7 @@ import project.team36.ui.map.MapScreen
 import project.team36.ui.map.MapViewModel
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.myplants.MyPlantsScreen
-import project.team36.ui.plant.PlantSwipeViewModel
+//import project.team36.ui.plant.PlantSwipeViewModel
 
 @Composable
 fun AppNavHost(
@@ -23,7 +23,7 @@ fun AppNavHost(
     mapViewModel: MapViewModel,
     findPlantsViewModel: FindPlantsViewModel,
     savedPlacesViewModel: SavedPlacesViewModel,
-    swipeViewModel: PlantSwipeViewModel
+    //swipeViewModel: PlantSwipeViewModel
 ) {
     //TODO - fiks viewmodels i alle screens også
     val mapViewModel: MapViewModel = viewModel()

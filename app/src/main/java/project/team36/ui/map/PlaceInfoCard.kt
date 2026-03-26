@@ -1,4 +1,4 @@
-
+package project.team36.ui.map
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column

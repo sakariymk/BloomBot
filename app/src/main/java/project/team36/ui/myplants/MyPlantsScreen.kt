@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import project.team36.ui.map.SavedPlace
 import project.team36.ui.map.SavedPlacesViewModel
+import project.team36.ui.plant.PlantCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,12 +63,12 @@ fun MyPlantsScreen (
                     icon = { }, //fyller ut med icon senere!
                     label = { Text("Oppdag planter")}
                 )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { navController.navigate("swipe") },
-                    icon = { }, //fyller ut med icon senere!
-                    label = { Text("test")}
-                )
+//                NavigationBarItem(
+//                    selected = false,
+//                    onClick = { navController.navigate("swipe") },
+//                    icon = { }, //fyller ut med icon senere!
+//                    label = { Text("test")}
+//                )
             }
         }
     ) { innerPadding ->
@@ -84,14 +85,10 @@ fun MyPlantsScreen (
             }
 
             item {
-                PlaceholderExpandableCard(title = "Tomat") {
-                    Text("Her kan du legge info om tomaten")
-                }
+                //PlantCard(title = "Tomat")
             }
             item {
-                PlaceholderExpandableCard(title = "Basilikum") {
-                    Text("Her kan du legge info om basilikum")
-                }
+                //PlantCard(title = "Basilikum")
             }
         }
     }
@@ -125,29 +122,10 @@ fun PlaceDropdown(
                 DropdownMenuItem(
                     text = { Text(place.customName) },
                     onClick = {
-                        onPlaceSelected(place) // sender valgt distrikt til ViewModel
+                        onPlaceSelected(place) // sender valgt sted til ViewModel
                         expanded = false
                     }
                 )
-            }
-        }
-    }
-}
-
-@Composable
-fun PlaceholderExpandableCard(title: String, content: @Composable () -> Unit) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { expanded = !expanded },
-        shape = RoundedCornerShape(16.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = title, style = MaterialTheme.typography.titleMedium)
-            AnimatedVisibility(visible = expanded) {
-                content()
             }
         }
     }

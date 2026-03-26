@@ -1,6 +1,6 @@
 package project.team36.ui.map
 
-import PlaceInfoCard
+//import PlaceInfoCard
 import android.Manifest
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
