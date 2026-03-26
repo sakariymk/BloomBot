@@ -103,7 +103,13 @@ class MainActivity : ComponentActivity() {
 
                 // Initialiserer ViewModels
                 val savedPlacesViewModel: SavedPlacesViewModel = viewModel()
-                val findPlantsViewModel: FindPlantsViewModel = viewModel()
+                val findPlantsViewModel: FindPlantsViewModel = viewModel(
+                    factory = object : ViewModelProvider.Factory {
+                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                            return FindPlantsViewModel(plantRepository) as T
+                        }
+                    }
+                )
                 //val swipeViewModel = remember { PlantSwipeViewModel(plantRepository) }
                 val mapViewModel: MapViewModel = viewModel(
                     factory = MapViewModelFactory(hybridAiRepository)
