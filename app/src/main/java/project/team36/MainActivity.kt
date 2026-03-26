@@ -36,10 +36,9 @@ import project.team36.data.plant.PlantRepository
 import project.team36.ui.map.MapScreen
 import project.team36.ui.map.MapViewModel
 import project.team36.ui.map.SavedPlacesViewModel
-import project.team36.ui.navigation.AppNavHost
-//import project.team36.ui.plant.PlantSwipeViewModel
+import project.team36.ui.plant.PlantSwipeViewModel
 import project.team36.ui.theme.Team36Theme
-//import project.team36.ui.plant.PlantSwipeScreen
+import project.team36.ui.plant.PlantSwipeScreen
 
 class MapViewModelFactory(
     private val repository: HybridAiRepository
@@ -98,23 +97,22 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             Team36Theme {
-
                 val navController = rememberNavController()
 
                 // Initialiserer ViewModels
                 val savedPlacesViewModel: SavedPlacesViewModel = viewModel()
-                val findPlantsViewModel: FindPlantsViewModel = viewModel(
-                    factory = object : ViewModelProvider.Factory {
-                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                            return FindPlantsViewModel(plantRepository) as T
-                        }
-                    }
-                )
-                //val swipeViewModel = remember { PlantSwipeViewModel(plantRepository) }
+                val findPlantsViewModel: FindPlantsViewModel = viewModel()
+                val swipeViewModel = remember { PlantSwipeViewModel(plantRepository) }
                 val mapViewModel: MapViewModel = viewModel(
                     factory = MapViewModelFactory(hybridAiRepository)
                 )
 
+                AppNavHost(
+                    navController = navController,
+                    mapViewModel = mapViewModel,
+                    findPlantsViewModel = findPlantsViewModel,
+                    savedPlacesViewModel = savedPlacesViewModel
+                )
                 AppNavHost(
                     navController = navController,
                     mapViewModel = mapViewModel,

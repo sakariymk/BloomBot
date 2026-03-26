@@ -6,15 +6,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+
 import project.team36.ui.findplants.FindPlantsScreen
 import project.team36.ui.findplants.FindPlantsViewModel
 import project.team36.ui.map.MapScreen
 import project.team36.ui.map.MapViewModel
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.myplants.MyPlantsScreen
-import project.team36.ui.myplants.MyPlantsViewModel
-
-//import project.team36.ui.plant.PlantSwipeViewModel
 
 @Composable
 fun AppNavHost(
@@ -24,8 +23,13 @@ fun AppNavHost(
     findPlantsViewModel: FindPlantsViewModel,
     savedPlacesViewModel: SavedPlacesViewModel
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val plantDataSource = PlantDataSource(context)
+    val plantRepository = PlantRepository(plantDataSource)
 
-    val myPlantsViewModel: MyPlantsViewModel = viewModel()
+    val savedPlacesViewModel: SavedPlacesViewModel = viewModel()
+    val findPlantsViewModel: FindPlantsViewModel = viewModel()
+
 
     NavHost(
         navController = navController,
@@ -33,19 +37,25 @@ fun AppNavHost(
         modifier = modifier
     ){
         composable("map") {
+            val mapViewModel: MapViewModel = viewModel(
+                factory = MapViewModelFactory(HybridAiRepository(context))
+            )
             MapScreen(
                 modifier = modifier,
                 viewModel = mapViewModel,
                 navController = navController,
-                savedPlacesViewModel = savedPlacesViewModel
+                savedPlacesViewModel = savedPlacesViewModel,
+                viewModel = mapViewModel
             )
         }
         composable ("myPlants"){
             MyPlantsScreen(
-                mapViewModel = mapViewModel,
                 navController = navController,
                 savedPlacesViewModel = savedPlacesViewModel,
                 myPlantsViewModel = myPlantsViewModel
+                savedPlacesViewModel = savedPlacesViewModel,
+                plantRepository = plantRepository
+
             )
         }
         composable ("findPlants") {
