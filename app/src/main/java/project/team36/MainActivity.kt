@@ -127,9 +127,9 @@ class MainActivity : ComponentActivity() {
                         }
                         composable("myPlants") {
                             MyPlantsScreen(
-                                mapViewModel = mapViewModel,
                                 navController = navController,
-                                savedPlacesViewModel = savedPlacesViewModel
+                                savedPlacesViewModel = savedPlacesViewModel,
+                                plantRepository = plantRepository
                             )
                         }
                         composable("findPlants") {
