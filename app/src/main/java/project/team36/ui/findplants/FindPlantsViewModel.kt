@@ -14,4 +14,8 @@ class FindPlantsViewModel (private val plantRepository: PlantRepository) : ViewM
     init {
         _plants.value = plantRepository.initiatePlants()
     }
+
+    fun removePlant(plant: PlantInfo) {
+        _plants.value -= plant
+    }
 }

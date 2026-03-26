@@ -12,37 +12,11 @@ import project.team36.model.plant.SoilType
 
 class MyPlantsViewModel : ViewModel () {
     // To hardcodede planter for å vise funksjonalitet
-    private val _plants = MutableStateFlow<List<PlantInfo>>(
-        listOf(
-            PlantInfo(
-                name = "Daglilje",
-                soil = setOf(SoilType.LOAM, SoilType.CLAY),
-                light = setOf(LightType.FULL, LightType.PARTIAL),
-                isFrostResistant = true,
-                waterPerWeek = 1.5f,
-                plantingMonth = setOf(4, 5),
-                climateZone = 2,
-                hasBeenWatered = false,
-                daysSinceWatered = 0,
-                maxDaysWithoutWater = 7,
-                imageRes = R.drawable.defaultplant,
-                description = "En hardfør hageplante som trives godt i det norske klimaet."
-            ),
-            PlantInfo(
-                name = "Løvetann",
-                soil = setOf(SoilType.LOAM, SoilType.SAND),
-                light = setOf(LightType.FULL),
-                isFrostResistant = true,
-                waterPerWeek = 1.0f,
-                plantingMonth = setOf(3, 4, 5),
-                climateZone = 2,
-                hasBeenWatered = false,
-                daysSinceWatered = 0,
-                maxDaysWithoutWater = 10,
-                imageRes = R.drawable.defaultplant,
-                description = "Svært hardfør plante som klarer seg i nesten alle forhold."
-            )
-        )
-    )
+    private val _plants = MutableStateFlow<List<PlantInfo>>(emptyList())
+
+    //funksjon for å legge til plante fra oppdagsiden
+    fun addPlant(plant: PlantInfo){
+        _plants.value += plant
+    }
     val plants: StateFlow<List<PlantInfo>> = _plants.asStateFlow()
 }

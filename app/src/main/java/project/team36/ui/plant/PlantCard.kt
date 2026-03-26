@@ -1,6 +1,9 @@
 package project.team36.ui.plant
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -31,23 +34,32 @@ import project.team36.model.plant.LightType
 import project.team36.model.plant.SoilType
 
 @Composable
-fun PlantCard(plant: PlantInfo) {
+fun PlantCard(
+    plant: PlantInfo,
+    showPlantStatus: Boolean = false, //kort som vises på MinePlanter
+    showAddButton: Boolean = false, //Kort som vises på VelgPlanter
+    onAddPlant: (() -> Unit)? = null
+) {
     var expanded by remember { mutableStateOf(false) }
 
     OutlinedCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .animateContentSize()
-            .height(if (expanded) 400.dp else 100.dp)
+            .animateContentSize(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessLow
+                )
+            )
     ) {
         Column (
             modifier = Modifier.fillMaxWidth(),
         ) {
-
             val imageId = if (plant.imageRes != 0) plant.imageRes else R.drawable.defaultplant
 
-            if (!expanded) {
+            // Lite kort
+            AnimatedVisibility(visible = !expanded) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
@@ -60,20 +72,31 @@ fun PlantCard(plant: PlantInfo) {
                             .padding(8.dp),
                         contentScale = ContentScale.Crop
                     )
-                    Text(plant.name)
+                    Text(
+                        text = plant.name,
+                        modifier = Modifier.weight(1f)
+                        )
+                    Text(
+                        text = if (plant.daysSinceWatered < plant.maxDaysWithoutWater) "Status: Trenger vann" else "Status: Vannet",
+                        color = if(plant.daysSinceWatered < plant.maxDaysWithoutWater) MaterialTheme.colorScheme.error
+                        else MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
                 }
             }
 
-            if (expanded) {
-                Image(
-                    painter = painterResource(id = imageId),
-                    contentDescription = "Bilde av ${plant.name}",
-                    modifier = Modifier
-                        .fillMaxWidth(0.3f)
-                        .align(Alignment.CenterHorizontally),
-                    contentScale = ContentScale.Crop
-                )
+            //Utvidet kort
+            AnimatedVisibility(visible = expanded) {
                 Column(modifier = Modifier.padding(16.dp)) {
+                    Image(
+                        painter = painterResource(id = imageId),
+                        contentDescription = "Bilde av ${plant.name}",
+                        modifier = Modifier
+                            .fillMaxWidth(0.3f)
+                            .height(100.dp)
+                            .align(Alignment.CenterHorizontally),
+                        contentScale = ContentScale.Crop
+                    )
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -115,9 +138,23 @@ fun PlantCard(plant: PlantInfo) {
                         style = MaterialTheme.typography.bodySmall,
                         maxLines = 3
                     )
+                    if (showPlantStatus) {
+                        //legg til logikk for å sjekke vanning
+                    }
+
+                    if (showAddButton){
+                        Button(
+                            onClick = { onAddPlant?.invoke() },
+                            modifier = Modifier
+                                .align(Alignment.End)
+                                .padding(top = 8.dp)
+                        ) { Text("Legg til") }
+                    }
                 }
 
+
             }
+            // Knapp for utvidelse eller lukking
             IconButton(
                 onClick = { expanded = !expanded },
                 modifier = Modifier

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -29,13 +30,15 @@ import project.team36.ui.plant.PlantCard
 fun MyPlantsScreen (
     mapViewModel: MapViewModel,
     navController: NavController,
-    savedPlacesViewModel: SavedPlacesViewModel
+    savedPlacesViewModel: SavedPlacesViewModel,
+    myPlantsViewModel: MyPlantsViewModel = viewModel()
 ) {
 
     // for å få tak i liste over lagrede steder fra MapViewModel
     var selectedPlace by remember { mutableStateOf<SavedPlace?>(null) }
     val savedPlaces by savedPlacesViewModel.savedPlaces.collectAsState()
     val uiState by mapViewModel.uiState.collectAsState()
+    val plants by myPlantsViewModel.plants.collectAsState()
 
     Scaffold(
         topBar = {
@@ -52,7 +55,7 @@ fun MyPlantsScreen (
                     label = { Text("Kart")}
                 )
                 NavigationBarItem(
-                    selected = false,
+                    selected = true,
                     onClick = { navController.navigate("myPlants") },
                     icon = { }, //fyller ut med icon senere!
                     label = { Text("Mine planter")}
@@ -63,18 +66,12 @@ fun MyPlantsScreen (
                     icon = { }, //fyller ut med icon senere!
                     label = { Text("Oppdag planter")}
                 )
-//                NavigationBarItem(
-//                    selected = false,
-//                    onClick = { navController.navigate("swipe") },
-//                    icon = { }, //fyller ut med icon senere!
-//                    label = { Text("test")}
-//                )
             }
         }
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier.padding(innerPadding),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             item {
                 PlaceDropdown(
@@ -84,12 +81,13 @@ fun MyPlantsScreen (
                 )
             }
 
-            item {
-                //PlantCard(title = "Tomat")
+            items(plants) { plant ->
+                PlantCard(
+                    plant = plant,
+                    showPlantStatus = true
+                )
             }
-            item {
-                //PlantCard(title = "Basilikum")
-            }
+
         }
     }
 }

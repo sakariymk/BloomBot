@@ -120,7 +120,6 @@ class MainActivity : ComponentActivity() {
                     mapViewModel = mapViewModel,
                     findPlantsViewModel = findPlantsViewModel,
                     savedPlacesViewModel = savedPlacesViewModel
-                    //swipeViewModel = swipeViewModel
                 )
             }
         }
