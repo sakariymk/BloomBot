@@ -1,67 +1,66 @@
-package project.team36.ui.navigation
-
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-
+import project.team36.data.plant.PlantDataSource
+import project.team36.data.plant.PlantRepository
 import project.team36.ui.findplants.FindPlantsScreen
 import project.team36.ui.findplants.FindPlantsViewModel
 import project.team36.ui.map.MapScreen
 import project.team36.ui.map.MapViewModel
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.myplants.MyPlantsScreen
+import project.team36.ui.myplants.MyPlantsViewModel
+import project.team36.ui.plant.PlantSwipeScreen
+import project.team36.ui.plant.PlantSwipeViewModel
 
 @Composable
 fun AppNavHost(
     modifier: Modifier = Modifier,
-    navController: NavHostController,
+    navController: NavHostController = rememberNavController(),
     mapViewModel: MapViewModel,
     findPlantsViewModel: FindPlantsViewModel,
-    savedPlacesViewModel: SavedPlacesViewModel
+    savedPlacesViewModel: SavedPlacesViewModel,
+    swipeViewModel: PlantSwipeViewModel,
+    myPlantsViewModel: MyPlantsViewModel
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val plantDataSource = PlantDataSource(context)
     val plantRepository = PlantRepository(plantDataSource)
 
-    val savedPlacesViewModel: SavedPlacesViewModel = viewModel()
-    val findPlantsViewModel: FindPlantsViewModel = viewModel()
-
-
     NavHost(
         navController = navController,
         startDestination = "map",
         modifier = modifier
-    ){
+    ) {
         composable("map") {
-            val mapViewModel: MapViewModel = viewModel(
-                factory = MapViewModelFactory(HybridAiRepository(context))
-            )
             MapScreen(
                 modifier = modifier,
                 viewModel = mapViewModel,
                 navController = navController,
-                savedPlacesViewModel = savedPlacesViewModel,
-                viewModel = mapViewModel
+                savedPlacesViewModel = savedPlacesViewModel
             )
         }
-        composable ("myPlants"){
+        composable("myPlants") {
             MyPlantsScreen(
                 navController = navController,
                 savedPlacesViewModel = savedPlacesViewModel,
+                plantRepository = plantRepository,
                 myPlantsViewModel = myPlantsViewModel
-                savedPlacesViewModel = savedPlacesViewModel,
-                plantRepository = plantRepository
-
             )
         }
-        composable ("findPlants") {
+        composable("findPlants") {
             FindPlantsScreen(
                 findPlantsViewModel = findPlantsViewModel,
-                myPlantsViewModel = myPlantsViewModel,
+                navController = navController,
+                myPlantsViewModel = myPlantsViewModel
+            )
+        }
+        composable("swipe") {
+            PlantSwipeScreen(
+                viewModel = swipeViewModel,
                 navController = navController
             )
         }

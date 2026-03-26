@@ -11,32 +11,36 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel  // NY: import for viewModel()
 import androidx.navigation.NavController
 import project.team36.ui.map.SavedPlace
 import project.team36.ui.map.SavedPlacesViewModel
-import project.team36.ui.plant.PlantCard
 import project.team36.ui.plant.PlantCard
 import project.team36.model.plant.PlantInfo
 import project.team36.data.plant.PlantRepository
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyPlantsScreen (
-    mapViewModel: MapViewModel,
+fun MyPlantsScreen(
     navController: NavController,
     savedPlacesViewModel: SavedPlacesViewModel,
-    savedPlacesViewModel: SavedPlacesViewModel,
-    myPlantsViewModel: MyPlantsViewModel = viewModel(),
-    plantRepository: PlantRepository
+    plantRepository: PlantRepository,
+    myPlantsViewModel: MyPlantsViewModel
 ) {
-
-    // Observer savedPlaces fra ViewModel
     val savedPlaces by savedPlacesViewModel.savedPlaces.collectAsStateWithLifecycle()
     var selectedPlace by remember { mutableStateOf<SavedPlace?>(null) }
-    val uiState by mapViewModel.uiState.collectAsState()
-    val plants by myPlantsViewModel.plants.collectAsState()
     val plantsForSelectedPlace = selectedPlace?.plants ?: emptyList()
 
+    //hent MyPlantsViewModel
+    val myPlantsViewModel: MyPlantsViewModel = viewModel()
+
+    //observer dialog-state
+    val showPlantPicker by myPlantsViewModel.showPlantPicker.collectAsStateWithLifecycle()
+
+    //hent tilgjengelige planter én gang
+    val availablePlants = remember { plantRepository.initiatePlants() }
+
+    //synkroniser selectedPlace når savedPlaces oppdateres
     LaunchedEffect(savedPlaces) {
         selectedPlace = savedPlaces.find { it.id == selectedPlace?.id }
     }
@@ -67,12 +71,6 @@ fun MyPlantsScreen (
                     icon = { },
                     label = { Text("Oppdag planter") }
                 )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { navController.navigate("swipe") },
-                    icon = { }, //fyller ut med icon senere!
-                    label = { Text("test")}
-                )
             }
         }
     ) { innerPadding ->
@@ -82,30 +80,23 @@ fun MyPlantsScreen (
                 .padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-
-            //Dropdown for å velge sted
             item {
                 PlaceDropdown(
+                    savedPlaces = savedPlaces,
                     selectedPlace = selectedPlace,
                     onPlaceSelected = { selectedPlace = it }
                 )
             }
 
-            // --- Liste over planter for valgt sted ---
             items(plantsForSelectedPlace) { plant: PlantInfo ->
-                PlantCard(plante = plant)
+                PlantCard(plant = plant)
             }
 
-            // --- Knapp for å legge til en plante ---
             item {
                 Button(
+                    // ENDRET: åpner dialog i stedet for å legge til direkte
                     onClick = {
-                        selectedPlace?.let { place ->
-                            val newPlant = plantRepository.InitiatePlants().firstOrNull()
-                            if (newPlant != null) {
-                                savedPlacesViewModel.addPlantToPlace(place, newPlant)
-                            }
-                        }
+                        if (selectedPlace != null) myPlantsViewModel.openPlantPicker()
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -114,6 +105,37 @@ fun MyPlantsScreen (
                     Text("Legg til plante")
                 }
             }
+        }
+
+        //dialog for å velge plante
+        if (showPlantPicker) {
+            AlertDialog(
+                onDismissRequest = { myPlantsViewModel.closePlantPicker() },
+                title = { Text("Velg plante") },
+                text = {
+                    LazyColumn {
+                        items(availablePlants) { plant ->
+                            TextButton(
+                                onClick = {
+                                    selectedPlace?.let {
+                                        savedPlacesViewModel.addPlantToPlace(it, plant)
+                                    }
+                                    myPlantsViewModel.closePlantPicker()
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(plant.name)
+                            }
+                        }
+                    }
+                },
+                confirmButton = {},
+                dismissButton = {
+                    TextButton(onClick = { myPlantsViewModel.closePlantPicker() }) {
+                        Text("Avbryt")
+                    }
+                }
+            )
         }
     }
 }
@@ -140,6 +162,7 @@ fun PlaceDropdown(
                 .fillMaxWidth()
                 .menuAnchor()
         )
+
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
@@ -148,7 +171,7 @@ fun PlaceDropdown(
                 DropdownMenuItem(
                     text = { Text(place.customName) },
                     onClick = {
-                        onPlaceSelected(place) // sender valgt sted til ViewModel
+                        onPlaceSelected(place)
                         expanded = false
                     }
                 )

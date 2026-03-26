@@ -41,6 +41,7 @@ data class MapUiState(
     val selectedSavedPlace: SavedPlace? = null
 )
 
+
 class MapViewModelFactory(
     private val repository: HybridAiRepository
 ) : ViewModelProvider.Factory {
@@ -52,6 +53,8 @@ class MapViewModelFactory(
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
+
+
 
 
 

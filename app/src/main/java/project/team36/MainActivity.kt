@@ -1,5 +1,6 @@
 package project.team36
 
+import AppNavHost
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -21,7 +22,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import java.util.concurrent.TimeUnit
-
+import project.team36.ui.myplants.MyPlantsViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -47,6 +48,18 @@ class MapViewModelFactory(
         if (modelClass.isAssignableFrom(MapViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
             return MapViewModel(repository) as T
+        }
+        throw IllegalArgumentException("Ukjent ViewModel klasse")
+    }
+}
+
+class FindPlantsViewModelFactory(
+    private val plantRepository: PlantRepository
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(FindPlantsViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return FindPlantsViewModel(plantRepository) as T
         }
         throw IllegalArgumentException("Ukjent ViewModel klasse")
     }
@@ -99,25 +112,23 @@ class MainActivity : ComponentActivity() {
             Team36Theme {
                 val navController = rememberNavController()
 
-                // Initialiserer ViewModels
                 val savedPlacesViewModel: SavedPlacesViewModel = viewModel()
-                val findPlantsViewModel: FindPlantsViewModel = viewModel()
+                val findPlantsViewModel: FindPlantsViewModel = viewModel(
+                        factory = FindPlantsViewModelFactory(plantRepository)
+                        )
                 val swipeViewModel = remember { PlantSwipeViewModel(plantRepository) }
                 val mapViewModel: MapViewModel = viewModel(
                     factory = MapViewModelFactory(hybridAiRepository)
                 )
+                val myPlantsViewModel: MyPlantsViewModel = viewModel()
 
                 AppNavHost(
                     navController = navController,
                     mapViewModel = mapViewModel,
                     findPlantsViewModel = findPlantsViewModel,
-                    savedPlacesViewModel = savedPlacesViewModel
-                )
-                AppNavHost(
-                    navController = navController,
-                    mapViewModel = mapViewModel,
-                    findPlantsViewModel = findPlantsViewModel,
-                    savedPlacesViewModel = savedPlacesViewModel
+                    savedPlacesViewModel = savedPlacesViewModel,
+                    swipeViewModel = swipeViewModel,
+                    myPlantsViewModel = myPlantsViewModel
                 )
             }
         }
