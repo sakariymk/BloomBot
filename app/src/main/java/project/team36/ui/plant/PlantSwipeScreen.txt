@@ -38,7 +38,7 @@ fun PlantSwipeScreen(
             ) {
                 // Selve kortet
                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                    PlantCard(plant = plants[0])
+                    PlantCard(plante = plants[0])
                 }
 
                 // Handlingsknapper under kortet
