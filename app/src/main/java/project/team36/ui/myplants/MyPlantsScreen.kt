@@ -2,39 +2,47 @@ package project.team36.ui.myplants
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.lifecycle.viewmodel.compose.viewModel
-import project.team36.ui.map.MapViewModel
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel  // NY: import for viewModel()
 import androidx.navigation.NavController
 import project.team36.ui.map.SavedPlace
 import project.team36.ui.map.SavedPlacesViewModel
+import project.team36.ui.plant.PlantCard
+import project.team36.model.plant.PlantInfo
+import project.team36.data.plant.PlantRepository
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyPlantsScreen (
-    mapViewModel: MapViewModel,
+fun MyPlantsScreen(
     navController: NavController,
-    savedPlacesViewModel: SavedPlacesViewModel
+    savedPlacesViewModel: SavedPlacesViewModel,
+    plantRepository: PlantRepository,
 ) {
-
-    // for å få tak i liste over lagrede steder fra MapViewModel
+    val savedPlaces by savedPlacesViewModel.savedPlaces.collectAsStateWithLifecycle()
     var selectedPlace by remember { mutableStateOf<SavedPlace?>(null) }
-    val savedPlaces by savedPlacesViewModel.savedPlaces.collectAsState()
-    val uiState by mapViewModel.uiState.collectAsState()
+    val plantsForSelectedPlace = selectedPlace?.plants ?: emptyList()
+
+    //hent MyPlantsViewModel
+    val myPlantsViewModel: MyPlantsViewModel = viewModel()
+
+    //observer dialog-state
+    val showPlantPicker by myPlantsViewModel.showPlantPicker.collectAsStateWithLifecycle()
+
+    //hent tilgjengelige planter én gang
+    val availablePlants = remember { plantRepository.initiatePlants() }
+
+    //synkroniser selectedPlace når savedPlaces oppdateres
+    LaunchedEffect(savedPlaces) {
+        selectedPlace = savedPlaces.find { it.id == selectedPlace?.id }
+    }
 
     Scaffold(
         topBar = {
@@ -43,56 +51,99 @@ fun MyPlantsScreen (
             )
         },
         bottomBar = {
-            NavigationBar{
+            NavigationBar {
                 NavigationBarItem(
                     selected = false,
-                    onClick = { navController.navigate("map")},
-                    icon = { }, //fyller ut med icon senere!
-                    label = { Text("Kart")}
+                    onClick = { navController.navigate("map") },
+                    icon = { },
+                    label = { Text("Kart") }
                 )
                 NavigationBarItem(
-                    selected = false,
+                    selected = true,
                     onClick = { navController.navigate("myPlants") },
-                    icon = { }, //fyller ut med icon senere!
-                    label = { Text("Mine planter")}
+                    icon = { },
+                    label = { Text("Mine planter") }
                 )
                 NavigationBarItem(
                     selected = false,
                     onClick = { navController.navigate("findPlants") },
-                    icon = { }, //fyller ut med icon senere!
-                    label = { Text("Oppdag planter")}
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { navController.navigate("swipe") },
-                    icon = { }, //fyller ut med icon senere!
-                    label = { Text("test")}
+                    icon = { },
+                    label = { Text("Oppdag planter") }
                 )
             }
         }
     ) { innerPadding ->
         LazyColumn(
-            modifier = Modifier.padding(innerPadding),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             item {
                 PlaceDropdown(
-                    selectedPlace = selectedPlace,
                     savedPlaces = savedPlaces,
-                    onPlaceSelected = { selectedPlace = it },
+                    selectedPlace = selectedPlace,
+                    onPlaceSelected = { selectedPlace = it }
+                )
+            }
+
+
+            // Vi mater inn riktig liste, og tegner opp nøyaktig det elementet vi er på.
+            items(plantsForSelectedPlace) { lagretPlante ->
+                PlantCard(
+                    plant = lagretPlante,
+                    onDeletePlant = {
+                        selectedPlace?.let {
+                            savedPlacesViewModel.removePlantFromPlace(it, lagretPlante)
+                        }
+                    }
                 )
             }
 
             item {
-                PlaceholderExpandableCard(title = "Tomat") {
-                    Text("Her kan du legge info om tomaten")
+                Button(
+                    //åpner dialog i stedet for å legge til direkte
+                    onClick = {
+                        if (selectedPlace != null) myPlantsViewModel.openPlantPicker()
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                ) {
+                    Text("Legg til plante")
                 }
             }
-            item {
-                PlaceholderExpandableCard(title = "Basilikum") {
-                    Text("Her kan du legge info om basilikum")
+        }
+
+        //dialog for å velge plante
+        if (showPlantPicker) {
+            AlertDialog(
+                onDismissRequest = { myPlantsViewModel.closePlantPicker() },
+                title = { Text("Velg plante") },
+                text = {
+                    LazyColumn {
+                        items(availablePlants) { plant ->
+                            TextButton(
+                                onClick = {
+                                    selectedPlace?.let {
+                                        savedPlacesViewModel.addPlantToPlace(it, plant)
+                                    }
+                                    myPlantsViewModel.closePlantPicker()
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(plant.name)
+                            }
+                        }
+                    }
+                },
+                confirmButton = {},
+                dismissButton = {
+                    TextButton(onClick = { myPlantsViewModel.closePlantPicker() }) {
+                        Text("Avbryt")
+                    }
                 }
-            }
+            )
         }
     }
 }
@@ -104,19 +155,22 @@ fun PlaceDropdown(
     selectedPlace: SavedPlace?,
     onPlaceSelected: (SavedPlace) -> Unit
 ) {
-
     var expanded by remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(
         expanded = expanded,
-        onExpandedChange = { expanded = !expanded } // åpner/lukker menyen
+        onExpandedChange = { expanded = !expanded }
     ) {
         TextField(
             value = selectedPlace?.customName ?: "Velg sted",
             onValueChange = {},
             readOnly = true,
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor()
         )
+
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
@@ -125,7 +179,7 @@ fun PlaceDropdown(
                 DropdownMenuItem(
                     text = { Text(place.customName) },
                     onClick = {
-                        onPlaceSelected(place) // sender valgt distrikt til ViewModel
+                        onPlaceSelected(place)
                         expanded = false
                     }
                 )

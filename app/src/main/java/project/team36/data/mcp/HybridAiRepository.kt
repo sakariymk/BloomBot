@@ -5,6 +5,7 @@ import project.team36.data.klima.MetWeatherApi
 import project.team36.data.klima.frost.getNearestStation
 import project.team36.data.klima.frost.getTemperatures
 import project.team36.data.plant.PlantDataSource
+import project.team36.ui.map.MapViewModel
 import project.team36.model.ai.*
 import retrofit2.HttpException
 
@@ -66,7 +67,7 @@ class HybridAiRepository(
             var response = claudeApi.sendMessage(
                 apiKey = claudeApiKey,
                 request = ClaudeRequest(
-                    model = "claude-sonnet-4-6",
+                    model = "claude-sonnet-4-5",
                     system = systemPrompt,
                     messages = conversation,
                     tools = listOf(frostTool, weatherTool)
@@ -112,7 +113,7 @@ class HybridAiRepository(
                 response = claudeApi.sendMessage(
                     apiKey = claudeApiKey,
                     request = ClaudeRequest(
-                        model = "claude-sonnet-4-6",
+                        model = "claude-sonnet-4-5",
                         system = systemPrompt,
                         messages = conversation
                     )

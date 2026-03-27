@@ -1,5 +1,6 @@
 package project.team36
 
+import project.team36.ui.navigation.AppNavHost
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -21,7 +22,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import java.util.concurrent.TimeUnit
-
+import project.team36.ui.myplants.MyPlantsViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -38,7 +39,7 @@ import project.team36.ui.map.MapViewModel
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.plant.PlantSwipeViewModel
 import project.team36.ui.theme.Team36Theme
-import project.team36.ui.plant.PlantSwipeScreen
+
 
 class MapViewModelFactory(
     private val repository: HybridAiRepository
@@ -47,6 +48,18 @@ class MapViewModelFactory(
         if (modelClass.isAssignableFrom(MapViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
             return MapViewModel(repository) as T
+        }
+        throw IllegalArgumentException("Ukjent ViewModel klasse")
+    }
+}
+
+class FindPlantsViewModelFactory(
+    private val plantRepository: PlantRepository
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(FindPlantsViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return FindPlantsViewModel(plantRepository) as T
         }
         throw IllegalArgumentException("Ukjent ViewModel klasse")
     }
@@ -99,52 +112,22 @@ class MainActivity : ComponentActivity() {
             Team36Theme {
                 val navController = rememberNavController()
 
-                // Initialiserer ViewModels
                 val savedPlacesViewModel: SavedPlacesViewModel = viewModel()
-                val findPlantsViewModel: FindPlantsViewModel = viewModel()
-                val swipeViewModel = remember { PlantSwipeViewModel(plantRepository) }
+                val findPlantsViewModel: FindPlantsViewModel = viewModel(
+                    factory = FindPlantsViewModelFactory(plantRepository)
+                )
+
                 val mapViewModel: MapViewModel = viewModel(
                     factory = MapViewModelFactory(hybridAiRepository)
                 )
 
-                // Hovedflaten for appen
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    // Dette er RUTE-KARTET som NavController manglet!
-                    NavHost(
-                        navController = navController,
-                        startDestination = "map"
-                    ) {
-                        composable("map") {
-                            MapScreen(
-                                modifier = Modifier,
-                                viewModel = mapViewModel,
-                                savedPlacesViewModel = savedPlacesViewModel,
-                                navController = navController
-                            )
-                        }
-                        composable("myPlants") {
-                            MyPlantsScreen(
-                                mapViewModel = mapViewModel,
-                                navController = navController,
-                                savedPlacesViewModel = savedPlacesViewModel
-                            )
-                        }
-                        composable("findPlants") {
-                            FindPlantsScreen(
-                                viewModel = findPlantsViewModel,
-                                navController = navController
-                            )
-                        }
-                        composable("swipe") {
-                            PlantSwipeScreen(
-                                viewModel = swipeViewModel,
-                                navController = navController)
-                        }
-                    }
-                }
+                AppNavHost(
+                    navController = navController,
+                    mapViewModel = mapViewModel,
+                    findPlantsViewModel = findPlantsViewModel,
+                    savedPlacesViewModel = savedPlacesViewModel,
+                    plantRepository = plantRepository
+                )
             }
         }
     }

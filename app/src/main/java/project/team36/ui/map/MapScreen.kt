@@ -1,6 +1,6 @@
 package project.team36.ui.map
 
-import PlaceInfoCard
+//import PlaceInfoCard
 import android.Manifest
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -71,7 +71,7 @@ fun MapScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Kart(?)") }
+                title = { Text("Hjemmeskjerm") }
             )
         },
         bottomBar = {
@@ -185,6 +185,10 @@ fun MapScreen(
         uiState.selectedSavedPlace?.let { place ->
             PlaceInfoCard(
                 place = place,
+                onGetAiAdvice = { lat, lon -> viewModel.fetchAiAdvice(lat, lon) },
+                aiResponse = uiState.aiResponse,
+                isAiLoading = uiState.isAiLoading,
+                onDismissAi = { viewModel.dismissAiAdvice() },
                 onDismiss = { viewModel.dismissPlaceInfo() },
                 onEdit = { newName ->
                     savedPlacesViewModel.updatePlace(place, newName)
