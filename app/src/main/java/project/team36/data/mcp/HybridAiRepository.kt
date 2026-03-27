@@ -66,7 +66,7 @@ class HybridAiRepository(
             var response = claudeApi.sendMessage(
                 apiKey = claudeApiKey,
                 request = ClaudeRequest(
-                    model = "claude-sonnet-4-6",
+                    model = "claude-sonnet-4-5",
                     system = systemPrompt,
                     messages = conversation,
                     tools = listOf(frostTool, weatherTool)
@@ -112,7 +112,7 @@ class HybridAiRepository(
                 response = claudeApi.sendMessage(
                     apiKey = claudeApiKey,
                     request = ClaudeRequest(
-                        model = "claude-sonnet-4-6",
+                        model = "claude-sonnet-4-5",
                         system = systemPrompt,
                         messages = conversation
                     )

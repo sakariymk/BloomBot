@@ -88,6 +88,10 @@ fun MyPlantsScreen(
             }
 
 
+            // Vi mater inn riktig liste, og tegner opp nøyaktig det elementet vi er på.
+            items(plantsForSelectedPlace) { lagretPlante ->
+                PlantCard(plant = lagretPlante)
+            }
 
             item {
                 Button(
