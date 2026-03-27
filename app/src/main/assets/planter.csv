@@ -11,5 +11,9 @@ Boolean for har blit vannet,
 Int for dager siden vanning,
 Int for maximum dager uten vann,
 Pelargonia,SOIL;SAND,FULL;PARTIAL,false,2.5,5;9,2,false,0,7
-Tulipan,SOIL;LOAM,FULL;PARTIAL,true,1.5,9;11,7,true,2,14
+Tulipan,SOIL;LOAM,FULL;PARTIAL,true,1.5,9;11,7,false,0,14
 Julestjerne,SOIL;SAND,PARTIAL,false,1.0,11;1,1,false,0,5
+Thuja,CLAY;LOAM,FULL;PARTIAL,true,3.0,4;10,4,false,0,3
+Potet,SAND;LOAM,FULL,false,7.0,2;6,8,false,0,2
+Lavendel,SOIL,FULL,true,0.5,2;7,6,false,0,20
+Rhododendron,SOIL,FULL;PARTIAL,true,7,false,0,3
