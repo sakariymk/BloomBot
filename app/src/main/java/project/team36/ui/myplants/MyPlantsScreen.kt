@@ -90,7 +90,14 @@ fun MyPlantsScreen(
 
             // Vi mater inn riktig liste, og tegner opp nøyaktig det elementet vi er på.
             items(plantsForSelectedPlace) { lagretPlante ->
-                PlantCard(plant = lagretPlante)
+                PlantCard(
+                    plant = lagretPlante,
+                    onDeletePlant = {
+                        selectedPlace?.let {
+                            savedPlacesViewModel.removePlantFromPlace(it, lagretPlante)
+                        }
+                    }
+                )
             }
 
             item {

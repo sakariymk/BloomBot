@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import project.team36.data.plant.PlantRepository
 import project.team36.model.plant.PlantInfo
+import project.team36.ui.map.SavedPlace
 
 class MyPlantsViewModel : ViewModel() {
     private val _plants = MutableStateFlow<List<PlantInfo>>(emptyList())
@@ -24,5 +25,4 @@ class MyPlantsViewModel : ViewModel() {
     fun addPlant(plant: PlantInfo) {
         _plants.value += plant
     }
-
 }
