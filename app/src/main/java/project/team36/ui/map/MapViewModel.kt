@@ -29,6 +29,7 @@ data class SavedPlace(
     val customName: String,
     val plants: List<PlantInfo> = emptyList(),
     val id: String = UUID.randomUUID().toString()
+
 )
 
 data class MapUiState(
