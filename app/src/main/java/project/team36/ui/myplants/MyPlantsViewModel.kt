@@ -24,4 +24,5 @@ class MyPlantsViewModel : ViewModel() {
     fun addPlant(plant: PlantInfo) {
         _plants.value += plant
     }
+
 }

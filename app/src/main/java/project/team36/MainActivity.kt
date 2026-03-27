@@ -1,6 +1,6 @@
 package project.team36
 
-import AppNavHost
+import project.team36.ui.navigation.AppNavHost
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -39,7 +39,7 @@ import project.team36.ui.map.MapViewModel
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.plant.PlantSwipeViewModel
 import project.team36.ui.theme.Team36Theme
-import project.team36.ui.plant.PlantSwipeScreen
+
 
 class MapViewModelFactory(
     private val repository: HybridAiRepository
@@ -114,21 +114,19 @@ class MainActivity : ComponentActivity() {
 
                 val savedPlacesViewModel: SavedPlacesViewModel = viewModel()
                 val findPlantsViewModel: FindPlantsViewModel = viewModel(
-                        factory = FindPlantsViewModelFactory(plantRepository)
-                        )
-                val swipeViewModel = remember { PlantSwipeViewModel(plantRepository) }
+                    factory = FindPlantsViewModelFactory(plantRepository)
+                )
+
                 val mapViewModel: MapViewModel = viewModel(
                     factory = MapViewModelFactory(hybridAiRepository)
                 )
-                val myPlantsViewModel: MyPlantsViewModel = viewModel()
 
                 AppNavHost(
                     navController = navController,
                     mapViewModel = mapViewModel,
                     findPlantsViewModel = findPlantsViewModel,
                     savedPlacesViewModel = savedPlacesViewModel,
-                    swipeViewModel = swipeViewModel,
-                    myPlantsViewModel = myPlantsViewModel
+                    plantRepository = plantRepository
                 )
             }
         }

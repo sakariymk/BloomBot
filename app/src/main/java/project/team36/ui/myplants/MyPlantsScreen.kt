@@ -25,7 +25,6 @@ fun MyPlantsScreen(
     navController: NavController,
     savedPlacesViewModel: SavedPlacesViewModel,
     plantRepository: PlantRepository,
-    myPlantsViewModel: MyPlantsViewModel
 ) {
     val savedPlaces by savedPlacesViewModel.savedPlaces.collectAsStateWithLifecycle()
     var selectedPlace by remember { mutableStateOf<SavedPlace?>(null) }
@@ -88,16 +87,7 @@ fun MyPlantsScreen(
                 )
             }
 
-            items(plantsForSelectedPlace) { plant: PlantInfo ->
-                PlantCard(
-                    plant = plant,
-                    onDeletePlant = {
-                        selectedPlace?.let {
-                            savedPlacesViewModel.removePlantFromPlace(it, plant)
-                        }
-                    }
-                )
-            }
+
 
             item {
                 Button(

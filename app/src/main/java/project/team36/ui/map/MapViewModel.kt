@@ -21,6 +21,8 @@ import com.mapbox.search.SearchEngine
 import project.team36.data.ai.HybridAiRepository
 import project.team36.model.plant.PlantInfo
 import java.util.UUID
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 
 data class SavedPlace(
     val result: SearchResult,
@@ -38,7 +40,9 @@ data class MapUiState(
     val selectedResult: SearchResult? = null,
     val showSaveDialog: Boolean = false,
     val placeNameInput: String = "",
-    val selectedSavedPlace: SavedPlace? = null
+    val selectedSavedPlace: SavedPlace? = null,
+    val aiResponse: String? = null,
+    val isAiLoading: Boolean = false
 )
 
 
@@ -155,5 +159,26 @@ class MapViewModel(private val repository: HybridAiRepository) : ViewModel() {
 
     fun dismissPlaceInfo() {
         _uiState.value = _uiState.value.copy(selectedSavedPlace = null)
+    }
+
+    fun fetchAiAdvice(lat: Double, lon: Double) {
+        // Skrur på "laster..."-visningen i UI-et
+        _uiState.value = _uiState.value.copy(isAiLoading = true, aiResponse = null)
+
+        viewModelScope.launch {
+            // Venter på at Claude skal tenke ferdig (og sjekke været)
+            val response = repository.getPlantRecommendations(lat, lon)
+
+            // Skrur av "laster..." og lagrer Claude sitt svar!
+            _uiState.value = _uiState.value.copy(
+                isAiLoading = false,
+                aiResponse = response
+            )
+        }
+    }
+
+    // 3. En liten funksjon for å lukke AI-svaret igjen:
+    fun dismissAiAdvice() {
+        _uiState.value = _uiState.value.copy(aiResponse = null)
     }
 }
