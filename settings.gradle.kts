@@ -36,4 +36,3 @@ rootProject.name = "team-36"
 include(":app")
 }
 }
- 

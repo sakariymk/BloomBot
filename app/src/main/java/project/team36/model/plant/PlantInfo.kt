@@ -1,0 +1,24 @@
+package project.team36.model.plant
+
+import kotlinx.serialization.Serializable
+
+enum class SoilType { SOIL, CHALK, CLAY, LOAM, SAND }
+enum class LightType { SHADE, PARTIAL, FULL }
+
+
+@Serializable
+data class PlantInfo(
+    val name: String,
+    val soil: Set<SoilType>,
+    val light: Set<LightType>,
+    val isFrostResistant: Boolean,
+    val waterPerWeek: Float,
+    val plantingMonth: Set<Int>,
+    val climateZone: Int,
+    val hasBeenWatered: Boolean,
+    val daysSinceWatered: Int,
+    val maxDaysWithoutWater: Int,
+    val imageRes: Int,
+    val description: String,
+
+    )
