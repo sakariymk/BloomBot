@@ -1,4 +1,4 @@
-
+package project.team36.ui.map
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -7,13 +7,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -36,6 +40,12 @@ import project.team36.ui.map.SavedPlace
 @Composable
 fun PlaceInfoCard(
     place: SavedPlace,
+    // NYE PARAMETERE FOR AI:
+    onGetAiAdvice: (Double, Double) -> Unit,
+    aiResponse: String?,
+    isAiLoading: Boolean,
+    onDismissAi: () -> Unit,
+    // EKSISTERENDE PARAMETERE:
     onDismiss: () -> Unit,
     onEdit: (String) -> Unit,
     onDelete: () -> Unit,
@@ -70,6 +80,17 @@ fun PlaceInfoCard(
         )
     }
 
+    // NY BOKS: Dette er popupen som viser rådet fra Claude når den er ferdig
+    if (aiResponse != null) {
+        AlertDialog(
+            onDismissRequest = onDismissAi,
+            title = { Text("Hageråd fra Claude 🌱") },
+            text = { Text(aiResponse, modifier = Modifier .verticalScroll(rememberScrollState())) },
+            confirmButton = {
+                TextButton(onClick = onDismissAi) { Text("OK") }
+            }
+        )
+    }
 
     //dette viser selve lokasjon og litt info
     Dialog(onDismissRequest = onDismiss) {
@@ -77,7 +98,7 @@ fun PlaceInfoCard(
             modifier = Modifier
                 .shadow(elevation = 4.dp, spotColor = Color(0x40000000), ambientColor = Color(0x40000000))
                 .width(316.dp)
-                .height(230.dp)
+                .height(290.dp) // ØKT HØYDE FRA 230 TIL 290 FOR Å FÅ PLASS TIL KNAPPEN
                 .background(color = Color(0xFFE8F8E3), shape = RoundedCornerShape(size = 15.dp))
                 .fillMaxSize()
         ) {
@@ -153,6 +174,40 @@ fun PlaceInfoCard(
                         fontSize = 15.sp,
                         fontWeight = FontWeight(400)
                     )
+                }
+
+                // NY AI-KNAPP
+                Button(
+                    onClick = {
+                        // Henter koordinatene for denne spesifikke plassen og sender til viewmodel
+                        onGetAiAdvice(place.result.coordinate.latitude(), place.result.coordinate.longitude())
+                    },
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(6.dp)
+                        .shadow(
+                            elevation = 4.dp,
+                            spotColor = Color(0x40000000),
+                            ambientColor = Color(0x40000000)
+                        )
+                        .width(193.dp)
+                        .height(42.dp),
+                    enabled = !isAiLoading, // Låser knappen mens vi venter på svar
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF4CAF50), // Mørkere grønnfarge
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(23.5.dp)
+                ) {
+                    if (isAiLoading) {
+                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                    } else {
+                        Text(
+                            text = "✨ Få AI-Råd",
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight(400)
+                        )
+                    }
                 }
 
                 //knapp for å lukke boksen

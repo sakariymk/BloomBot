@@ -17,7 +17,7 @@ class PlantSwipeViewModel(private val repository: PlantRepository) : ViewModel()
     }
 
     private fun loadPlants() {
-        _uiState.value = repository.InitiatePlants()
+        _uiState.value = repository.initiatePlants()
     }
 
     fun onLike() {
