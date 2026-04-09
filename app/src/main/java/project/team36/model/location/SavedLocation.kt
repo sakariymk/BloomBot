@@ -10,5 +10,6 @@ data class SavedLocation(
     @ColumnInfo(name = "name") val name: String?,
     @ColumnInfo(name = "latitude") val lat: Double?,
     @ColumnInfo(name = "longitude") val lon: Double?,
-    @ColumnInfo(name = "address") val address: String?
+    @ColumnInfo(name = "address") val address: String?,
+    @ColumnInfo(name = "zone") val zone: Int = 0
 )

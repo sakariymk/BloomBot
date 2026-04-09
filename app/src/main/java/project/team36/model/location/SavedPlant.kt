@@ -1,14 +1,12 @@
 package project.team36.model.location
 
-import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import io.ktor.util.date.Month
-import project.team36.model.plante.LightType
-import project.team36.model.plante.SoilType
-import project.team36.model.plante.Zone
+import project.team36.model.plant.LightType
+import project.team36.model.plant.SoilType
+
 
 @Entity(
     tableName = "saved_plants",
@@ -24,15 +22,15 @@ data class SavedPlant(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val locationId: Long,
     val name: String,
-    val soil: SoilType,
-    val light: LightType,
+    val soil: Set<SoilType>, //kommaseparert streng av jordtyper
+    val light: Set<LightType>,//kommaseparert streng av lystyper
     val isFrostResistant: Boolean,
-    val isIndoor: Boolean,
     val waterPerWeek: Float,
-    val plantingMonth: Month,
-    val minZone: Zone,
-    val maxZone: Zone,
-    val growthdays: Int, //kan vi pls endre i data classen til growthDays
+    val plantingMonth: Set<Int>, //kommaseparert streng av tall
+    val climateZone: Int,
+    val hasBeenWatered: Boolean,
+    val daysSinceWatered: Int,
+    val maxDaysWithoutWater: Int,
     val imageRes: Int,
-    val beskrivelse: String, //kan vi pls endre til description
+    val description: String,
 )

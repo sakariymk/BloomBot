@@ -15,7 +15,7 @@ import project.team36.model.location.SavedPlant
         SavedLocation::class,
         SavedPlant::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 
@@ -34,7 +34,9 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "app_database"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }

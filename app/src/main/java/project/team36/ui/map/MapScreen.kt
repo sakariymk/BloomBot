@@ -1,6 +1,6 @@
 package project.team36.ui.map
 
-//import PlaceInfoCard
+//impor<t PlaceInfoCard
 import android.Manifest
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -49,7 +49,7 @@ fun MapScreen(
     navController: NavController
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val savedPlaces by savedPlacesViewModel.savedPlaces.collectAsStateWithLifecycle() // NYTT: hent savedPlaces herfra
+    val savedLocations by savedPlacesViewModel.savedLocations.collectAsStateWithLifecycle() // NYTT: hent savedPlaces herfra -- henter nå fra database
 
     //få lokasjon permissions
     val locationPermissionState = rememberPermissionState(
@@ -131,27 +131,27 @@ fun MapScreen(
                 }
 
                 //Går gjennom savedPlaces lista og putter pins på kartet
-                savedPlaces.forEach { place ->
-
-                    place.result.coordinate.let { coord ->
-                        val savedMarker = rememberIconImage(
-                            key = R.drawable.plant_map_marker,
-                            painter = painterResource(id = R.drawable.plant_map_marker)
-                        )
+                savedLocations.forEach { location ->
+                    val lat = location.lat ?: return@forEach
+                    val lon = location.lon ?: return@forEach
+                    val coord = Point.fromLngLat(lon, lat)
+                    val savedMarker = rememberIconImage(
+                        key = R.drawable.plant_map_marker,
+                        painter = painterResource(id = R.drawable.plant_map_marker)
+                    )
                         PointAnnotation(point = coord) {
                             iconImage = savedMarker
                             interactionsState.onClicked {
-                                viewModel.onSavedPlaceClicked(place)
+                                viewModel.onSavedLocationClicked(location)
                                 true
                             }
                         }
                     }
-                }
             }
 
             Column(
                 modifier = Modifier
-                    .align (Alignment.TopCenter)
+                    .align(Alignment.TopCenter)
                     .padding(top = 48.dp)
                     .fillMaxWidth()
             ) {
@@ -174,7 +174,12 @@ fun MapScreen(
                     onDismissRequest = { viewModel.dismissSaveDialog() },
                     title = { Text("Lagre sted?") },
 
-                    confirmButton = { TextButton(onClick = {viewModel.confirmSavePlace(savedPlacesViewModel)}) { Text("Ja") } },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                viewModel.confirmSavePlace(savedPlacesViewModel)
+                                viewModel.dismissSaveDialog()
+                            }) { Text("Ja") } },
                     dismissButton = {TextButton(onClick = {viewModel.dismissSaveDialog()}) { Text("Nei") }}
                 )
             }
@@ -182,20 +187,20 @@ fun MapScreen(
 
 
         //viser planteinfocard når pin blir trykket på av brukeren
-        uiState.selectedSavedPlace?.let { place ->
+        uiState.selectedSavedLocation?.let { location ->
             PlaceInfoCard(
-                place = place,
+                location = location,
                 onGetAiAdvice = { lat, lon -> viewModel.fetchAiAdvice(lat, lon) },
                 aiResponse = uiState.aiResponse,
                 isAiLoading = uiState.isAiLoading,
                 onDismissAi = { viewModel.dismissAiAdvice() },
                 onDismiss = { viewModel.dismissPlaceInfo() },
                 onEdit = { newName ->
-                    savedPlacesViewModel.updatePlace(place, newName)
+                    savedPlacesViewModel.updateLocation(location.copy (name = newName))
                     viewModel.dismissPlaceInfo()
                 },
                 onDelete = {
-                    savedPlacesViewModel.removePlace(place)
+                    savedPlacesViewModel.deleteLocation(location)
                     viewModel.dismissPlaceInfo()
                 },
                 navController = navController as NavHostController

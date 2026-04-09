@@ -24,10 +24,9 @@ fun AppNavHost(
     mapViewModel: MapViewModel,
     findPlantsViewModel: FindPlantsViewModel,
     savedPlacesViewModel: SavedPlacesViewModel,
+    myPlantsViewModel: MyPlantsViewModel,
     plantRepository: PlantRepository
 ) {
-
-    val myPlantsViewModel: MyPlantsViewModel = viewModel()
 
     NavHost(
         navController = navController,
@@ -46,8 +45,7 @@ fun AppNavHost(
             MyPlantsScreen(
                 navController = navController,
                 savedPlacesViewModel = savedPlacesViewModel,
-                plantRepository = plantRepository
-
+                myPlantsViewModel = myPlantsViewModel
             )
         }
         composable ("findPlants") {

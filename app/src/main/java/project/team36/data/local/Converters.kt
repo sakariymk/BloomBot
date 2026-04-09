@@ -1,35 +1,28 @@
 package project.team36.data.local
 
 import androidx.room.TypeConverter
-import project.team36.model.plante.Month
-import project.team36.model.plante.LightType
-import project.team36.model.plante.SoilType
-import project.team36.model.plante.Zone
+import project.team36.model.plant.LightType
+import project.team36.model.plant.SoilType
 
-// konvertere enum-klasser til og fra Strings
+// konvertere Set av soiltype osv, i stedet for å ha egne tabeller for disse
 
 class Converters {
     @TypeConverter
-    fun fromSoilType(value: SoilType): String = value.name
+    fun fromSoilTypeSet(value: Set<SoilType>): String = value.joinToString(",") { it.name }
 
     @TypeConverter
-    fun toSoilType(value: String): SoilType = SoilType.valueOf(value)
+    fun toSoilTypeSet(value: String): Set<SoilType> = value.split(",").map { SoilType.valueOf(it) }.toSet()
 
     @TypeConverter
-    fun fromLightType(value: LightType): String = value.name
+    fun fromLightTypeSet(value: Set<LightType>): String = value.joinToString(",") { it.name }
 
     @TypeConverter
-    fun toLightType(value: String): LightType = LightType.valueOf(value)
+    fun toLightTypeSet(value: String): Set<LightType> = value.split(",").map { LightType.valueOf(it) }.toSet()
 
     @TypeConverter
-    fun fromMonth(value: Month): String = value.name
+    fun fromIntSet(value: Set<Int>): String = value.joinToString(",")
 
     @TypeConverter
-    fun toMonth(value: String): Month = Month.valueOf(value)
+    fun toIntSet(value: String): Set<Int> = value.split(",").map { it.toInt() }.toSet()
 
-    @TypeConverter
-    fun fromZone(value: Zone): String = value.name
-
-    @TypeConverter
-    fun toZone(value: String): Zone = Zone.valueOf(value)
 }

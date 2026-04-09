@@ -1,28 +1,37 @@
 package project.team36.ui.myplants
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
+import project.team36.data.local.LocationRepository
 import project.team36.data.plant.PlantRepository
+import project.team36.model.location.SavedPlant
 import project.team36.model.plant.PlantInfo
 import project.team36.ui.map.SavedPlace
+import project.team36.ui.map.SavedPlacesViewModel
 
-class MyPlantsViewModel : ViewModel() {
-    private val _plants = MutableStateFlow<List<PlantInfo>>(emptyList())
-    val plants: StateFlow<List<PlantInfo>> = _plants.asStateFlow()
+class MyPlantsViewModel(
+    private val repository: LocationRepository,
+    private val savedPlacesViewModel: SavedPlacesViewModel
+) : ViewModel() {
 
-    //state for å vise/skjule plantevelger-dialog
-    private val _showPlantPicker = MutableStateFlow(false)
-    val showPlantPicker: StateFlow<Boolean> = _showPlantPicker.asStateFlow()
+    val plants = savedPlacesViewModel.selectedLocation
+        .flatMapLatest { location ->
+            repository.getPlantsForLocation(location?.id ?: -1)
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    //åpne dialog
-    fun openPlantPicker() { _showPlantPicker.value = true }
-
-    // lukke dialog
-    fun closePlantPicker() { _showPlantPicker.value = false }
-
-    fun addPlant(plant: PlantInfo) {
-        _plants.value += plant
+    //Slette plante
+    fun removePlant(plant: SavedPlant) {
+        viewModelScope.launch {
+            repository.deletePlant(plant)
+        }
     }
 }

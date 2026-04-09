@@ -1,11 +1,8 @@
 package project.team36.ui.myplants
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -13,36 +10,26 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel  // NY: import for viewModel()
 import androidx.navigation.NavController
-import project.team36.ui.map.SavedPlace
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.plant.PlantCard
+import project.team36.model.location.SavedLocation
+import project.team36.model.location.SavedPlant
 import project.team36.model.plant.PlantInfo
-import project.team36.data.plant.PlantRepository
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyPlantsScreen(
     navController: NavController,
     savedPlacesViewModel: SavedPlacesViewModel,
-    plantRepository: PlantRepository,
+    myPlantsViewModel: MyPlantsViewModel
 ) {
-    val savedPlaces by savedPlacesViewModel.savedPlaces.collectAsStateWithLifecycle()
-    var selectedPlace by remember { mutableStateOf<SavedPlace?>(null) }
-    val plantsForSelectedPlace = selectedPlace?.plants ?: emptyList()
 
-    //hent MyPlantsViewModel
-    val myPlantsViewModel: MyPlantsViewModel = viewModel()
+    val savedLocations by savedPlacesViewModel.savedLocations.collectAsStateWithLifecycle()
+    val selectedLocation by savedPlacesViewModel.selectedLocation.collectAsStateWithLifecycle()
 
-    //observer dialog-state
-    val showPlantPicker by myPlantsViewModel.showPlantPicker.collectAsStateWithLifecycle()
+    //hent planter for valgt sted
+    val plants by myPlantsViewModel.plants.collectAsStateWithLifecycle()
 
-    //hent tilgjengelige planter én gang
-    val availablePlants = remember { plantRepository.initiatePlants() }
-
-    //synkroniser selectedPlace når savedPlaces oppdateres
-    LaunchedEffect(savedPlaces) {
-        selectedPlace = savedPlaces.find { it.id == selectedPlace?.id }
-    }
 
     Scaffold(
         topBar = {
@@ -80,80 +67,32 @@ fun MyPlantsScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             item {
-                PlaceDropdown(
-                    savedPlaces = savedPlaces,
-                    selectedPlace = selectedPlace,
-                    onPlaceSelected = { selectedPlace = it }
+                LocationDropdown(
+                    savedLocations = savedLocations,
+                    selectedLocation = selectedLocation,
+                    onLocationSelected = { savedPlacesViewModel.selectLocation(it) }
                 )
             }
-
 
             // Vi mater inn riktig liste, og tegner opp nøyaktig det elementet vi er på.
-            items(plantsForSelectedPlace) { lagretPlante ->
+            items(plants){ savedPlant ->
                 PlantCard(
-                    plant = lagretPlante,
+                    plant = savedPlant.toPlantInfo(),
                     onDeletePlant = {
-                        selectedPlace?.let {
-                            savedPlacesViewModel.removePlantFromPlace(it, lagretPlante)
-                        }
+                        myPlantsViewModel.removePlant(savedPlant)
                     }
                 )
             }
-
-            item {
-                Button(
-                    //åpner dialog i stedet for å legge til direkte
-                    onClick = {
-                        if (selectedPlace != null) myPlantsViewModel.openPlantPicker()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                ) {
-                    Text("Legg til plante")
-                }
-            }
-        }
-
-        //dialog for å velge plante
-        if (showPlantPicker) {
-            AlertDialog(
-                onDismissRequest = { myPlantsViewModel.closePlantPicker() },
-                title = { Text("Velg plante") },
-                text = {
-                    LazyColumn {
-                        items(availablePlants) { plant ->
-                            TextButton(
-                                onClick = {
-                                    selectedPlace?.let {
-                                        savedPlacesViewModel.addPlantToPlace(it, plant)
-                                    }
-                                    myPlantsViewModel.closePlantPicker()
-                                },
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text(plant.name)
-                            }
-                        }
-                    }
-                },
-                confirmButton = {},
-                dismissButton = {
-                    TextButton(onClick = { myPlantsViewModel.closePlantPicker() }) {
-                        Text("Avbryt")
-                    }
-                }
-            )
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlaceDropdown(
-    savedPlaces: List<SavedPlace>,
-    selectedPlace: SavedPlace?,
-    onPlaceSelected: (SavedPlace) -> Unit
+fun LocationDropdown(
+    savedLocations: List<SavedLocation>,
+    selectedLocation: SavedLocation?,
+    onLocationSelected: (SavedLocation) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -162,7 +101,7 @@ fun PlaceDropdown(
         onExpandedChange = { expanded = !expanded }
     ) {
         TextField(
-            value = selectedPlace?.customName ?: "Velg sted",
+            value = selectedLocation?.name ?: "Velg sted",
             onValueChange = {},
             readOnly = true,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
@@ -175,11 +114,11 @@ fun PlaceDropdown(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            savedPlaces.forEach { place ->
+            savedLocations.forEach { location ->
                 DropdownMenuItem(
-                    text = { Text(place.customName) },
+                    text = { Text(location.name ?: "Ukjent") },
                     onClick = {
-                        onPlaceSelected(place)
+                        onLocationSelected(location)
                         expanded = false
                     }
                 )
@@ -188,21 +127,18 @@ fun PlaceDropdown(
     }
 }
 
-@Composable
-fun PlaceholderExpandableCard(title: String, content: @Composable () -> Unit) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { expanded = !expanded },
-        shape = RoundedCornerShape(16.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = title, style = MaterialTheme.typography.titleMedium)
-            AnimatedVisibility(visible = expanded) {
-                content()
-            }
-        }
-    }
-}
+//For at alt skal fungere midledtidig før vi får laget nye plantsCards, eller andre løsninger
+fun SavedPlant.toPlantInfo(): PlantInfo = PlantInfo(
+    name = this.name,
+    soil = this.soil,
+    light = this.light,
+    isFrostResistant = this.isFrostResistant,
+    waterPerWeek = this.waterPerWeek,
+    plantingMonth = this.plantingMonth,
+    climateZone = this.climateZone,
+    hasBeenWatered = this.hasBeenWatered,
+    daysSinceWatered = this.daysSinceWatered,
+    maxDaysWithoutWater = this.maxDaysWithoutWater,
+    imageRes = this.imageRes,
+    description = this.description
+)
