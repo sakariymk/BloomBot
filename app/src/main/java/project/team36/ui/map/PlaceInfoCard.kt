@@ -34,12 +34,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
-import project.team36.ui.map.SavedPlace
+import project.team36.model.location.SavedLocation
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaceInfoCard(
-    place: SavedPlace,
+    location: SavedLocation,
     // NYE PARAMETERE FOR AI:
     onGetAiAdvice: (Double, Double) -> Unit,
     aiResponse: String?,
@@ -52,7 +52,7 @@ fun PlaceInfoCard(
     navController: NavHostController //DENNE GIR ERROR; IGNORER!
 ) {
     var showEditDialog by rememberSaveable { mutableStateOf((false)) }
-    var editedName by rememberSaveable { mutableStateOf(place.customName)}
+    var editedName by rememberSaveable { mutableStateOf(location.name ?: "")}
 
     //dette er boks hvis bruker vil redigere stedet man har lagra
     if (showEditDialog) {
@@ -108,11 +108,11 @@ fun PlaceInfoCard(
                     .padding(16.dp)
             ) {
                 //viser custom navn, adresse hvis brukeren ikke har redigert navnet
-                Text(text = place.customName, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text(text = location.name ?: "Ukjent", fontWeight = FontWeight.Bold, fontSize = 18.sp)
 
                 //viser adressen
                 Text(
-                    text = place.result.fullAddress ?: place.result.address?.region ?: "Ingen adresse",
+                    text = location.address ?: "Ingen adresse",
                     modifier = Modifier.padding(top = 4.dp),
                     color = Color(0xFF6F8069)
                 )
@@ -180,7 +180,7 @@ fun PlaceInfoCard(
                 Button(
                     onClick = {
                         // Henter koordinatene for denne spesifikke plassen og sender til viewmodel
-                        onGetAiAdvice(place.result.coordinate.latitude(), place.result.coordinate.longitude())
+                        onGetAiAdvice(location.lat ?: 0.0, location.lon ?: 0.0)
                     },
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)

@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -44,21 +45,17 @@ dependencies {
     //MapBox
     implementation("com.mapbox.maps:android:11.19.0")
     implementation("com.mapbox.extension:maps-compose:11.19.0")
+    implementation("com.mapbox.search:mapbox-search-android:2.14.0-beta.1")
     //ViewModel
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.10.0")
     implementation("com.google.accompanist:accompanist-permissions:0.37.3")
-    implementation("com.mapbox.search:mapbox-search-android:2.14.0-beta.1")
-    implementation("com.mapbox.extension:maps-compose:11.19.0")
-    implementation("com.mapbox.maps:android:11.19.0")
+
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     // OkHttp for nettverk og Server-Sent Events (SSE)
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:okhttp-sse:4.12.0")
-    // Retrofit for Claude API
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     // Coroutines for asynkrone kall
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
     //retrofit
@@ -86,7 +83,11 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:3.4.1")
     implementation("io.ktor:ktor-client-cio:3.4.1")
     implementation("androidx.activity:activity-compose:1.8.2")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation("androidx.compose.material3:material3:1.2.0")
     implementation("androidx.compose.runtime:runtime:1.6.1")
+
+    //Room database
+    implementation("androidx.room:room-runtime:2.8.4")
+    ksp("androidx.room:room-compiler:2.8.4")
+    implementation("androidx.room:room-ktx:2.8.4")
 }

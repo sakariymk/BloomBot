@@ -20,5 +20,4 @@ data class PlantInfo(
     val maxDaysWithoutWater: Int,
     val imageRes: Int,
     val description: String,
-
     )

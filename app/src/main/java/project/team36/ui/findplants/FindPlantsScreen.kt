@@ -1,8 +1,6 @@
 package project.team36.ui.findplants
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,10 +13,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import project.team36.ui.myplants.MyPlantsViewModel
 import project.team36.ui.plant.PlantCard
@@ -36,7 +32,7 @@ fun FindPlantsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Oppdag planter") }
+                title = { Text("Finn nye planter") }
             )
         },
         bottomBar = {
@@ -68,11 +64,11 @@ fun FindPlantsScreen(
         ) {
             items(plants) {plant ->
                 PlantCard(
-                    plant,
+                    plant = plant,
                     showAddButton = true,
                     onAddPlant = {
-                        myPlantsViewModel.addPlant(plant)
-                        findPlantsViewModel.removePlant(plant)
+                        findPlantsViewModel.addPlant(plant)
+                        findPlantsViewModel.onPlantAdded(plant)
                     } )
             }
         }

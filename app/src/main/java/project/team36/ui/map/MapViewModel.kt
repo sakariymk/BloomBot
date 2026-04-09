@@ -23,6 +23,7 @@ import project.team36.model.plant.PlantInfo
 import java.util.UUID
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import project.team36.model.location.SavedLocation
 
 data class SavedPlace(
     val result: SearchResult,
@@ -41,7 +42,7 @@ data class MapUiState(
     val selectedResult: SearchResult? = null,
     val showSaveDialog: Boolean = false,
     val placeNameInput: String = "",
-    val selectedSavedPlace: SavedPlace? = null,
+    val selectedSavedLocation: SavedLocation? = null,
     val aiResponse: String? = null,
     val isAiLoading: Boolean = false
 )
@@ -138,28 +139,34 @@ class MapViewModel(private val repository: HybridAiRepository) : ViewModel() {
         })
     }
 
+    //Lagre stedet i DB
     fun confirmSavePlace(savedPlacesViewModel: SavedPlacesViewModel) {
         val result = _uiState.value.selectedResult ?: run {
             Log.e("MapViewModel", "confirmSavePlace: selectedResult er null!")
             return
         }
         val name = _uiState.value.placeNameInput.ifEmpty { result.name }
-        val savedPlace = SavedPlace(result = result, customName = name)
-        Log.d("MapViewModel", "Legger til sted: ${savedPlace.customName}")
-        savedPlacesViewModel.addPlace(savedPlace)
-        _uiState.value = _uiState.value.copy(showSaveDialog = false, placeNameInput = "")
+
+        savedPlacesViewModel.addLocation(
+            SavedLocation(
+                name = name,
+                lat = result.coordinate.latitude(),
+                lon = result.coordinate.longitude(),
+                address = result.fullAddress
+            )
+        )
     }
 
     fun dismissSaveDialog() {
         _uiState.value = _uiState.value.copy(showSaveDialog = false, placeNameInput = "")
     }
 
-    fun onSavedPlaceClicked(place: SavedPlace) {
-        _uiState.value = _uiState.value.copy(selectedSavedPlace = place)
+    fun onSavedLocationClicked(location: SavedLocation) {
+        _uiState.value = _uiState.value.copy(selectedSavedLocation = location)
     }
 
     fun dismissPlaceInfo() {
-        _uiState.value = _uiState.value.copy(selectedSavedPlace = null)
+        _uiState.value = _uiState.value.copy(selectedSavedLocation = null)
     }
 
     fun fetchAiAdvice(lat: Double, lon: Double) {
@@ -178,7 +185,7 @@ class MapViewModel(private val repository: HybridAiRepository) : ViewModel() {
         }
     }
 
-    // 3. En liten funksjon for å lukke AI-svaret igjen:
+    // En liten funksjon for å lukke AI-svaret igjen:
     fun dismissAiAdvice() {
         _uiState.value = _uiState.value.copy(aiResponse = null)
     }
