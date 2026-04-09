@@ -22,6 +22,8 @@ import project.team36.data.ai.HybridAiRepository
 import project.team36.model.plant.PlantInfo
 import java.util.UUID
 import androidx.lifecycle.viewModelScope
+import com.mapbox.geojson.Point
+import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
 import kotlinx.coroutines.launch
 import project.team36.model.location.SavedLocation
 
@@ -62,16 +64,32 @@ class MapViewModelFactory(
 
 
 
-
-
 class MapViewModel(private val repository: HybridAiRepository) : ViewModel() {
+
+    val mapViewportState = MapViewportState().apply {
+        setCameraOptions {
+            zoom(4.3)
+            center(Point.fromLngLat(9.30, 63.59))
+            pitch(0.0)
+            bearing(0.0)
+        }
+    }
+
     private val _uiState = MutableStateFlow(MapUiState())
     val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()
+    private var hasInitializedCamera = false //for at kameraet skal ikke zoome sykt mye rundt når man beveger på seg
 
     private val searchEngine = SearchEngine.createSearchEngine(
         ApiType.SEARCH_BOX,
         SearchEngineSettings()
     )
+
+    fun onLocationReady() {
+        if (!hasInitializedCamera) {
+            hasInitializedCamera = true
+            mapViewportState.transitionToFollowPuckState()
+        }
+    }
 
     fun onSearchQueryChanged(query: String) {
         _uiState.value = _uiState.value.copy(searchQuery = query)

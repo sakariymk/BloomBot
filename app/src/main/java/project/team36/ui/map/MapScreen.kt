@@ -50,6 +50,7 @@ fun MapScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val savedLocations by savedPlacesViewModel.savedLocations.collectAsStateWithLifecycle() // NYTT: hent savedPlaces herfra -- henter nå fra database
+    val mapViewportState = viewModel.mapViewportState
 
     //få lokasjon permissions
     val locationPermissionState = rememberPermissionState(
@@ -57,15 +58,6 @@ fun MapScreen(
     )
     LaunchedEffect(Unit) {
         locationPermissionState.launchPermissionRequest()
-    }
-
-    val mapViewportState = rememberMapViewportState {
-        setCameraOptions {
-            zoom(uiState.zoom)
-            center(Point.fromLngLat(uiState.centerLng, uiState.centerLat))
-            pitch(0.0)
-            bearing(0.0)
-        }
     }
 
     Scaffold(
@@ -115,7 +107,7 @@ fun MapScreen(
                             enabled = true
                             puckBearingEnabled = false
                         }
-                        mapViewportState.transitionToFollowPuckState()
+                        viewModel.onLocationReady() //view følger ikke lenger location puck 24/7, kun når appen startes
                     }
                 }
 
