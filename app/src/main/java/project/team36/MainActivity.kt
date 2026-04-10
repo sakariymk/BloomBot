@@ -4,6 +4,14 @@ import project.team36.ui.navigation.AppNavHost
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -14,6 +22,12 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import java.util.concurrent.TimeUnit
+
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import project.team36.ui.myplants.MyPlantsScreen
+import project.team36.ui.findplants.FindPlantsScreen
 import project.team36.ui.findplants.FindPlantsViewModel
 import project.team36.data.ai.ClaudeApi
 import project.team36.data.ai.HybridAiRepository
@@ -22,10 +36,14 @@ import project.team36.data.local.AppDatabase
 import project.team36.data.local.LocationRepository
 import project.team36.data.plant.PlantDataSource
 import project.team36.data.plant.PlantRepository
+import project.team36.ui.map.MapScreen
 import project.team36.ui.map.MapViewModel
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.map.SavedPlacesViewModelFactory
 import project.team36.ui.myplants.MyPlantsViewModel
+import project.team36.ui.navigation.AppNavHost
+import project.team36.ui.plant.PlantDetailsViewModel
+//import project.team36.ui.plant.PlantSwipeViewModel
 import project.team36.ui.theme.Team36Theme
 
 
@@ -116,6 +134,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             Team36Theme {
+
                 val navController = rememberNavController()
 
                 val savedPlacesViewModel: SavedPlacesViewModel = viewModel(
@@ -133,10 +152,21 @@ class MainActivity : ComponentActivity() {
                     factory = MapViewModelFactory(hybridAiRepository)
                 )
 
+                // plantDetailsScreen ViewModel --> sjekk om den skal ligge her
+                val plantDetailsViewModel: PlantDetailsViewModel = viewModel(
+                    factory = object : ViewModelProvider.Factory {
+                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                            return PlantDetailsViewModel(plantRepository) as T
+                        }
+                    }
+                )
+
                 AppNavHost(
                     navController = navController,
                     mapViewModel = mapViewModel,
                     findPlantsViewModel = findPlantsViewModel,
+                    savedPlacesViewModel = savedPlacesViewModel,
+                    plantDetailsViewModel = plantDetailsViewModel
                     savedPlacesViewModel = savedPlacesViewModel,
                     myPlantsViewModel = myPlantsViewModel,
                     plantRepository = plantRepository
