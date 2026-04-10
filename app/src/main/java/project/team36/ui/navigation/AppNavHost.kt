@@ -57,7 +57,8 @@ fun AppNavHost(
             FindPlantsScreen(
                 findPlantsViewModel = findPlantsViewModel,
                 myPlantsViewModel = myPlantsViewModel,
-                navController = navController
+                navController = navController,
+                savedPlacesViewModel = savedPlacesViewModel
             )
         }
         // plantDetailScreen
