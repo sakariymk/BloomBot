@@ -1,5 +1,6 @@
 package project.team36
 
+import project.team36.ui.navigation.AppNavHost
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -31,16 +32,20 @@ import project.team36.ui.findplants.FindPlantsViewModel
 import project.team36.data.ai.ClaudeApi
 import project.team36.data.ai.HybridAiRepository
 import project.team36.data.klima.MetWeatherApi
+import project.team36.data.local.AppDatabase
+import project.team36.data.local.LocationRepository
 import project.team36.data.plant.PlantDataSource
 import project.team36.data.plant.PlantRepository
 import project.team36.ui.map.MapScreen
 import project.team36.ui.map.MapViewModel
 import project.team36.ui.map.SavedPlacesViewModel
+import project.team36.ui.map.SavedPlacesViewModelFactory
+import project.team36.ui.myplants.MyPlantsViewModel
 import project.team36.ui.navigation.AppNavHost
 import project.team36.ui.plant.PlantDetailsViewModel
 //import project.team36.ui.plant.PlantSwipeViewModel
 import project.team36.ui.theme.Team36Theme
-//import project.team36.ui.plant.PlantSwipeScreen
+
 
 class MapViewModelFactory(
     private val repository: HybridAiRepository
@@ -54,12 +59,42 @@ class MapViewModelFactory(
     }
 }
 
+class FindPlantsViewModelFactory(
+    private val plantRepository: PlantRepository,
+    private val locationRepository: LocationRepository,
+    private val savedPlacesViewModel: SavedPlacesViewModel
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(FindPlantsViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return FindPlantsViewModel(plantRepository, locationRepository, savedPlacesViewModel) as T
+        }
+        throw IllegalArgumentException("Ukjent ViewModel klasse")
+    }
+}
+
+class MyPlantsViewModelFactory(
+    private val repository: LocationRepository,
+    private val savedPlacesViewModel: SavedPlacesViewModel
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(MyPlantsViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return MyPlantsViewModel(repository, savedPlacesViewModel) as T
+        }
+        throw IllegalArgumentException("Ukjent ViewModel klasse")
+    }
+}
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val dataSource = PlantDataSource(this)
         val plantRepository = PlantRepository(dataSource)
+
+        //Database og repo
+        val db = AppDatabase.getDatabase(this)
+        val locationRepository = LocationRepository(db.savedLocationDao(), db.savedPlantDao())
 
         val contentType = "application/json".toMediaType()
         val jsonConfig = Json {
@@ -102,16 +137,17 @@ class MainActivity : ComponentActivity() {
 
                 val navController = rememberNavController()
 
-                // Initialiserer ViewModels
-                val savedPlacesViewModel: SavedPlacesViewModel = viewModel()
-                val findPlantsViewModel: FindPlantsViewModel = viewModel(
-                    factory = object : ViewModelProvider.Factory {
-                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                            return FindPlantsViewModel(plantRepository) as T
-                        }
-                    }
+                val savedPlacesViewModel: SavedPlacesViewModel = viewModel(
+                    factory = SavedPlacesViewModelFactory(locationRepository)
                 )
-                //val swipeViewModel = remember { PlantSwipeViewModel(plantRepository) }
+                val findPlantsViewModel: FindPlantsViewModel = viewModel(
+                    factory = FindPlantsViewModelFactory(plantRepository, locationRepository, savedPlacesViewModel)
+                )
+
+                val myPlantsViewModel: MyPlantsViewModel = viewModel(
+                    factory = MyPlantsViewModelFactory(locationRepository, savedPlacesViewModel)
+                )
+
                 val mapViewModel: MapViewModel = viewModel(
                     factory = MapViewModelFactory(hybridAiRepository)
                 )
@@ -131,6 +167,9 @@ class MainActivity : ComponentActivity() {
                     findPlantsViewModel = findPlantsViewModel,
                     savedPlacesViewModel = savedPlacesViewModel,
                     plantDetailsViewModel = plantDetailsViewModel
+                    savedPlacesViewModel = savedPlacesViewModel,
+                    myPlantsViewModel = myPlantsViewModel,
+                    plantRepository = plantRepository
                 )
             }
         }

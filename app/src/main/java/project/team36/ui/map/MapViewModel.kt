@@ -2,6 +2,7 @@ package project.team36.ui.map
 
 import androidx.lifecycle.ViewModel
 import android.util.Log
+import androidx.lifecycle.ViewModelProvider
 import com.mapbox.maps.dsl.cameraOptions
 import com.mapbox.maps.extension.compose.animation.viewport.MapViewportState
 import com.mapbox.search.SearchEngineSettings
@@ -18,10 +19,18 @@ import com.mapbox.search.ApiType
 import com.mapbox.search.ResponseInfo
 import com.mapbox.search.SearchEngine
 import project.team36.data.ai.HybridAiRepository
+import project.team36.model.plant.PlantInfo
+import java.util.UUID
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
+import project.team36.model.location.SavedLocation
 
 data class SavedPlace(
     val result: SearchResult,
-    val customName: String
+    val customName: String,
+    val plants: List<PlantInfo> = emptyList(),
+    val id: String = UUID.randomUUID().toString()
+
 )
 
 data class MapUiState(
@@ -33,8 +42,27 @@ data class MapUiState(
     val selectedResult: SearchResult? = null,
     val showSaveDialog: Boolean = false,
     val placeNameInput: String = "",
-    val selectedSavedPlace: SavedPlace? = null
+    val selectedSavedLocation: SavedLocation? = null,
+    val aiResponse: String? = null,
+    val isAiLoading: Boolean = false
 )
+
+
+class MapViewModelFactory(
+    private val repository: HybridAiRepository
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(MapViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return MapViewModel(repository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
+
+
+
+
 
 class MapViewModel(private val repository: HybridAiRepository) : ViewModel() {
     private val _uiState = MutableStateFlow(MapUiState())
@@ -111,24 +139,54 @@ class MapViewModel(private val repository: HybridAiRepository) : ViewModel() {
         })
     }
 
+    //Lagre stedet i DB
     fun confirmSavePlace(savedPlacesViewModel: SavedPlacesViewModel) {
-        val result = _uiState.value.selectedResult ?: return
-        val name = _uiState.value.placeNameInput.ifEmpty { result.name }.ifEmpty { result.name }
-        val savedPlace = SavedPlace(result = result, customName = name)
+        val result = _uiState.value.selectedResult ?: run {
+            Log.e("MapViewModel", "confirmSavePlace: selectedResult er null!")
+            return
+        }
+        val name = _uiState.value.placeNameInput.ifEmpty { result.name }
 
-        savedPlacesViewModel.addPlace(savedPlace)
-        _uiState.value = _uiState.value.copy(showSaveDialog = false, placeNameInput = "")
+        savedPlacesViewModel.addLocation(
+            SavedLocation(
+                name = name,
+                lat = result.coordinate.latitude(),
+                lon = result.coordinate.longitude(),
+                address = result.fullAddress
+            )
+        )
     }
 
     fun dismissSaveDialog() {
         _uiState.value = _uiState.value.copy(showSaveDialog = false, placeNameInput = "")
     }
 
-    fun onSavedPlaceClicked(place: SavedPlace) {
-        _uiState.value = _uiState.value.copy(selectedSavedPlace = place)
+    fun onSavedLocationClicked(location: SavedLocation) {
+        _uiState.value = _uiState.value.copy(selectedSavedLocation = location)
     }
 
     fun dismissPlaceInfo() {
-        _uiState.value = _uiState.value.copy(selectedSavedPlace = null)
+        _uiState.value = _uiState.value.copy(selectedSavedLocation = null)
+    }
+
+    fun fetchAiAdvice(lat: Double, lon: Double) {
+        // Skrur på "laster..."-visningen i UI-et
+        _uiState.value = _uiState.value.copy(isAiLoading = true, aiResponse = null)
+
+        viewModelScope.launch {
+            // Venter på at Claude skal tenke ferdig (og sjekke været)
+            val response = repository.getPlantRecommendations(lat, lon)
+
+            // Skrur av "laster..." og lagrer Claude sitt svar!
+            _uiState.value = _uiState.value.copy(
+                isAiLoading = false,
+                aiResponse = response
+            )
+        }
+    }
+
+    // En liten funksjon for å lukke AI-svaret igjen:
+    fun dismissAiAdvice() {
+        _uiState.value = _uiState.value.copy(aiResponse = null)
     }
 }

@@ -7,13 +7,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -30,19 +34,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
-import project.team36.ui.map.SavedPlace
+import project.team36.model.location.SavedLocation
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaceInfoCard(
-    place: SavedPlace,
+    location: SavedLocation,
+    // NYE PARAMETERE FOR AI:
+    onGetAiAdvice: (Double, Double) -> Unit,
+    aiResponse: String?,
+    isAiLoading: Boolean,
+    onDismissAi: () -> Unit,
+    // EKSISTERENDE PARAMETERE:
     onDismiss: () -> Unit,
     onEdit: (String) -> Unit,
     onDelete: () -> Unit,
     navController: NavHostController //DENNE GIR ERROR; IGNORER!
 ) {
     var showEditDialog by rememberSaveable { mutableStateOf((false)) }
-    var editedName by rememberSaveable { mutableStateOf(place.customName)}
+    var editedName by rememberSaveable { mutableStateOf(location.name ?: "")}
 
     //dette er boks hvis bruker vil redigere stedet man har lagra
     if (showEditDialog) {
@@ -70,6 +80,17 @@ fun PlaceInfoCard(
         )
     }
 
+    // NY BOKS: Dette er popupen som viser rådet fra Claude når den er ferdig
+    if (aiResponse != null) {
+        AlertDialog(
+            onDismissRequest = onDismissAi,
+            title = { Text("Hageråd fra Claude 🌱") },
+            text = { Text(aiResponse, modifier = Modifier .verticalScroll(rememberScrollState())) },
+            confirmButton = {
+                TextButton(onClick = onDismissAi) { Text("OK") }
+            }
+        )
+    }
 
     //dette viser selve lokasjon og litt info
     Dialog(onDismissRequest = onDismiss) {
@@ -77,7 +98,7 @@ fun PlaceInfoCard(
             modifier = Modifier
                 .shadow(elevation = 4.dp, spotColor = Color(0x40000000), ambientColor = Color(0x40000000))
                 .width(316.dp)
-                .height(230.dp)
+                .height(290.dp) // ØKT HØYDE FRA 230 TIL 290 FOR Å FÅ PLASS TIL KNAPPEN
                 .background(color = Color(0xFFE8F8E3), shape = RoundedCornerShape(size = 15.dp))
                 .fillMaxSize()
         ) {
@@ -87,11 +108,11 @@ fun PlaceInfoCard(
                     .padding(16.dp)
             ) {
                 //viser custom navn, adresse hvis brukeren ikke har redigert navnet
-                Text(text = place.customName, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text(text = location.name ?: "Ukjent", fontWeight = FontWeight.Bold, fontSize = 18.sp)
 
                 //viser adressen
                 Text(
-                    text = place.result.fullAddress ?: place.result.address?.region ?: "Ingen adresse",
+                    text = location.address ?: "Ingen adresse",
                     modifier = Modifier.padding(top = 4.dp),
                     color = Color(0xFF6F8069)
                 )
@@ -153,6 +174,40 @@ fun PlaceInfoCard(
                         fontSize = 15.sp,
                         fontWeight = FontWeight(400)
                     )
+                }
+
+                // NY AI-KNAPP
+                Button(
+                    onClick = {
+                        // Henter koordinatene for denne spesifikke plassen og sender til viewmodel
+                        onGetAiAdvice(location.lat ?: 0.0, location.lon ?: 0.0)
+                    },
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(6.dp)
+                        .shadow(
+                            elevation = 4.dp,
+                            spotColor = Color(0x40000000),
+                            ambientColor = Color(0x40000000)
+                        )
+                        .width(193.dp)
+                        .height(42.dp),
+                    enabled = !isAiLoading, // Låser knappen mens vi venter på svar
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF4CAF50), // Mørkere grønnfarge
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(23.5.dp)
+                ) {
+                    if (isAiLoading) {
+                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                    } else {
+                        Text(
+                            text = "✨ Få AI-Råd",
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight(400)
+                        )
+                    }
                 }
 
                 //knapp for å lukke boksen
