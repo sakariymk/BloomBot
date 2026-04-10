@@ -48,7 +48,6 @@ fun AppNavHost(
         }
         composable ("myPlants"){
             MyPlantsScreen(
-                mapViewModel = mapViewModel,
                 navController = navController,
                 savedPlacesViewModel = savedPlacesViewModel,
                 myPlantsViewModel = myPlantsViewModel
