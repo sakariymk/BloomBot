@@ -165,11 +165,10 @@ class MainActivity : ComponentActivity() {
                     navController = navController,
                     mapViewModel = mapViewModel,
                     findPlantsViewModel = findPlantsViewModel,
-                    savedPlacesViewModel = savedPlacesViewModel,
-                    plantDetailsViewModel = plantDetailsViewModel
-                    savedPlacesViewModel = savedPlacesViewModel,
                     myPlantsViewModel = myPlantsViewModel,
-                    plantRepository = plantRepository
+                    savedPlacesViewModel = savedPlacesViewModel,
+                    plantRepository = plantRepository,
+                    plantDetailsViewModel = plantDetailsViewModel
                 )
             }
         }
