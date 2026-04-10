@@ -37,6 +37,7 @@ import project.team36.ui.map.MapScreen
 import project.team36.ui.map.MapViewModel
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.navigation.AppNavHost
+import project.team36.ui.plant.PlantDetailsViewModel
 //import project.team36.ui.plant.PlantSwipeViewModel
 import project.team36.ui.theme.Team36Theme
 //import project.team36.ui.plant.PlantSwipeScreen
@@ -115,11 +116,21 @@ class MainActivity : ComponentActivity() {
                     factory = MapViewModelFactory(hybridAiRepository)
                 )
 
+                // plantDetailsScreen ViewModel --> sjekk om den skal ligge her
+                val plantDetailsViewModel: PlantDetailsViewModel = viewModel(
+                    factory = object : ViewModelProvider.Factory {
+                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                            return PlantDetailsViewModel(plantRepository) as T
+                        }
+                    }
+                )
+
                 AppNavHost(
                     navController = navController,
                     mapViewModel = mapViewModel,
                     findPlantsViewModel = findPlantsViewModel,
-                    savedPlacesViewModel = savedPlacesViewModel
+                    savedPlacesViewModel = savedPlacesViewModel,
+                    plantDetailsViewModel = plantDetailsViewModel
                 )
             }
         }

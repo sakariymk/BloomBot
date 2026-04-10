@@ -13,6 +13,8 @@ import project.team36.ui.map.MapViewModel
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.myplants.MyPlantsScreen
 import project.team36.ui.myplants.MyPlantsViewModel
+import project.team36.ui.plant.PlantDetailsScreen
+import project.team36.ui.plant.PlantDetailsViewModel
 
 //import project.team36.ui.plant.PlantSwipeViewModel
 
@@ -22,7 +24,8 @@ fun AppNavHost(
     navController: NavHostController,
     mapViewModel: MapViewModel,
     findPlantsViewModel: FindPlantsViewModel,
-    savedPlacesViewModel: SavedPlacesViewModel
+    savedPlacesViewModel: SavedPlacesViewModel,
+    plantDetailsViewModel: PlantDetailsViewModel // SJEKK OM DENNE SKAL VÆRE HER
 ) {
 
     val myPlantsViewModel: MyPlantsViewModel = viewModel()
@@ -53,6 +56,16 @@ fun AppNavHost(
                 findPlantsViewModel = findPlantsViewModel,
                 myPlantsViewModel = myPlantsViewModel,
                 navController = navController
+            )
+        }
+        // plantDetailScreen
+        composable ("plantDetail/{plantName}") { backStackEntry ->
+            val plantName = backStackEntry.arguments?.getString("plantName") ?: return@composable
+            PlantDetailsScreen(
+                plantName = plantName,
+                viewModel = plantDetailsViewModel,
+                onBackClick = { navController.popBackStack() },
+                onAddClick = {/*TODO*/}
             )
         }
     }
