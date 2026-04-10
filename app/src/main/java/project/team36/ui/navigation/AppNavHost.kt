@@ -71,7 +71,6 @@ fun AppNavHost(
                 showAddButton = TODO(),
                 onAddPlant = TODO()
             )
-
         }
     }
 }
