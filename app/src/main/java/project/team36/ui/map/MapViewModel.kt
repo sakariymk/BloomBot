@@ -23,9 +23,14 @@ import project.team36.model.plant.PlantInfo
 import java.util.UUID
 import androidx.lifecycle.viewModelScope
 import com.mapbox.geojson.Point
-import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
+import com.mapbox.maps.MapboxMap
+import com.mapbox.maps.RenderedQueryGeometry
+import com.mapbox.maps.RenderedQueryOptions
 import kotlinx.coroutines.launch
 import project.team36.model.location.SavedLocation
+import project.team36.ui.map.ClimateZoneConfig.LAYER_ID
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 data class SavedPlace(
     val result: SearchResult,
@@ -157,22 +162,65 @@ class MapViewModel(private val repository: HybridAiRepository) : ViewModel() {
         })
     }
 
-    //Lagre stedet i DB
-    fun confirmSavePlace(savedPlacesViewModel: SavedPlacesViewModel) {
-        val result = _uiState.value.selectedResult ?: run {
-            Log.e("MapViewModel", "confirmSavePlace: selectedResult er null!")
-            return
+    //Lagre stedet i DB og legge til sone
+    private var mapboxMap: MapboxMap? = null
+
+    fun onMapReady(map: MapboxMap) {
+        mapboxMap = map
+        Log.d("ZONE_TEST", "Kart klart!")
+    }
+
+    //Hente klimasone for koordinatet på valgt sted ved å spørre klimasonelaget via queryRenderedFeatures. suspendCoroutine for å få gjort
+    //den asynkrone Mapbox funksjonen om til suspend-funksjon og returnere en verdi
+    suspend fun getClimateZone(
+        lng: Double,
+        lat: Double
+    ): Int? = suspendCoroutine { continuation ->
+        val map = mapboxMap ?: run {
+            continuation.resume(null)
+            return@suspendCoroutine
         }
+
+        val pointOnScreen = map.pixelForCoordinate(
+            Point.fromLngLat(lng, lat)
+        )
+
+        map.queryRenderedFeatures(
+            RenderedQueryGeometry(pointOnScreen),
+            RenderedQueryOptions(listOf(LAYER_ID), null)
+        ) {
+                result ->
+            val zone = result.value
+                ?.firstOrNull()
+                ?.queriedFeature
+                ?.feature
+                ?.getNumberProperty("Klasse")
+                ?.toInt()
+            continuation.resume(zone)
+        }
+    }
+
+    fun confirmSavePlace(savedPlacesViewModel: SavedPlacesViewModel) {
+        val result = _uiState.value.selectedResult ?: return
         val name = _uiState.value.placeNameInput.ifEmpty { result.name }
 
-        savedPlacesViewModel.addLocation(
-            SavedLocation(
-                name = name,
-                lat = result.coordinate.latitude(),
-                lon = result.coordinate.longitude(),
-                address = result.fullAddress
+        viewModelScope.launch {
+            val zone = getClimateZone(
+                lng = result.coordinate.longitude(),
+                lat = result.coordinate.latitude()
             )
-        )
+
+            Log.d("ZONE_TEST", "Hentet sone: $zone for $name")
+            savedPlacesViewModel.addLocation(
+                SavedLocation(
+                    name = name,
+                    lat = result.coordinate.latitude(),
+                    lon = result.coordinate.longitude(),
+                    address = result.fullAddress,
+                    zone = zone ?: 0
+                )
+            )
+        }
     }
 
     fun dismissSaveDialog() {

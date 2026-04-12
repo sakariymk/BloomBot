@@ -135,6 +135,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             Team36Theme {
 
+
                 val navController = rememberNavController()
 
                 val savedPlacesViewModel: SavedPlacesViewModel = viewModel(

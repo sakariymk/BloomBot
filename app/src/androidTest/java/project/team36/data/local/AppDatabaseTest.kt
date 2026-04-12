@@ -10,13 +10,14 @@ import project.team36.data.local.dao.SavedPlantDao
 import android.content.Context
 import androidx.room.Room
 import junit.framework.TestCase
+import kotlinx.coroutines.flow.any
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Test
 import project.team36.model.location.SavedLocation
 import project.team36.model.location.SavedPlant
-import project.team36.model.plante.LightType
-import project.team36.model.plante.SoilType
+import project.team36.model.plant.LightType
+import project.team36.model.plant.SoilType
 
 @RunWith(AndroidJUnit4::class)
 class AppDatabaseTest : TestCase() {
@@ -44,7 +45,7 @@ class AppDatabaseTest : TestCase() {
     fun writeAndReadLocation() = runBlocking {
         val location = SavedLocation(name = "Hjem", lat = 59.8, lon = 10.9, address = "Solveien 61")
         locationDao.insert(location)
-        val locations = locationDao.getAll()
+        val locations = locationDao.getAllLocations()
         assertTrue(locations.any {it.name == "Hjem"})
     }
 

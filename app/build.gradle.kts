@@ -62,6 +62,14 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     //Icons
     implementation("androidx.compose.material:material-icons-extended")
+    // Ktor og SDK-klient
+    implementation("io.modelcontextprotocol:kotlin-sdk-client:0.9.0")
+    implementation(platform("io.ktor:ktor-bom:3.4.1"))         // styrer alle versjoner automatisk
+    implementation("io.ktor:ktor-client-android")
+    implementation("io.ktor:ktor-client-content-negotiation")
+    implementation("io.ktor:ktor-serialization-kotlinx-json")
+    implementation("io.ktor:ktor-client-cio:3.4.1")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -78,10 +86,7 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-    implementation("io.ktor:ktor-client-android:3.4.1")
-    implementation("io.ktor:ktor-client-content-negotiation:3.4.1")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:3.4.1")
-    implementation("io.ktor:ktor-client-cio:3.4.1")
+
     implementation("androidx.activity:activity-compose:1.8.2")
     implementation("androidx.compose.material3:material3:1.2.0")
     implementation("androidx.compose.runtime:runtime:1.6.1")
