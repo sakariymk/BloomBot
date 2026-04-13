@@ -1,7 +1,7 @@
 package project.team36.ui.map
 
-//impor<t PlaceInfoCard
 import android.Manifest
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mapbox.geojson.Point
 import com.mapbox.maps.extension.compose.MapboxMap
-import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -36,6 +35,11 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.mapbox.maps.extension.compose.MapEffect
 import com.mapbox.maps.extension.compose.annotation.generated.PointAnnotation
 import com.mapbox.maps.extension.compose.annotation.rememberIconImage
+import com.mapbox.maps.extension.style.expressions.dsl.generated.literal
+import com.mapbox.maps.extension.style.layers.addLayer
+import com.mapbox.maps.extension.style.layers.generated.fillLayer
+import com.mapbox.maps.extension.style.sources.addSource
+import com.mapbox.maps.extension.style.sources.generated.vectorSource
 import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
 import com.mapbox.maps.plugin.locationcomponent.location
 import project.team36.R
@@ -108,6 +112,19 @@ fun MapScreen(
                             puckBearingEnabled = false
                         }
                         viewModel.onLocationReady() //view følger ikke lenger location puck 24/7, kun når appen startes
+                        viewModel.onMapReady(mapView.mapboxMap)
+
+                        // legger til klimasoner her via vectorSource, bruker info fra ClimateZoneConfig for bedre vedlikeholdbarhet
+                        mapView.mapboxMap.getStyle { style ->
+                            style.addSource(vectorSource(ClimateZoneConfig.SOURCE_ID) {
+                                tiles(listOf(ClimateZoneConfig.TILE_URL))
+                            })
+                            style.addLayer(fillLayer(ClimateZoneConfig.LAYER_ID, ClimateZoneConfig.SOURCE_ID) {
+                                sourceLayer(ClimateZoneConfig.SOURCE_LAYER)
+                                fillOpacity(literal(0.0))
+                            })
+                            Log.d("ZONE_TEST", "Klimasone source og lag lagt til!")
+                        }
                     }
                 }
 
@@ -122,7 +139,7 @@ fun MapScreen(
                     }
                 }
 
-                //Går gjennom savedPlaces lista og putter pins på kartet
+                //Går gjennom savedLocation skjema og putter pins på kartet
                 savedLocations.forEach { location ->
                     val lat = location.lat ?: return@forEach
                     val lon = location.lon ?: return@forEach

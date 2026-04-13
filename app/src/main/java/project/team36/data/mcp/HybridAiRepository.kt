@@ -4,6 +4,7 @@ import kotlinx.serialization.json.*
 import project.team36.data.klima.MetWeatherApi
 import project.team36.data.klima.frost.getNearestStation
 import project.team36.data.klima.frost.getTemperatures
+import project.team36.data.mcp.MetMcpClient
 import project.team36.data.plant.PlantDataSource
 import project.team36.ui.map.MapViewModel
 import project.team36.model.ai.*
@@ -11,7 +12,7 @@ import retrofit2.HttpException
 
 class HybridAiRepository(
     private val claudeApi: ClaudeApi,
-    private val metWeatherApi: MetWeatherApi,
+    private val mcpClient: MetMcpClient,
     private val plantDataSource: PlantDataSource,
     private val frostClientId: String,
     private val claudeApiKey: String
@@ -92,9 +93,9 @@ class HybridAiRepository(
                             val station = getNearestStation(rLat, rLon, frostClientId)
                             if (station != null) "Temp på ${station.name}: ${getTemperatures(station.id, frostClientId)}°C" else "Ingen stasjon funnet."
                         }
+                        //Endret kun kall her til faktisk MCPserver -Therese
                         "weatherforecast" -> {
-                            val metRes = metWeatherApi.getWeather(rLat, rLon)
-                            if (metRes.isSuccessful) metRes.body()?.string()?.take(800) ?: "Tomt svar" else "Feil fra MET."
+                            mcpClient.getForecast(rLat,rLon)
                         }
                         else -> "Ukjent verktøy."
                     }
