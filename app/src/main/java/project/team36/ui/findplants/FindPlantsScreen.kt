@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.myplants.MyPlantsViewModel
-import project.team36.ui.plant.PlantCard
+import project.team36.ui.plant.SimplePlantCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,12 +68,11 @@ fun FindPlantsScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(plants) {plant ->
-                PlantCard(
+                SimplePlantCard(
                     plant = plant,
-                    showAddButton = true,
-                    onAddPlant = {
-                        myPlantsViewModel.requestAddPlant(plant)
-                    } )
+                    onNavigateToPlantDetails =  { navController.navigate("plantDetail/${plant.name}") }
+                )
+
             }
         }
     }

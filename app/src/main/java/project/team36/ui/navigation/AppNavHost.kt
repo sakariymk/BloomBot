@@ -62,15 +62,15 @@ fun AppNavHost(
             )
         }
         // plantDetailScreen
-        composable ("plantDetail/{plantName}") { backStackEntry ->
+        composable ("plantDetailsScreen/{plant.name}") { backStackEntry ->
             val plantName = backStackEntry.arguments?.getString("plantName") ?: return@composable
             PlantDetailsScreen(
                 plantName = plantName,
                 viewModel = plantDetailsViewModel,
                 onBackClick = { navController.popBackStack() },
-                onAddClick = TODO(),
-                showAddButton = TODO(),
-                onAddPlant = TODO()
+                onAddClick =
+                showAddButton = true,
+                onDeletePlant =
             )
         }
     }
