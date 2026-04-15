@@ -41,9 +41,9 @@ fun MyPlantsScreen(
             NavigationBar {
                 NavigationBarItem(
                     selected = false,
-                    onClick = { navController.navigate("map") },
+                    onClick = { navController.navigate("landingpage") },
                     icon = { },
-                    label = { Text("Kart") }
+                    label = { Text("Hjem") }
                 )
                 NavigationBarItem(
                     selected = true,

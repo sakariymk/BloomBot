@@ -1,0 +1,114 @@
+package project.team36.ui.landingpage
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.mapbox.maps.extension.style.expressions.dsl.generated.mod
+import project.team36.data.mcp.WeatherForecast
+
+fun weatherSymbolToDescription(symbol: String): String {
+    val base = symbol.replace(Regex("_(day|night|polartwilight)$"), "")
+    return when (base) {
+        "clearsky"       -> "Klarvær"
+        "fair"           -> "Lettskyet"
+        "partlycloudy"   -> "Delvis skyet"
+        "cloudy"         -> "Overskyet"
+        "fog"            -> "Tåke"
+        "rain"           -> "Regn"
+        "heavyrain"      -> "Kraftig regn"
+        "lightrain"      -> "Lett regn"
+        "snow"           -> "Snø"
+        "sleet"          -> "Sludd"
+        "thunder"        -> "Torden"
+        else             -> symbol
+    }
+}
+
+@Composable
+fun WeatherCard(
+    weatherForecast: WeatherForecast?,
+    isLoading: Boolean,
+    modifier: Modifier = Modifier
+) {
+
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, 8.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+            else if (weatherForecast != null) {
+              Row(
+                  modifier = Modifier
+                      .fillMaxWidth()
+                      .padding(16.dp),
+                  verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.SpaceBetween
+              ) {
+                  Column() {
+                      Text(text = "${weatherForecast.temperature}°C", style = MaterialTheme.typography.headlineMedium)
+
+                      Text(
+                          text = weatherSymbolToDescription(weatherForecast.weatherSymbol),
+                          style = MaterialTheme.typography.bodyMedium,
+                          color = MaterialTheme.colorScheme.onSurfaceVariant
+                      )
+                  }
+                  Column(horizontalAlignment = Alignment.End) {
+                      Text(
+                          text = "💨 ${weatherForecast.windSpeed} m/s",
+                          style = MaterialTheme.typography.bodySmall
+                      )
+                      Text(
+                          text = "🌧 ${weatherForecast.precipitation} mm",
+                          style = MaterialTheme.typography.bodySmall
+                      )
+                  }
+              }
+            }
+            else {
+                Text(
+                    text = "Kunne ikke hente vær",
+                    modifier = Modifier.padding(16.dp),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+    }
+}
+
+@Preview (showBackground = true)
+@Composable
+fun WeatherCardPreview() {
+    WeatherCard(
+        weatherForecast = WeatherForecast(
+            temperature = 12.5,
+            weatherSymbol = "partlycloudy_day",
+            windSpeed = 3.2,
+            precipitation = 0.0
+        ),
+        isLoading = false
+    )
+}

@@ -44,9 +44,9 @@ fun FindPlantsScreen(
             NavigationBar {
                 NavigationBarItem(
                     selected = false,
-                    onClick = { navController.navigate("map") },
+                    onClick = { navController.navigate("landingpage") },
                     icon = { }, //fyller ut med icon senere!
-                    label = { Text("Kart") }
+                    label = { Text("Hjem") }
                 )
                 NavigationBarItem(
                     selected = false,
