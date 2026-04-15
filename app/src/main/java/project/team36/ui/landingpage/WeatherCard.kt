@@ -7,9 +7,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -29,7 +32,7 @@ import project.team36.R
 import project.team36.data.mcp.WeatherForecast
 
 fun weatherSymbolToDescription(symbol: String): String {
-    val base = symbol.replace(Regex("_(day|night|polartwilight)$"), "")
+    val base = symbol.substringBeforeLast("_")
     return when (base) {
         "clearsky"       -> "Klarvær"
         "fair"           -> "Lettskyet"
@@ -57,7 +60,8 @@ fun WeatherCard(
 
     Card(
         modifier = modifier
-            .padding(horizontal = 16.dp, 8.dp),
+            .padding(horizontal = 6.dp, 6.dp)
+            .height(100.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         if (isLoading) {
@@ -71,6 +75,17 @@ fun WeatherCard(
             }
         }
             else if (weatherForecast != null) {
+
+            val cleanSymbol = weatherForecast.weatherSymbol
+                .trim()
+                .replace(Regex("[^a-zA-Z_]"), "")
+
+            val iconRes = context.resources.getIdentifier(
+                weatherForecast.weatherSymbol,
+                "drawable",
+                context.packageName
+            )
+
               Row(
                   modifier = Modifier
                       .fillMaxWidth()
@@ -79,32 +94,40 @@ fun WeatherCard(
                   horizontalArrangement = Arrangement.SpaceBetween
               ) {
 
-                  val iconRes = context.resources.getIdentifier(
-                      weatherForecast.weatherSymbol,
-                      "drawable",
-                      context.packageName
-                  )
-
-                  Image(
-                      painter = painterResource(id = if (iconRes != 0) iconRes else R.drawable.cloudy),
-                      contentDescription = "Ikon av ${weatherForecast.weatherSymbol}",
-                      modifier = Modifier.size(48.dp)
-                  )
-
-                  Column() {
-                      Text(text = "${weatherForecast.temperature}°C", style = MaterialTheme.typography.headlineMedium)
-
-                      Text(
-                          text = weatherSymbolToDescription(weatherForecast.weatherSymbol),
-                          style = MaterialTheme.typography.bodyMedium,
-                          color = MaterialTheme.colorScheme.onSurfaceVariant
+                  //venstre side av kortet
+                  Row(
+                      modifier = Modifier.weight(1f),
+                      verticalAlignment = Alignment.CenterVertically
+                  ) {
+                      Image(
+                          painter = painterResource(id = if (iconRes != 0) iconRes else R.drawable.cloudy),
+                          contentDescription = "Ikon av ${weatherForecast.weatherSymbol}",
+                          modifier = Modifier.size(40.dp)
                       )
+
+                      Column(
+                          modifier = Modifier.padding(start = 12.dp)
+                      ) {
+                          Text(
+                              text = "${weatherForecast.temperature}°C",
+                              style = MaterialTheme.typography.headlineSmall
+                          )
+
+                          Text(
+                              text = weatherSymbolToDescription(cleanSymbol),
+                              style = MaterialTheme.typography.bodyMedium,
+                              color = MaterialTheme.colorScheme.onSurfaceVariant
+                          )
+                      }
                   }
-                  Column(horizontalAlignment = Alignment.End) {
-                      Text(
-                          text = "💨 ${weatherForecast.windSpeed} m/s",
-                          style = MaterialTheme.typography.bodySmall
-                      )
+
+                  Spacer(modifier = Modifier.width(3.dp))
+
+
+                  //høyre side av kortet
+                  Column(
+                      horizontalAlignment = Alignment.End,
+                  ) {
                       Text(
                           text = "🌧 ${weatherForecast.precipitation} mm",
                           style = MaterialTheme.typography.bodySmall
