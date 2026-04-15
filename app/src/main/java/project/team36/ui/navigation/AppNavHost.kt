@@ -68,9 +68,9 @@ fun AppNavHost(
                 plantName = plantName,
                 viewModel = plantDetailsViewModel,
                 onBackClick = { navController.popBackStack() },
-                onAddClick =
+                onAddClick = TODO(), //jeg (viktoria) endra litt på dette slik at appen kan buildes og kjøres
                 showAddButton = true,
-                onDeletePlant =
+                onDeletePlant = TODO() //jeg (viktoria) endra litt på dette slik at appen kan buildes og kjøres
             )
         }
     }

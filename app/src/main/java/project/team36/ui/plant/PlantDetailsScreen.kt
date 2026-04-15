@@ -56,9 +56,11 @@ fun PlantDetailsScreen(
     plantName: String,
     viewModel: PlantDetailsViewModel,
     onBackClick: () -> Unit,
-    onAddClick: (() -> Unit)? = null,
+    onAddClick: () -> Unit, //jeg (viktoria) endra litt på dette slik at appen kan buildes og kjøres
     showAddButton: Boolean,
-    onDeletePlant: (() -> Unit)? = null
+    onDeletePlant: (() -> Unit)? = null, //jeg (viktoria) endra litt på dette slik at appen kan buildes og kjøres
+    onAddPlant: (() -> Unit)? = null //jeg (viktoria) endra litt på dette slik at appen kan buildes og kjøres
+
     // boolean-parameter for om det er plantdetailsscreen på mine planter eller oppdag planter
 
 ) {
