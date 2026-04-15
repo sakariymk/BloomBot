@@ -11,6 +11,7 @@ import android.content.Context
 import androidx.room.Room
 import junit.framework.TestCase
 import kotlinx.coroutines.flow.any
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Test
@@ -41,13 +42,16 @@ class AppDatabaseTest : TestCase() {
         db.close()
     }
 
-//    @Test
-//    fun writeAndReadLocation() = runBlocking {
-//        val location = SavedLocation(name = "Hjem", lat = 59.8, lon = 10.9, address = "Solveien 61")
-//        locationDao.insert(location)
-//        val locations = locationDao.getAllLocations()
-//        assertTrue(locations.any {it.name == "Hjem"})
-//    }
+
+
+    @Test
+    fun writeAndReadLocation() = runBlocking {
+        val location = SavedLocation(name = "Hjem", lat = 59.8, lon = 10.9, address = "Solveien 61")
+        locationDao.insert(location)
+        val locations = locationDao.getAllLocations().first()
+        assertTrue(locations.any { it.name == "Hjem" })
+    }
+
 
     // For mye specs og usikker på siste versjon av disse, så lager test senere
 //    @Test
