@@ -53,10 +53,10 @@ fun WeatherCard(
     isLoading: Boolean,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
 
     Card(
         modifier = modifier
-            .fillMaxWidth()
             .padding(horizontal = 16.dp, 8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
@@ -78,7 +78,6 @@ fun WeatherCard(
                   verticalAlignment = Alignment.CenterVertically,
                   horizontalArrangement = Arrangement.SpaceBetween
               ) {
-                  val context = LocalContext.current
 
                   val iconRes = context.resources.getIdentifier(
                       weatherForecast.weatherSymbol,

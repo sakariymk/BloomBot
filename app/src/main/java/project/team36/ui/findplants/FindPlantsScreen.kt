@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.myplants.MyPlantsViewModel
+import project.team36.ui.navigation.BottomNavBar
 import project.team36.ui.plant.PlantCard
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,28 +41,9 @@ fun FindPlantsScreen(
                 title = { Text("Finn nye planter") }
             )
         },
-        bottomBar = {
-            NavigationBar {
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { navController.navigate("landingpage") },
-                    icon = { }, //fyller ut med icon senere!
-                    label = { Text("Hjem") }
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { navController.navigate("myPlants") },
-                    icon = { }, //fyller ut med icon senere!
-                    label = { Text("Mine planter") }
-                )
-                NavigationBarItem(
-                    selected = true,
-                    onClick = { navController.navigate("findPlants") },
-                    icon = { }, //fyller ut med icon senere!
-                    label = { Text("Oppdag planter") }
-                )
-            }
-        }
+
+        bottomBar = { BottomNavBar(navController = navController) }
+
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier.padding(innerPadding),

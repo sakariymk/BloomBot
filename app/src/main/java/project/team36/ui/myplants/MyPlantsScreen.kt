@@ -15,6 +15,7 @@ import project.team36.ui.plant.PlantCard
 import project.team36.model.location.SavedLocation
 import project.team36.model.location.SavedPlant
 import project.team36.model.plant.PlantInfo
+import project.team36.ui.navigation.BottomNavBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,28 +38,9 @@ fun MyPlantsScreen(
                 title = { Text("Mine planter") }
             )
         },
-        bottomBar = {
-            NavigationBar {
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { navController.navigate("landingpage") },
-                    icon = { },
-                    label = { Text("Hjem") }
-                )
-                NavigationBarItem(
-                    selected = true,
-                    onClick = { navController.navigate("myPlants") },
-                    icon = { },
-                    label = { Text("Mine planter") }
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { navController.navigate("findPlants") },
-                    icon = { },
-                    label = { Text("Oppdag planter") }
-                )
-            }
-        }
+
+        bottomBar = { BottomNavBar(navController = navController) }
+
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier

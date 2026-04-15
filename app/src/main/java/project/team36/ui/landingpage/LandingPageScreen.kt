@@ -29,6 +29,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import project.team36.ui.map.MapViewModel
 import project.team36.ui.map.SavedPlacesViewModel
+import project.team36.ui.navigation.BottomNavBar
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
@@ -56,28 +57,9 @@ fun LandingPageScreen(
         topBar = {
             TopAppBar(title = { Text("Hjem") })
         },
-        bottomBar = {
-            NavigationBar {
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { navController.navigate("landingpage") },
-                    icon = { },
-                    label = { Text("Hjem") }
-                )
-                NavigationBarItem(
-                    selected = true,
-                    onClick = { navController.navigate("myPlants") },
-                    icon = { },
-                    label = { Text("Mine planter") }
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { navController.navigate("findPlants") },
-                    icon = { },
-                    label = { Text("Oppdag planter") }
-                )
-            }
-        }
+
+        bottomBar = { BottomNavBar(navController = navController) }
+
     ) { innerPadding ->
         Column(
             modifier = Modifier
