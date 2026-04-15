@@ -1,6 +1,7 @@
 package project.team36.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -16,6 +17,7 @@ import project.team36.ui.myplants.MyPlantsViewModel
 import project.team36.ui.plant.PlantDetailsScreen
 import project.team36.ui.plant.PlantDetailsViewModel
 import project.team36.data.plant.PlantRepository
+import project.team36.ui.findplants.SavePlantDialog
 
 //import project.team36.ui.plant.PlantSwipeViewModel
 
@@ -62,16 +64,35 @@ fun AppNavHost(
             )
         }
         // plantDetailScreen
-        composable ("plantDetail/{plantName}") { backStackEntry ->
+        composable ("plantDetailsScreen/{plantName}/{action}") { backStackEntry ->
             val plantName = backStackEntry.arguments?.getString("plantName") ?: return@composable
+            val action = backStackEntry.arguments?.getString("action") ?: ""
+            val savedLocations = savedPlacesViewModel.savedLocations.collectAsState()
+            val pendingPlant = myPlantsViewModel.pendingPlant.collectAsState()
             PlantDetailsScreen(
                 plantName = plantName,
                 viewModel = plantDetailsViewModel,
                 onBackClick = { navController.popBackStack() },
-                onAddClick = TODO(),
-                showAddButton = TODO(),
-                onAddPlant = TODO()
+                onAddPlant = if (action == "add") {
+                    { plantDetailsViewModel.plant.value?.let { myPlantsViewModel.requestAddPlant(it) } }
+                } else null, //jeg (viktoria) endra litt på dette slik at appen kan buildes og kjøres
+                onDeletePlant = if (action == "delete") {
+                    { myPlantsViewModel.removePlantByName(plantName) }
+                } else null//jeg (viktoria) endra litt på dette slik at appen kan buildes og kjøres
             )
+
+            pendingPlant.value?.let { plant ->
+                SavePlantDialog(
+                    plant = plant,
+                    savedLocations = savedLocations.value,
+                    onConfirm = { location ->
+                        myPlantsViewModel.confirmAddPlant(plant, location)
+                        savedPlacesViewModel.selectLocation(location)
+                        navController.navigate("myPlants")
+                                },
+                    onDismiss = { myPlantsViewModel.dismissAddPlant() }
+                )
+            }
         }
     }
 }
