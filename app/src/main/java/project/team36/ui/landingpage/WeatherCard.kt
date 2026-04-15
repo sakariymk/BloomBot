@@ -1,22 +1,31 @@
 package project.team36.ui.landingpage
 
+import android.util.Log.i
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.mapbox.maps.extension.style.expressions.dsl.generated.mod
+import project.team36.R
 import project.team36.data.mcp.WeatherForecast
 
 fun weatherSymbolToDescription(symbol: String): String {
@@ -25,6 +34,7 @@ fun weatherSymbolToDescription(symbol: String): String {
         "clearsky"       -> "Klarvær"
         "fair"           -> "Lettskyet"
         "partlycloudy"   -> "Delvis skyet"
+        "partlycloydy_day" -> "Delvis skyet"
         "cloudy"         -> "Overskyet"
         "fog"            -> "Tåke"
         "rain"           -> "Regn"
@@ -68,6 +78,20 @@ fun WeatherCard(
                   verticalAlignment = Alignment.CenterVertically,
                   horizontalArrangement = Arrangement.SpaceBetween
               ) {
+                  val context = LocalContext.current
+
+                  val iconRes = context.resources.getIdentifier(
+                      weatherForecast.weatherSymbol,
+                      "drawable",
+                      context.packageName
+                  )
+
+                  Image(
+                      painter = painterResource(id = if (iconRes != 0) iconRes else R.drawable.cloudy),
+                      contentDescription = "Ikon av ${weatherForecast.weatherSymbol}",
+                      modifier = Modifier.size(48.dp)
+                  )
+
                   Column() {
                       Text(text = "${weatherForecast.temperature}°C", style = MaterialTheme.typography.headlineMedium)
 
