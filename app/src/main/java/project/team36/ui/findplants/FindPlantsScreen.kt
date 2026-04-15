@@ -70,7 +70,7 @@ fun FindPlantsScreen(
             items(plants) {plant ->
                 SimplePlantCard(
                     plant = plant,
-                    onNavigateToPlantDetails =  { navController.navigate("plantDetail/${plant.name}") }
+                    onNavigateToPlantDetails =  { navController.navigate("plantDetailsScreen/${plant.name}/add") }
                 )
 
             }

@@ -56,10 +56,9 @@ fun PlantDetailsScreen(
     plantName: String,
     viewModel: PlantDetailsViewModel,
     onBackClick: () -> Unit,
-    onAddClick: () -> Unit, //jeg (viktoria) endra litt på dette slik at appen kan buildes og kjøres
-    showAddButton: Boolean,
-    onDeletePlant: (() -> Unit)? = null, //jeg (viktoria) endra litt på dette slik at appen kan buildes og kjøres
-    onAddPlant: (() -> Unit)? = null //jeg (viktoria) endra litt på dette slik at appen kan buildes og kjøres
+    //onAddClick: () -> Unit, //jeg (viktoria) endra litt på dette slik at appen kan buildes og kjøres
+    onAddPlant: (() -> Unit)? = null, //jeg (viktoria) endra litt på dette slik at appen kan buildes og kjøres
+    onDeletePlant: (() -> Unit)? = null //jeg (viktoria) endra litt på dette slik at appen kan buildes og kjøres
 
     // boolean-parameter for om det er plantdetailsscreen på mine planter eller oppdag planter
 
@@ -124,33 +123,30 @@ fun PlantDetailsScreen(
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Normal
                 )
-                OutlinedButton(
-                    onClick = onAddClick,
-                    shape = RoundedCornerShape(50),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = Color.White
-                    ),
-                    border = BorderStroke(0.dp, Color.Transparent)
-                ) {
-                    if (showAddButton) {
-                        Button(
-                            onClick = { onAddPlant?.invoke() },
-                            modifier = Modifier
-                                .padding(top = 8.dp)
-                        ) { Text("Legg til") }
+                if (onAddPlant != null) {
+                    OutlinedButton(
+                        onClick = { onAddPlant() },
+                        shape = RoundedCornerShape(50),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            containerColor = Color.White
+                        ),
+                        border = BorderStroke(0.dp, Color.Transparent)
+                    ) {
+                        Text("Legg til i hage")
                     }
-                    if (!showAddButton) {
-                        Button(
-                            onClick = { onDeletePlant?.invoke() },
-                            modifier = Modifier
-                                .padding(top = 8.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.Red,
-                                contentColor = Color.Black
-                            )
-                        ) { Text("Fjern plante") }
+                } else if (onDeletePlant != null) {
+                    OutlinedButton(
+                        onClick = { onDeletePlant() },
+                        shape = RoundedCornerShape(50),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            containerColor = Color.White
+                        ),
+                        border = BorderStroke(0.dp, Color.Transparent)
+                    ) {
+                        Text("Fjern plante fra hage")
                     }
                 }
+
 
                 Spacer(modifier = Modifier.height(8.dp))
             }
