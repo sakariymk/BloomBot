@@ -9,10 +9,11 @@ class PlantDataSource(private val context: Context) {
 
     fun fetchPlants(): List<PlantInfo> {
         val plants = mutableListOf<PlantInfo>()
+        var descIndex = 0
 
         context.assets.open("planter.csv").bufferedReader().useLines { lines ->
             lines.drop(1).forEach { line ->
-                val tokens = line.split(",")
+                val tokens = line.split("/")
                 if (tokens.size >= 10) {
                     plants.add(mapToPlant(tokens))
                 }
@@ -34,6 +35,6 @@ class PlantDataSource(private val context: Context) {
             daysSinceWatered = tokens[8].trim().toInt(),
             maxDaysWithoutWater = tokens[9].trim().toInt(),
             imageRes = context.resources.getIdentifier(name, "drawable", context.packageName),
-            description = context.assets.open("descriptions/$name.txt").bufferedReader().readText(),
+            description = tokens[10],
         )
     }}
