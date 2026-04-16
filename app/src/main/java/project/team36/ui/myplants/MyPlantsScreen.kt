@@ -3,11 +3,13 @@ package project.team36.ui.myplants
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel  // NY: import for viewModel()
@@ -55,16 +57,22 @@ fun MyPlantsScreen(
                 )
                 NavigationBarItem(
                     selected = false,
-                    onClick = { navController.navigate("findPlants") },
+                    onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "ukjent"}") },
                     icon = { },
                     label = { Text("Oppdag planter") }
                 )
             }
         },
+        // Finn ut hvordan sende informasjon om hvor du kommer fra
         floatingActionButton = {
-            FloatingActionButton(onClick = { navController.navigate("addPlant") }) {
-                Icon(Icons.Default.Add, contentDescription = "Legg til plante")
-            }
+            ExtendedFloatingActionButton(
+                onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "ukjent"}") },
+                icon = { Icon(Icons.Default.Add, contentDescription = "Nytt sted") },
+                text = { Text("Nytt sted") },
+                containerColor = Color(0xFF2D5A27),
+                contentColor = Color.White,
+                shape = RoundedCornerShape(50)
+            )
         }
     ) { innerPadding ->
         LazyColumn(

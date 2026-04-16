@@ -54,6 +54,7 @@ fun MapScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val savedLocations by savedPlacesViewModel.savedLocations.collectAsStateWithLifecycle() // NYTT: hent savedPlaces herfra -- henter nå fra database
+    val selectedLocation by savedPlacesViewModel.selectedLocation.collectAsStateWithLifecycle()
     val mapViewportState = viewModel.mapViewportState
 
     //få lokasjon permissions
@@ -86,7 +87,7 @@ fun MapScreen(
                 )
                 NavigationBarItem(
                     selected = false,
-                    onClick = { navController.navigate("findPlants") },
+                    onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "ukjent"}") },
                     icon = { }, //fyller ut med icon senere!
                     label = { Text("Oppdag planter")}
                 )
