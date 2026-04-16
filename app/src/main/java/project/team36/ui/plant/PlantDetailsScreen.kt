@@ -152,9 +152,6 @@ fun PlantDetailsScreen(
             }
         }
     }
-
-
-
 }
 
 @Composable
