@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -18,6 +19,8 @@ import project.team36.ui.plant.PlantDetailsScreen
 import project.team36.ui.plant.PlantDetailsViewModel
 import project.team36.data.plant.PlantRepository
 import project.team36.ui.findplants.SavePlantDialog
+import project.team36.ui.landingpage.LandingPageScreen
+import project.team36.ui.landingpage.LandingPageViewModel
 
 //import project.team36.ui.plant.PlantSwipeViewModel
 
@@ -30,14 +33,15 @@ fun AppNavHost(
     myPlantsViewModel: MyPlantsViewModel,
     plantRepository: PlantRepository,
     savedPlacesViewModel: SavedPlacesViewModel,
-    plantDetailsViewModel: PlantDetailsViewModel // SJEKK OM DENNE SKAL VÆRE HER
+    plantDetailsViewModel: PlantDetailsViewModel, // SJEKK OM DENNE SKAL VÆRE HER
+    landingPageViewModel: LandingPageViewModel,
 ) {
 
     val myPlantsViewModel: MyPlantsViewModel = viewModel()
 
     NavHost(
         navController = navController,
-        startDestination = "map",
+        startDestination = "landingpage", //HER ENDRER JEG BARE TIL LANDINGPAGE FOR Å SE DEN PÅ APPEN
         modifier = modifier
     ){
         composable("map") {
@@ -63,6 +67,13 @@ fun AppNavHost(
                 navController = navController,
                 savedPlacesViewModel = savedPlacesViewModel,
                 locationName = locationName
+            )
+        }
+        composable("landingpage") {
+            LandingPageScreen(
+                navController = navController,
+                savedPlacesViewModel = savedPlacesViewModel,
+                landingPageViewModel = landingPageViewModel,
             )
         }
         // plantDetailScreen

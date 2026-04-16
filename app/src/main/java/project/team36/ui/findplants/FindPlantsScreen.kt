@@ -41,6 +41,8 @@ import com.mapbox.maps.extension.style.expressions.dsl.generated.image
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.myplants.MyPlantsViewModel
 import project.team36.ui.plant.SimplePlantCard
+import project.team36.ui.navigation.BottomNavBar
+import project.team36.ui.plant.PlantCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,31 +65,8 @@ fun FindPlantsScreen(
                 title = { Text("Finn nye planter") }
             )
         },
-        bottomBar = {
-            Column {
 
-                NavigationBar(containerColor = Color.Transparent) {
-                    NavigationBarItem(
-                        selected = false,
-                        onClick = { navController.navigate("map") },
-                        icon = { },
-                        label = { Text("Kart") }
-                    )
-                    NavigationBarItem(
-                        selected = false,
-                        onClick = { navController.navigate("myPlants") },
-                        icon = { },
-                        label = { Text("Mine planter") }
-                    )
-                    NavigationBarItem(
-                        selected = true,
-                        onClick = { navController.navigate("findPlants/$locationName") },
-                        icon = { },
-                        label = { Text("Oppdag planter") }
-                    )
-                }
-            }
-        },
+        bottomBar = { BottomNavBar(navController = navController) }
 
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
