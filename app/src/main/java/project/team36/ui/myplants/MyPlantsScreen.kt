@@ -45,8 +45,8 @@ fun MyPlantsScreen(
 
         bottomBar = { BottomNavBar(navController = navController)},
 
-                // Finn ut hvordan sende informasjon om hvor du kommer fra
-                floatingActionButton = {
+        // Finn ut hvordan sende informasjon om hvor du kommer fra
+        floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "ukjent"}") },
                 icon = { Icon(Icons.Default.Add, contentDescription = "Nytt sted") },
