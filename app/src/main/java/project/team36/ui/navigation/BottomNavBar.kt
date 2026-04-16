@@ -53,19 +53,18 @@ fun BottomNavBar(navController: NavController) {
         )
 
         NavigationBarItem(
-            selected = activeRoute == "findPlants",
-            onClick = {navController.navigate("findPlants")},
+            selected = activeRoute?.startsWith("findPlants") == true,
+            onClick = { navController.navigate("findPlants/") },
             icon = {
                 Icon(
                     painter = painterResource(
-                        id = if (activeRoute == "findPlants") R.drawable.search_icon_thick
+                        id = if (activeRoute?.startsWith("findPlants") == true) R.drawable.search_icon_thick
                         else R.drawable.search_icon
                     ),
                     contentDescription = "Oppdag planter"
-
                 )
             },
-            label = {Text("Oppdag planter")}
+            label = { Text("Oppdag planter") }
         )
     }
 }
