@@ -81,7 +81,7 @@ fun WeatherCard(
                 .replace(Regex("[^a-zA-Z_]"), "")
 
             val iconRes = context.resources.getIdentifier(
-                weatherForecast.weatherSymbol,
+                cleanSymbol,
                 "drawable",
                 context.packageName
             )
@@ -100,7 +100,7 @@ fun WeatherCard(
                       verticalAlignment = Alignment.CenterVertically
                   ) {
                       Image(
-                          painter = painterResource(id = if (iconRes != 0) iconRes else R.drawable.cloudy),
+                          painter = painterResource(id = if (iconRes != 0) iconRes else R.drawable.heavysnow),
                           contentDescription = "Ikon av ${weatherForecast.weatherSymbol}",
                           modifier = Modifier.size(40.dp)
                       )
@@ -132,6 +132,8 @@ fun WeatherCard(
                           text = "🌧 ${weatherForecast.precipitation} mm",
                           style = MaterialTheme.typography.bodySmall
                       )
+
+                      Text(text = weatherForecast.weatherSymbol)
                   }
               }
             }
