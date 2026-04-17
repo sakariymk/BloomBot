@@ -45,11 +45,11 @@ fun BottomNavBar(navController: NavController) {
                         id = if (activeRoute == "myPlants") R.drawable.plant_icon_thick
                         else R.drawable.plant_icon
                     ),
-                    contentDescription = "Mine planter"
+                    contentDescription = "Mine steder"
 
                 )
             },
-            label = {Text("Mine planter")}
+            label = {Text("Mine steder")}
         )
 
         NavigationBarItem(
@@ -61,10 +61,10 @@ fun BottomNavBar(navController: NavController) {
                         id = if (activeRoute?.startsWith("findPlants") == true) R.drawable.search_icon_thick
                         else R.drawable.search_icon
                     ),
-                    contentDescription = "Oppdag planter"
+                    contentDescription = "Oppdag"
                 )
             },
-            label = { Text("Oppdag planter") }
+            label = { Text("Oppdag") }
         )
     }
 }
