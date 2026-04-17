@@ -53,10 +53,10 @@ fun MapScreen(
     navController: NavController
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val savedLocations by savedPlacesViewModel.savedLocations.collectAsStateWithLifecycle() // NYTT: hent savedPlaces herfra -- henter nå fra database
+    val savedLocations by savedPlacesViewModel.savedLocations.collectAsStateWithLifecycle()
+    val selectedLocation by savedPlacesViewModel.selectedLocation.collectAsStateWithLifecycle()
     val mapViewportState = viewModel.mapViewportState
 
-    //få lokasjon permissions
     val locationPermissionState = rememberPermissionState(
         Manifest.permission.ACCESS_FINE_LOCATION
     )
@@ -75,19 +75,19 @@ fun MapScreen(
                 NavigationBarItem(
                     selected = false,
                     onClick = { navController.navigate("map")},
-                    icon = { }, //fyller ut med icon senere!
+                    icon = { },
                     label = { Text("Kart")}
                 )
                 NavigationBarItem(
                     selected = false,
                     onClick = { navController.navigate("myPlants") },
-                    icon = { }, //fyller ut med icon senere!
+                    icon = { },
                     label = { Text("Mine planter")}
                 )
                 NavigationBarItem(
                     selected = false,
-                    onClick = { navController.navigate("findPlants") },
-                    icon = { }, //fyller ut med icon senere!
+                    onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "ukjent"}") },
+                    icon = { },
                     label = { Text("Oppdag planter")}
                 )
             }
@@ -97,11 +97,11 @@ fun MapScreen(
         Box(modifier = modifier
             .fillMaxSize()
             .padding(innerPadding)) {
-            //dette er selve kartet
+
             MapboxMap(
                 modifier = modifier.fillMaxSize(),
                 mapViewportState = mapViewportState,
-                scaleBar = {} //disabler den scale bar
+                scaleBar = {}
             ) {
                 if (locationPermissionState.status.isGranted) {
                     @Suppress("COMPOSE_APPLIER_CALL_MISMATCH")
@@ -111,10 +111,9 @@ fun MapScreen(
                             enabled = true
                             puckBearingEnabled = false
                         }
-                        viewModel.onLocationReady() //view følger ikke lenger location puck 24/7, kun når appen startes
+                        viewModel.onLocationReady()
                         viewModel.onMapReady(mapView.mapboxMap)
 
-                        // legger til klimasoner her via vectorSource, bruker info fra ClimateZoneConfig for bedre vedlikeholdbarhet
                         mapView.mapboxMap.getStyle { style ->
                             style.addSource(vectorSource(ClimateZoneConfig.SOURCE_ID) {
                                 tiles(listOf(ClimateZoneConfig.TILE_URL))
@@ -128,7 +127,6 @@ fun MapScreen(
                     }
                 }
 
-                //viser pin på valgt lokasjon
                 uiState.selectedResult?.coordinate?.let { coord ->
                     val marker = rememberIconImage(
                         key = R.drawable.plant_map_marker,
@@ -139,7 +137,6 @@ fun MapScreen(
                     }
                 }
 
-                //Går gjennom savedLocation skjema og putter pins på kartet
                 savedLocations.forEach { location ->
                     val lat = location.lat ?: return@forEach
                     val lon = location.lon ?: return@forEach
@@ -148,14 +145,14 @@ fun MapScreen(
                         key = R.drawable.plant_map_marker,
                         painter = painterResource(id = R.drawable.plant_map_marker)
                     )
-                        PointAnnotation(point = coord) {
-                            iconImage = savedMarker
-                            interactionsState.onClicked {
-                                viewModel.onSavedLocationClicked(location)
-                                true
-                            }
+                    PointAnnotation(point = coord) {
+                        iconImage = savedMarker
+                        interactionsState.onClicked {
+                            viewModel.onSavedLocationClicked(location)
+                            true
                         }
                     }
+                }
             }
 
             Column(
@@ -175,9 +172,6 @@ fun MapScreen(
                 )
             }
 
-
-            //Boks som spør om brukeren vil legge til lokasjonen i mine steder
-            // kun vises showSaveDialog er true, fra viewmodel
             if (uiState.showSaveDialog) {
                 AlertDialog(
                     onDismissRequest = { viewModel.dismissSaveDialog() },
@@ -194,14 +188,20 @@ fun MapScreen(
             }
         }
 
-
-        //viser planteinfocard når pin blir trykket på av brukeren
         uiState.selectedSavedLocation?.let { location ->
             PlaceInfoCard(
                 location = location,
-                onGetAiAdvice = { lat, lon -> viewModel.fetchAiAdvice(lat, lon) },
+                // <------ ENDRING: Passerer hele lokasjonen inn for begge knappene
+                onGetAiAdvice = { loc -> viewModel.fetchAiAdvice(loc) },
+                onGetFutureAiAdvice = { loc -> viewModel.fetchFutureAiAdvice(loc) },
                 aiResponse = uiState.aiResponse,
                 isAiLoading = uiState.isAiLoading,
+                isFutureAiLoading = uiState.isFutureAiLoading,
+                // <------ ENDRING: Sender med de tre nye test-parameterne
+                onGetRawApiData = { loc -> viewModel.fetchRawApiData(loc) },
+                rawApiData = uiState.rawApiData,
+                onDismissRawApi = { viewModel.dismissRawApiData() },
+
                 onDismissAi = { viewModel.dismissAiAdvice() },
                 onDismiss = { viewModel.dismissPlaceInfo() },
                 onEdit = { newName ->
