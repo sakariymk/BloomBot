@@ -1,6 +1,7 @@
 package project.team36.ui.findplants
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.runtime.setValue
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,6 +33,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -55,6 +58,7 @@ fun FindPlantsScreen(
     val plants by findPlantsViewModel.plants.collectAsState()
     val pendingPlant by myPlantsViewModel.pendingPlant.collectAsState()
     val savedLocations by savedPlacesViewModel.savedLocations.collectAsState()
+    var showSwitchLocationDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         containerColor = Color.Transparent,
@@ -128,7 +132,7 @@ fun FindPlantsScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 ExtendedFloatingActionButton(
-                    onClick = { },
+                    onClick = { showSwitchLocationDialog = true },
                     icon = { Icon(Icons.Default.SwapHoriz, contentDescription = "Endre sted") },
                     text = { Text("Endre sted") },
                     containerColor = Color(0xFF2D5A27),
@@ -145,6 +149,19 @@ fun FindPlantsScreen(
             savedLocations = savedLocations,
             onConfirm = { location -> myPlantsViewModel.confirmAddPlant(plant, location) },
             onDismiss = { myPlantsViewModel.dismissAddPlant() }
+        )
+    }
+
+    if (showSwitchLocationDialog) {
+        SwitchLocationDialog(
+            savedLocations = savedLocations,
+            currentLocationName = locationName,
+            onConfirm = { location ->
+                savedPlacesViewModel.selectLocation(location)
+                showSwitchLocationDialog = false
+                navController.navigate("findPlants/${location.name}")
+            },
+            onDismiss = { showSwitchLocationDialog = false }
         )
     }
 }
