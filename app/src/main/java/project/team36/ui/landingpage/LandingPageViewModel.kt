@@ -12,9 +12,49 @@ import project.team36.data.mcp.WeatherForecast
 import project.team36.model.location.SavedLocation
 import kotlin.jvm.java
 
+
+
+data class WeatherUiState(
+    val temperature: String,
+    val precipitation: String,
+    val description: String,
+    val iconName: String
+)
+
 data class LandingPageUiState(
-    val locationForecasts: Map<Long, WeatherForecast?> = emptyMap(),
+    val locationForecasts: Map<Long, WeatherUiState?> = emptyMap(),
     val isWeatherLoading: Boolean = false
+)
+
+private fun weatherSymbolToDescription(symbol: String): String {
+    return when (symbol) {
+        "clearsky"         -> "Klarvær"
+        "clearsky_day"     -> "Klarvær"
+        "clearsky_night"   -> "Klarvær"
+        "fair"             -> "Lettskyet"
+        "fair_day"         -> "Lettskyet"
+        "fair_night"       -> "Lettskyet"
+        "partlycloudy"     -> "Delvis skyet"
+        "partlycloudy_day" -> "Delvis skyet"
+        "partlycloudy_night" -> "Delvis skyet"
+        "cloudy"           -> "Overskyet"
+        "fog"              -> "Tåke"
+        "rain"             -> "Regn"
+        "heavyrain"        -> "Kraftig regn"
+        "lightrain"        -> "Lett regn"
+        "snow"             -> "Snø"
+        "sleet"            -> "Sludd"
+        "thunder"          -> "Torden"
+        else               -> symbol
+    }
+}
+
+
+private fun WeatherForecast.toUiState() = WeatherUiState(
+    temperature = "${temperature}°C",
+    precipitation = "🌧 $precipitation mm",
+    description = weatherSymbolToDescription(weatherSymbol),
+    iconName = weatherSymbol
 )
 
 
@@ -35,7 +75,7 @@ class LandingPageViewModel(
                         location.lon ?: 0.0
                     )
                 }.getOrNull()
-                location.id to forecast
+                location.id to forecast?.toUiState()
             }
             _uiState.value = _uiState.value.copy(
                 locationForecasts = forecasts,

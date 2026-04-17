@@ -23,7 +23,9 @@ class MetWeatherRepository (private val mcpClient: MetMcpClient) {
                 windSpeed = Regex("Wind: ([\\d.]+) m/s").find(text)
                     ?.groupValues?.get(1)?.toDouble() ?: 0.0,
                 weatherSymbol = Regex("Weather symbol: (\\S+)").find(text)
-                    ?.groupValues?.get(1) ?: "",
+                    ?.groupValues?.get(1)
+                    ?.substringBeforeLast("\\n\\n##")
+                    ?: "",
                 precipitation = Regex("Precipitation: ([\\d.]+) mm").find(text)
                     ?.groupValues?.get(1)?.toDouble() ?: 0.0
             )
