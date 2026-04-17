@@ -107,7 +107,7 @@ fun FindPlantsScreen(
                 }
             }
 
-            // Chip med stedsnavn
+// Chip med stedsnavn
             Column(
                 horizontalAlignment = Alignment.End,
                 modifier = Modifier

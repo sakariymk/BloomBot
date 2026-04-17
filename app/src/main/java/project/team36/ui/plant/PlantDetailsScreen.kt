@@ -361,4 +361,3 @@ fun PlantDetailsScreenPreview_Content(plant: PlantInfo) {
         Spacer(modifier = Modifier.height(24.dp))
     }
 }
-

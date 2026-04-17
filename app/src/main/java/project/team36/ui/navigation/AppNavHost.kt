@@ -90,8 +90,8 @@ fun AppNavHost(
                     onConfirm = { location ->
                         myPlantsViewModel.confirmAddPlant(plant, location)
                         savedPlacesViewModel.selectLocation(location)
-                        navController.navigate("myPlants")
-                                },
+                        navController.navigate("myPlants")     
+                    },
                     onDismiss = { myPlantsViewModel.dismissAddPlant() }
                 )
             }

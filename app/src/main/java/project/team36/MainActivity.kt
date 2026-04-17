@@ -34,7 +34,6 @@ import project.team36.ui.myplants.MyPlantsViewModel
 import project.team36.ui.plant.PlantDetailsViewModel
 import project.team36.ui.theme.Team36Theme
 
-
 class MapViewModelFactory(
     private val repository: HybridAiRepository
 ) : ViewModelProvider.Factory {
@@ -73,6 +72,7 @@ class MyPlantsViewModelFactory(
         throw IllegalArgumentException("Ukjent ViewModel klasse")
     }
 }
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -121,9 +121,11 @@ class MainActivity : ComponentActivity() {
         val hybridAiRepository = HybridAiRepository(
             claudeApi = claudeApi,
             mcpClient = mcpClient,
-            plantDataSource = dataSource,
+            // <------ ENDRING: Vi sender inn locationRepository (lokal database) i stedet for dataSource (CSV)
+            plantDataSource = locationRepository,
             frostClientId = frostClientId,
             claudeApiKey = claudeKey
+
         )
 
         setContent {
