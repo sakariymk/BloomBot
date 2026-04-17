@@ -42,23 +42,24 @@ fun WeatherCard(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Row(
+                    Column(
                         modifier = Modifier.weight(1f),
-                        verticalAlignment = Alignment.CenterVertically
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        Text(
+                            text = weatherUiState.description,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
                         Image(
                             painter = painterResource(if (iconRes != 0) iconRes else R.drawable.cloudy),
                             contentDescription = weatherUiState.description,
                             modifier = Modifier.size(40.dp)
                         )
-                        Text(
-                            text = weatherUiState.description,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(start = 12.dp)
-                        )
                     }
                     Spacer(modifier = Modifier.width(3.dp))
+
                     Column(horizontalAlignment = Alignment.End) {
                         Text(
                             text = weatherUiState.temperature,
