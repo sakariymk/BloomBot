@@ -34,6 +34,7 @@ fun PlantCard(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
+    // HUSK å legge til "les mer" button
     OutlinedCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -144,6 +145,7 @@ fun PlantCard(
                         ) { Text("Legg til") }
                     }
 
+                    // FJERN dette når PlantDetailsScreen er klart
                     if (onDeletePlant != null) {
                         Button(
                             onClick = { onDeletePlant() },

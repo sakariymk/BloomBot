@@ -93,7 +93,7 @@ fun FindPlantsScreen(
             }
         },
 
-        ) { innerPadding ->
+    ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),

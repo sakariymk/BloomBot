@@ -87,7 +87,7 @@ fun MapScreen(
                 NavigationBarItem(
                     selected = false,
                     onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "ukjent"}") },
-                    icon = { },
+                    icon = { }, //fyller ut med icon senere!
                     label = { Text("Oppdag planter")}
                 )
             }
