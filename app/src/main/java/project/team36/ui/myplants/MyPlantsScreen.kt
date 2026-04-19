@@ -10,7 +10,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel  // NY: import for viewModel()
 import androidx.navigation.NavController
@@ -36,9 +38,20 @@ fun MyPlantsScreen(
 
 
     Scaffold(
+        containerColor = Color.Transparent,
         topBar = {
             TopAppBar(
-                title = { Text(selectedLocation?.name ?: "Mine planter") }
+                title = {
+                    Text(
+                        text = selectedLocation?.name ?: "Mine planter",
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = Color(0xFF2E7D32)
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFFE8F5E2)
+                )
             )
         },
         bottomBar = {
@@ -68,7 +81,7 @@ fun MyPlantsScreen(
             ExtendedFloatingActionButton(
                 onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "ukjent"}") },
                 icon = { Icon(Icons.Default.Add, contentDescription = "Nytt sted") },
-                text = { Text("Nytt sted") },
+                text = { Text("Ny plante") },
                 containerColor = Color(0xFF2D5A27),
                 contentColor = Color.White,
                 shape = RoundedCornerShape(50)
