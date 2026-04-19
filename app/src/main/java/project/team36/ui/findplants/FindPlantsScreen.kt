@@ -54,13 +54,12 @@ import project.team36.ui.plant.SimplePlantCard
 fun FindPlantsScreen(
     findPlantsViewModel: FindPlantsViewModel,
     navController: NavController,
-    myPlantsViewModel: MyPlantsViewModel,
     savedPlacesViewModel: SavedPlacesViewModel,
     locationName: String
 ) {
 
     val plants by findPlantsViewModel.plants.collectAsState()
-    val pendingPlant by myPlantsViewModel.pendingPlant.collectAsState()
+    val pendingPlant by findPlantsViewModel.pendingPlant.collectAsState()
     val savedLocations by savedPlacesViewModel.savedLocations.collectAsState()
     var showSwitchLocationDialog by remember { mutableStateOf(false) }
 
@@ -165,8 +164,8 @@ fun FindPlantsScreen(
         SavePlantDialog(
             plant = plant,
             savedLocations = savedLocations,
-            onConfirm = { location -> myPlantsViewModel.confirmAddPlant(plant, location) },
-            onDismiss = { myPlantsViewModel.dismissAddPlant() }
+            onConfirm = { location -> findPlantsViewModel.confirmAddPlant(plant, location) },
+            onDismiss = { findPlantsViewModel.dismissAddPlant() }
         )
     }
 

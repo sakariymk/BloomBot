@@ -60,7 +60,6 @@ fun AppNavHost(
             val locationName = backStackEntry.arguments?.getString("locationName") ?: ""
             FindPlantsScreen(
                 findPlantsViewModel = findPlantsViewModel,
-                myPlantsViewModel = myPlantsViewModel,
                 navController = navController,
                 savedPlacesViewModel = savedPlacesViewModel,
                 locationName = locationName
@@ -71,13 +70,13 @@ fun AppNavHost(
             val plantName = backStackEntry.arguments?.getString("plantName") ?: return@composable
             val action = backStackEntry.arguments?.getString("action") ?: ""
             val savedLocations = savedPlacesViewModel.savedLocations.collectAsState()
-            val pendingPlant = myPlantsViewModel.pendingPlant.collectAsState()
+            val pendingPlant = findPlantsViewModel.pendingPlant.collectAsState()
             PlantDetailsScreen(
                 plantName = plantName,
                 viewModel = plantDetailsViewModel,
                 onBackClick = { navController.popBackStack() },
                 onAddPlant = if (action == "add") {
-                    { plantDetailsViewModel.plant.value?.let { myPlantsViewModel.requestAddPlant(it) } }
+                    { plantDetailsViewModel.plant.value?.let { findPlantsViewModel.requestAddPlant(it) } }
                 } else null, //jeg (viktoria) endra litt på dette slik at appen kan buildes og kjøres
                 onDeletePlant = if (action == "delete") {
                     { myPlantsViewModel.removePlantByName(plantName) }
@@ -89,11 +88,11 @@ fun AppNavHost(
                     plant = plant,
                     savedLocations = savedLocations.value,
                     onConfirm = { location ->
-                        myPlantsViewModel.confirmAddPlant(plant, location)
+                        findPlantsViewModel.confirmAddPlant(plant, location)
                         savedPlacesViewModel.selectLocation(location)
                         navController.navigate("myPlants")     
                     },
-                    onDismiss = { myPlantsViewModel.dismissAddPlant() }
+                    onDismiss = { findPlantsViewModel.dismissAddPlant() }
                 )
             }
         }

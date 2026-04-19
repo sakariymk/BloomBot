@@ -105,12 +105,12 @@ fun MyPlantsScreen(
 //            }
 
             // Vi mater inn riktig liste, og tegner opp nøyaktig det elementet vi er på.
-            items(plants){ savedPlant ->
+            items(plants){ plant ->
                 PlantCard(
-                    plant = savedPlant.toPlantInfo(),
-                    onDeletePlant = {
-                        myPlantsViewModel.removePlant(savedPlant)
-                    },
+                    plant = plant,
+                    needsWater = myPlantsViewModel.needsWater(plant),
+                    daysUntilWatering = myPlantsViewModel.daysUntilWatering(plant),
+                    onMarkAsWatered = { myPlantsViewModel.markAsWatered(plant) },
                     navController = navController
                 )
             }
