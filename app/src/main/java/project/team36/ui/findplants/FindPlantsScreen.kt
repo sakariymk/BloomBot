@@ -79,9 +79,9 @@ fun FindPlantsScreen(
                     )
                     NavigationBarItem(
                         selected = false,
-                        onClick = { navController.navigate("myPlants") },
+                        onClick = { navController.navigate("myPlaces") },
                         icon = { },
-                        label = { Text("Mine planter") }
+                        label = { Text("Mine steder") }
                     )
                     NavigationBarItem(
                         selected = true,
@@ -91,7 +91,7 @@ fun FindPlantsScreen(
                     )
                 }
             }
-        },
+        }
 
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {

@@ -18,6 +18,7 @@ import project.team36.ui.plant.PlantDetailsScreen
 import project.team36.ui.plant.PlantDetailsViewModel
 import project.team36.data.plant.PlantRepository
 import project.team36.ui.findplants.SavePlantDialog
+import project.team36.ui.myplaces.MyPlacesScreen
 
 //import project.team36.ui.plant.PlantSwipeViewModel
 
@@ -30,10 +31,10 @@ fun AppNavHost(
     myPlantsViewModel: MyPlantsViewModel,
     plantRepository: PlantRepository,
     savedPlacesViewModel: SavedPlacesViewModel,
-    plantDetailsViewModel: PlantDetailsViewModel // SJEKK OM DENNE SKAL VÆRE HER
+    plantDetailsViewModel: PlantDetailsViewModel
 ) {
 
-    val myPlantsViewModel: MyPlantsViewModel = viewModel()
+    //val myPlantsViewModel: MyPlantsViewModel = viewModel() *Solveig: Slette denne?
 
     NavHost(
         navController = navController,
@@ -95,6 +96,14 @@ fun AppNavHost(
                     onDismiss = { myPlantsViewModel.dismissAddPlant() }
                 )
             }
+        }
+        composable("myPlaces") {
+            MyPlacesScreen(
+                navController = navController,
+                savedPlacesViewModel = savedPlacesViewModel,
+                onLocationCardClick = { navController.navigate("myPlants") },
+                onAddPlaceClick = { navController.navigate("map") }
+            )
         }
     }
 }

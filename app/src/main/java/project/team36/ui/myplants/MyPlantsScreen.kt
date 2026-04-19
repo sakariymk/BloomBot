@@ -38,7 +38,7 @@ fun MyPlantsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Mine planter") }
+                title = { Text(selectedLocation?.name ?: "Mine planter") }
             )
         },
         bottomBar = {
@@ -51,9 +51,9 @@ fun MyPlantsScreen(
                 )
                 NavigationBarItem(
                     selected = true,
-                    onClick = { navController.navigate("myPlants") },
+                    onClick = { navController.navigate("myPlaces") },
                     icon = { },
-                    label = { Text("Mine planter") }
+                    label = { Text("Mine steder") }
                 )
                 NavigationBarItem(
                     selected = false,
@@ -81,13 +81,13 @@ fun MyPlantsScreen(
                 .padding(innerPadding),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            item {
-                LocationDropdown(
-                    savedLocations = savedLocations,
-                    selectedLocation = selectedLocation,
-                    onLocationSelected = { savedPlacesViewModel.selectLocation(it) }
-                )
-            }
+//            item { // Fjerne dropdown
+//                LocationDropdown(
+//                    savedLocations = savedLocations,
+//                    selectedLocation = selectedLocation,
+//                    onLocationSelected = { savedPlacesViewModel.selectLocation(it) }
+//                )
+//            }
 
             // Vi mater inn riktig liste, og tegner opp nøyaktig det elementet vi er på.
             items(plants){ savedPlant ->

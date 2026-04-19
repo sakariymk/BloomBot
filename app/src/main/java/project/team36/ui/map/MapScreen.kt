@@ -80,9 +80,9 @@ fun MapScreen(
                 )
                 NavigationBarItem(
                     selected = false,
-                    onClick = { navController.navigate("myPlants") },
+                    onClick = { navController.navigate("myPlaces") },
                     icon = { },
-                    label = { Text("Mine planter")}
+                    label = { Text("Mine steder")}
                 )
                 NavigationBarItem(
                     selected = false,
@@ -92,8 +92,7 @@ fun MapScreen(
                 )
             }
         }
-    ) {
-            innerPadding ->
+    ) { innerPadding ->
         Box(modifier = modifier
             .fillMaxSize()
             .padding(innerPadding)) {
