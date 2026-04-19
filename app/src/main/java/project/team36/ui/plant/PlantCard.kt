@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,6 +22,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import project.team36.R
 import project.team36.model.plant.PlantInfo
 
@@ -30,21 +35,25 @@ fun PlantCard(
     showPlantStatus: Boolean = false, //kort som vises på MinePlanter
     showAddButton: Boolean = false, //Kort som vises på VelgPlanter
     onAddPlant: (() -> Unit)? = null,
-    onDeletePlant: (() -> Unit)? = null
+    onDeletePlant: (() -> Unit)? = null,
+    navController: NavController
 ) {
     var expanded by remember { mutableStateOf(false) }
 
     // HUSK å legge til "les mer" button
-    OutlinedCard(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(4.dp)
             .animateContentSize(
                 animationSpec = spring(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
                     stiffness = Spring.StiffnessLow
                 )
-            )
+            ),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column (
             modifier = Modifier.fillMaxWidth(),
@@ -61,13 +70,17 @@ fun PlantCard(
                         painter = painterResource(id = imageId),
                         contentDescription = "Bilde av ${plant.name}",
                         modifier = Modifier
-                            .size(80.dp)
-                            .padding(8.dp),
+                            .size(110.dp)
+                            .padding(16.dp)
+                            .clip(RoundedCornerShape(12.dp)),
                         contentScale = ContentScale.Crop
                     )
                     Text(
                         text = plant.name,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = Color.Black
                     )
                     Text(
                         text = if (plant.daysSinceWatered < plant.maxDaysWithoutWater) "Status: Trenger vann" else "Status: Vannet",
@@ -81,23 +94,25 @@ fun PlantCard(
             //Utvidet kort
             AnimatedVisibility(visible = expanded) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Image(
-                        painter = painterResource(id = imageId),
-                        contentDescription = "Bilde av ${plant.name}",
-                        modifier = Modifier
-                            .fillMaxWidth(0.3f)
-                            .height(100.dp)
-                            .align(Alignment.CenterHorizontally),
-                        contentScale = ContentScale.Crop
-                    )
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        Image(
+                            painter = painterResource(id = imageId),
+                            contentDescription = "Bilde av ${plant.name}",
+                            modifier = Modifier
+                                .size(100.dp)
+                                .padding(end = 16.dp, bottom = 16.dp)
+                                .clip(RoundedCornerShape(12.dp)),
+                            contentScale = ContentScale.Crop
+                        )
                         Text(
                             text = plant.name,
-                            style = MaterialTheme.typography.headlineMedium
+                            modifier = Modifier.weight(1f),
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Normal,
+                            color = Color.Black
                         )
                         if (plant.isFrostResistant) {
                             Badge { Text("Tåler frost") }
@@ -143,21 +158,28 @@ fun PlantCard(
                                 .align(Alignment.End)
                                 .padding(top = 8.dp)
                         ) { Text("Legg til") }
-                    }
-
-                    // FJERN dette når PlantDetailsScreen er klart
-                    if (onDeletePlant != null) {
+                    } else {
                         Button(
-                            onClick = { onDeletePlant() },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.Red,
-                                contentColor = Color.Black
-                            ),
+                            onClick = { navController.navigate("plantDetailsScreen/${plant.name}/delete") },
                             modifier = Modifier
                                 .align(Alignment.End)
                                 .padding(top = 8.dp)
-                        ) { Text("Slett") }
+                        ) { Text("Se detaljer") }
                     }
+
+                    // FJERN dette når PlantDetailsScreen er klart
+//                    if (onDeletePlant != null) {
+//                        Button(
+//                            onClick = { onDeletePlant() },
+//                            colors = ButtonDefaults.buttonColors(
+//                                containerColor = Color.Red,
+//                                contentColor = Color.Black
+//                            ),
+//                            modifier = Modifier
+//                                .align(Alignment.End)
+//                                .padding(top = 8.dp)
+//                        ) { Text("Slett") }
+ //                   }
                 }
 
 
@@ -176,30 +198,7 @@ fun PlantCard(
                 )
             }
 
+
         }
     }
 }
-
-
-//@Preview
-//@Composable
-//fun PlantCardPreview() {
-//    MaterialTheme {
-//        PlantCard(
-//            plant = SavedPlant(
-//                name = "Tulipan",
-//                soil = setOf(SoilType.LOAM, SoilType.CLAY),
-//                light = setOf(LightType.FULL),
-//                isFrostResistant = false,
-//                waterPerWeek = 2.0f,
-//                plantingMonth = setOf(4, 5),
-//                climateZone = 3,
-//                hasBeenWatered = false,
-//                daysSinceWatered = 0,
-//                maxDaysWithoutWater = 7,
-//                imageRes = R.drawable.defaultplant,
-//                description = "En klassisk hageplante med vakre blomster."
-//            )
-//        )
-//    }
-//}

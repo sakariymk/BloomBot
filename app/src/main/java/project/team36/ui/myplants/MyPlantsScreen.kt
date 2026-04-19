@@ -1,5 +1,6 @@
 package project.team36.ui.myplants
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -91,7 +92,8 @@ fun MyPlantsScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(innerPadding)
+                .background(Color(0xFFE8F5E2)),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
 //            item { // Fjerne dropdown
@@ -108,7 +110,8 @@ fun MyPlantsScreen(
                     plant = savedPlant.toPlantInfo(),
                     onDeletePlant = {
                         myPlantsViewModel.removePlant(savedPlant)
-                    }
+                    },
+                    navController = navController
                 )
             }
         }
