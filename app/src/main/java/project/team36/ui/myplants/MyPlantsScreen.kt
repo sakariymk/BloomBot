@@ -22,6 +22,7 @@ import project.team36.ui.plant.PlantCard
 import project.team36.model.location.SavedLocation
 import project.team36.model.location.SavedPlant
 import project.team36.model.plant.PlantInfo
+import project.team36.ui.navigation.BottomNavBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,28 +56,9 @@ fun MyPlantsScreen(
                 )
             )
         },
-        bottomBar = {
-            NavigationBar {
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { navController.navigate("map") },
-                    icon = { },
-                    label = { Text("Kart") }
-                )
-                NavigationBarItem(
-                    selected = true,
-                    onClick = { navController.navigate("myPlaces") },
-                    icon = { },
-                    label = { Text("Mine steder") }
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "ukjent"}") },
-                    icon = { },
-                    label = { Text("Oppdag planter") }
-                )
-            }
-        },
+
+        bottomBar = { BottomNavBar(navController = navController)},
+
         // Finn ut hvordan sende informasjon om hvor du kommer fra
         floatingActionButton = {
             ExtendedFloatingActionButton(

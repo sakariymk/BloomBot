@@ -257,7 +257,7 @@ class HybridAiRepository(
                             // <------ ENDRING: Bruker MetWeatherRepository her for å bygge en tekststreng for været
                             val weatherRepo = project.team36.data.mcp.MetWeatherRepository(mcpClient)
                             val forecast = weatherRepo.getParsedForecast(rLat, rLon)
-                            "Værvarsel: ${forecast.temperature}°C, ${forecast.weatherSymbol}, Vind: ${forecast.windSpeed} m/s, Nedbør: ${forecast.precipitation} mm."
+                            "Værvarsel: ${forecast?.temperature}°C, ${forecast?.weatherSymbol}, Vind: ${forecast?.windSpeed} m/s, Nedbør: ${forecast?.precipitation} mm."
                         }
                         else -> "Ukjent verktøy."
                     }
