@@ -54,7 +54,7 @@ fun LandingPageScreen(
             TopAppBar(title = { Text("Hjem") })
         },
 
-        bottomBar = { BottomNavBar(navController = navController) }
+        bottomBar = { BottomNavBar(navController = navController, savedPlacesViewModel) }
 
     ) { innerPadding ->
         Column(

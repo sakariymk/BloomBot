@@ -57,7 +57,7 @@ fun MyPlantsScreen(
             )
         },
 
-        bottomBar = { BottomNavBar(navController = navController)},
+        bottomBar = { BottomNavBar(navController = navController, savedPlacesViewModel)},
 
         // Finn ut hvordan sende informasjon om hvor du kommer fra
         floatingActionButton = {

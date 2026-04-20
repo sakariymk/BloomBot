@@ -45,6 +45,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import project.team36.model.location.SavedLocation
 import project.team36.ui.map.SavedPlacesViewModel
+import project.team36.ui.navigation.BottomNavBar
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -86,29 +87,7 @@ fun MyPlacesScreen (
                 shape = RoundedCornerShape(50)
             )
         },
-        bottomBar = {
-
-            NavigationBar(containerColor = Color.Transparent) {
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { navController.navigate("map") },
-                    icon = { },
-                    label = { Text("Kart") }
-                )
-                NavigationBarItem(
-                    selected = true,
-                    onClick = { navController.navigate("myPlaces") },
-                    icon = { },
-                    label = { Text("Mine steder") }
-                )
-                NavigationBarItem(
-                    selected = true,
-                    onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "ukjent"}") },
-                    icon = { },
-                    label = { Text("Oppdag planter") }
-                )
-            }
-        }
+            bottomBar = { BottomNavBar(navController = navController, savedPlacesViewModel)}
 
     ) { innerPadding ->
         Box(

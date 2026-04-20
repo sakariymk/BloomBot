@@ -83,7 +83,7 @@ fun FindPlantsScreen(
             )
         },
 
-        bottomBar = { BottomNavBar(navController = navController) }
+        bottomBar = { BottomNavBar(navController = navController, savedPlacesViewModel) }
 
     ) { innerPadding ->
         Box(modifier = Modifier
@@ -121,7 +121,10 @@ fun FindPlantsScreen(
                     ) {
                         Icon(Icons.Default.LocationOn, contentDescription = "Sted", tint = Color(0xFF2D5A27))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(locationName, color = Color(0xFF2D5A27))
+                        Text(
+                            text = locationName.ifEmpty { "Sted: Ikke valgt" },
+                            color = Color(0xFF2D5A27)
+                        )
                     }
                 }
 

@@ -60,7 +60,7 @@ fun AppNavHost(
                 myPlantsViewModel = myPlantsViewModel
             )
         }
-        composable ("findPlants/{locationName}") { backStackEntry ->
+        composable("findPlants/{locationName}") { backStackEntry ->
             val locationName = backStackEntry.arguments?.getString("locationName") ?: ""
             FindPlantsScreen(
                 findPlantsViewModel = findPlantsViewModel,
