@@ -68,6 +68,7 @@ import com.mapbox.maps.extension.style.sources.getSourceAs
 import com.mapbox.maps.extension.style.sources.generated.GeoJsonSource
 import project.team36.R
 import project.team36.data.mcp.WeatherAlert
+import project.team36.ui.navigation.BottomNavBar
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -107,26 +108,7 @@ fun MapScreen(
             )
         },
         bottomBar = {
-            NavigationBar{
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { navController.navigate("map")},
-                    icon = { },
-                    label = { Text("Kart")}
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { navController.navigate("myPlaces") },
-                    icon = { },
-                    label = { Text("Mine steder")}
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "ukjent"}") },
-                    icon = { }, //fyller ut med icon senere!
-                    label = { Text("Oppdag planter")}
-                )
-            }
+            BottomNavBar(navController = navController, savedPlacesViewModel)
         }
     ) { innerPadding ->
         Box(modifier = modifier
