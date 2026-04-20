@@ -17,14 +17,16 @@ import project.team36.model.location.SavedPlant
 import project.team36.model.plant.PlantInfo
 import project.team36.ui.map.SavedPlace
 import project.team36.ui.map.SavedPlacesViewModel
+import java.util.concurrent.TimeUnit
 
 class MyPlantsViewModel(
     private val repository: LocationRepository,
     private val savedPlacesViewModel: SavedPlacesViewModel
 ) : ViewModel() {
 
-    private val _pendingPlant = MutableStateFlow<PlantInfo?>(null)
-    val pendingPlant: StateFlow<PlantInfo?> = _pendingPlant.asStateFlow()
+    //Flyttet disse til FindPlantsViewModel, gjenstår å se om det ødelegger appen.. -T
+//    private val _pendingPlant = MutableStateFlow<PlantInfo?>(null)
+//    val pendingPlant: StateFlow<PlantInfo?> = _pendingPlant.asStateFlow()
 
     val plants = savedPlacesViewModel.selectedLocation
         .flatMapLatest { location ->
@@ -47,37 +49,28 @@ class MyPlantsViewModel(
         }
     }
 
-    //når en bruker vil lagre plante
-    fun requestAddPlant(plant: PlantInfo) {
-        _pendingPlant.value = plant
-    }
-
-    fun dismissAddPlant() {
-        _pendingPlant.value = null
-    }
-
-    //når bruker har valgt plante og lokasjon
-    fun confirmAddPlant(plant: PlantInfo, location: SavedLocation) {
+    //Metoder for vanning og å sjekke om den trenger vann, lagt til ny egenskap til SavedPlant - lastWateredDate som kan holde på nøyaktig tid for vanning
+    fun markAsWatered(plant: SavedPlant) {
         viewModelScope.launch {
-            repository.insertPlant(
-                SavedPlant(
-                    locationId = location.id,
-                    name = plant.name,
-                    soil = plant.soil,
-                    light = plant.light,
-                    isFrostResistant = plant.isFrostResistant,
-                    waterPerWeek = plant.waterPerWeek,
-                    plantingMonth = plant.plantingMonth,
-                    climateZone = plant.climateZone,
-                    hasBeenWatered = false,
-                    daysSinceWatered = 0,
-                    maxDaysWithoutWater = plant.maxDaysWithoutWater,
-                    imageRes = plant.imageRes,
-                    description = plant.description
-                )
-            )
-            _pendingPlant.value = null
+            repository.updatePlant(plant.copy(
+                hasBeenWatered = true,
+                daysSinceWatered = 0,
+                lastWateredDate = System.currentTimeMillis()
+            ))
         }
     }
 
+    fun needsWater(plant: SavedPlant): Boolean {
+        val daysSince = TimeUnit.MILLISECONDS.toDays(
+            System.currentTimeMillis() - plant.lastWateredDate
+        )
+        return daysSince >= plant.maxDaysWithoutWater
+    }
+
+    fun daysUntilWatering(plant: SavedPlant): Long {
+        val daysSince = TimeUnit.MILLISECONDS.toDays(
+            System.currentTimeMillis() - plant.lastWateredDate
+        )
+        return (plant.maxDaysWithoutWater.toLong() - daysSince).coerceAtLeast(0)
+    }
 }

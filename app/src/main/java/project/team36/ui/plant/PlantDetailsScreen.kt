@@ -58,7 +58,7 @@ fun PlantDetailsScreen(
     onBackClick: () -> Unit,
     //onAddClick: () -> Unit, //jeg (viktoria) endra litt på dette slik at appen kan buildes og kjøres
     onAddPlant: (() -> Unit)? = null, //jeg (viktoria) endra litt på dette slik at appen kan buildes og kjøres
-    onDeletePlant: (() -> Unit)? = null //jeg (viktoria) endra litt på dette slik at appen kan buildes og kjøres
+    onDeletePlant: (() -> Unit)? = null //jeg (viktoria) endra litt på dette slik at appen kan buildes og kjøres,
 
     // boolean-parameter for om det er plantdetailsscreen på mine planter eller oppdag planter
 
@@ -136,7 +136,10 @@ fun PlantDetailsScreen(
                     }
                 } else if (onDeletePlant != null) {
                     OutlinedButton(
-                        onClick = { onDeletePlant() },
+                        onClick = {
+                            onDeletePlant()
+                            onBackClick()
+                                  },
                         shape = RoundedCornerShape(50),
                         colors = ButtonDefaults.outlinedButtonColors(
                             containerColor = Color.White
@@ -152,9 +155,6 @@ fun PlantDetailsScreen(
             }
         }
     }
-
-
-
 }
 
 @Composable
@@ -364,4 +364,3 @@ fun PlantDetailsScreenPreview_Content(plant: PlantInfo) {
         Spacer(modifier = Modifier.height(24.dp))
     }
 }
-
