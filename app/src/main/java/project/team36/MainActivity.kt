@@ -2,6 +2,7 @@ package project.team36
 
 import project.team36.ui.navigation.AppNavHost
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.*
@@ -13,6 +14,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -25,8 +27,11 @@ import project.team36.data.klima.MetWeatherApi
 import project.team36.data.local.AppDatabase
 import project.team36.data.local.LocationRepository
 import project.team36.data.mcp.MetMcpClient
+import project.team36.data.mcp.MetWeatherRepository
 import project.team36.data.plant.PlantDataSource
 import project.team36.data.plant.PlantRepository
+import project.team36.ui.landingpage.LandingPageViewModel
+import project.team36.ui.landingpage.LandingPageViewModelFactory
 import project.team36.ui.map.MapViewModel
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.map.SavedPlacesViewModelFactory
@@ -84,6 +89,7 @@ class MainActivity : ComponentActivity() {
         val db = AppDatabase.getDatabase(this)
         val locationRepository = LocationRepository(db.savedLocationDao(), db.savedPlantDao())
 
+
         val contentType = "application/json".toMediaType()
         val jsonConfig = Json {
             ignoreUnknownKeys = true
@@ -114,9 +120,16 @@ class MainActivity : ComponentActivity() {
 
         val mcpClient = MetMcpClient()
 
-        lifecycleScope.launch {
-            mcpClient.connect()
+        //thrower exception hvis det ikke er internett tilgang, så appen ikke krasjer
+        try {
+            runBlocking { mcpClient.connect() }
+        } catch (e: Exception) {
+            Log.e("MCP", "Could not connect: ${e.message}")
+
         }
+
+
+        val metWeatherRepository = MetWeatherRepository(mcpClient)
 
         val hybridAiRepository = HybridAiRepository(
             claudeApi = claudeApi,
@@ -131,6 +144,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             Team36Theme {
                 val navController = rememberNavController()
+
+                val landingPageViewModel: LandingPageViewModel = viewModel(
+                    factory = LandingPageViewModelFactory(metWeatherRepository)
+                )
 
                 val savedPlacesViewModel: SavedPlacesViewModel = viewModel(
                     factory = SavedPlacesViewModelFactory(locationRepository)
@@ -163,7 +180,8 @@ class MainActivity : ComponentActivity() {
                     myPlantsViewModel = myPlantsViewModel,
                     savedPlacesViewModel = savedPlacesViewModel,
                     plantRepository = plantRepository,
-                    plantDetailsViewModel = plantDetailsViewModel
+                    plantDetailsViewModel = plantDetailsViewModel,
+                    landingPageViewModel = landingPageViewModel
                 )
             }
         }
