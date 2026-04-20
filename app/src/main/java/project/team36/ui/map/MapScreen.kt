@@ -67,6 +67,7 @@ import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.extension.style.sources.getSourceAs
 import com.mapbox.maps.extension.style.sources.generated.GeoJsonSource
 import project.team36.R
+import project.team36.data.mcp.WeatherAlert
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
