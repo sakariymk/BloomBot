@@ -19,7 +19,6 @@ import project.team36.ui.plant.PlantCard
 import project.team36.model.location.SavedLocation
 import project.team36.model.location.SavedPlant
 import project.team36.model.plant.PlantInfo
-import project.team36.ui.navigation.BottomNavBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,9 +41,39 @@ fun MyPlantsScreen(
                 title = { Text("Mine planter") }
             )
         },
-
-        bottomBar = { BottomNavBar(navController = navController) }
-
+        bottomBar = {
+            NavigationBar {
+                NavigationBarItem(
+                    selected = false,
+                    onClick = { navController.navigate("map") },
+                    icon = { },
+                    label = { Text("Kart") }
+                )
+                NavigationBarItem(
+                    selected = true,
+                    onClick = { navController.navigate("myPlants") },
+                    icon = { },
+                    label = { Text("Mine planter") }
+                )
+                NavigationBarItem(
+                    selected = false,
+                    onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "ukjent"}") },
+                    icon = { },
+                    label = { Text("Oppdag planter") }
+                )
+            }
+        },
+        // Finn ut hvordan sende informasjon om hvor du kommer fra
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "ukjent"}") },
+                icon = { Icon(Icons.Default.Add, contentDescription = "Nytt sted") },
+                text = { Text("Nytt sted") },
+                containerColor = Color(0xFF2D5A27),
+                contentColor = Color.White,
+                shape = RoundedCornerShape(50)
+            )
+        }
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier
