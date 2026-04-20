@@ -34,7 +34,7 @@ fun AppNavHost(
     myPlantsViewModel: MyPlantsViewModel,
     plantRepository: PlantRepository,
     savedPlacesViewModel: SavedPlacesViewModel,
-    plantDetailsViewModel: PlantDetailsViewModel
+    plantDetailsViewModel: PlantDetailsViewModel,
     landingPageViewModel: LandingPageViewModel,
 ) {
 
