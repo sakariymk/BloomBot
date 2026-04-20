@@ -36,4 +36,8 @@ class LocationRepository(
     suspend fun deletePlant(plant: SavedPlant) {
         savedPlantDao.delete(plant)
     }
+
+    suspend fun updatePlant(plant: SavedPlant) {
+        savedPlantDao.update(plant)
+    }
 }

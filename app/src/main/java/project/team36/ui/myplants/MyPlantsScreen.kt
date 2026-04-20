@@ -1,5 +1,6 @@
 package project.team36.ui.myplants
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -10,7 +11,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel  // NY: import for viewModel()
 import androidx.navigation.NavController
@@ -37,9 +40,20 @@ fun MyPlantsScreen(
 
 
     Scaffold(
+        containerColor = Color.Transparent,
         topBar = {
             TopAppBar(
-                title = { Text("Mine planter") }
+                title = {
+                    Text(
+                        text = selectedLocation?.name ?: "Mine planter",
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = Color(0xFF2E7D32)
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFFE8F5E2)
+                )
             )
         },
 
@@ -50,7 +64,7 @@ fun MyPlantsScreen(
             ExtendedFloatingActionButton(
                 onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "ukjent"}") },
                 icon = { Icon(Icons.Default.Add, contentDescription = "Nytt sted") },
-                text = { Text("Nytt sted") },
+                text = { Text("Ny plante") },
                 containerColor = Color(0xFF2D5A27),
                 contentColor = Color.White,
                 shape = RoundedCornerShape(50)
@@ -60,24 +74,26 @@ fun MyPlantsScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(innerPadding)
+                .background(Color(0xFFE8F5E2)),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            item {
-                LocationDropdown(
-                    savedLocations = savedLocations,
-                    selectedLocation = selectedLocation,
-                    onLocationSelected = { savedPlacesViewModel.selectLocation(it) }
-                )
-            }
+//            item { // Fjerne dropdown
+//                LocationDropdown(
+//                    savedLocations = savedLocations,
+//                    selectedLocation = selectedLocation,
+//                    onLocationSelected = { savedPlacesViewModel.selectLocation(it) }
+//                )
+//            }
 
             // Vi mater inn riktig liste, og tegner opp nøyaktig det elementet vi er på.
-            items(plants){ savedPlant ->
+            items(plants){ plant ->
                 PlantCard(
-                    plant = savedPlant.toPlantInfo(),
-                    onDeletePlant = {
-                        myPlantsViewModel.removePlant(savedPlant)
-                    }
+                    plant = plant,
+                    needsWater = myPlantsViewModel.needsWater(plant),
+                    daysUntilWatering = myPlantsViewModel.daysUntilWatering(plant),
+                    onMarkAsWatered = { myPlantsViewModel.markAsWatered(plant) },
+                    navController = navController
                 )
             }
         }

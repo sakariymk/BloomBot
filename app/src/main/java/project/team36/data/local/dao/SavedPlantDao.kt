@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import project.team36.model.location.SavedPlant
 
@@ -14,6 +15,9 @@ interface SavedPlantDao {
 
     @Delete
     suspend fun delete(plant: SavedPlant)
+
+    @Update
+    suspend fun update(plant: SavedPlant)
 
     //Hent alle planter for en lokasjon
     @Query("SELECT * FROM saved_plants WHERE locationId = :locationId")

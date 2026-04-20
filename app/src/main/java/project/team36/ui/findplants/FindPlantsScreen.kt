@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,6 +31,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -38,7 +40,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.mapbox.maps.extension.style.expressions.dsl.generated.image
 import project.team36.ui.map.SavedPlacesViewModel
@@ -52,13 +56,12 @@ import project.team36.ui.plant.PlantCard
 fun FindPlantsScreen(
     findPlantsViewModel: FindPlantsViewModel,
     navController: NavController,
-    myPlantsViewModel: MyPlantsViewModel,
     savedPlacesViewModel: SavedPlacesViewModel,
     locationName: String
 ) {
 
     val plants by findPlantsViewModel.plants.collectAsState()
-    val pendingPlant by myPlantsViewModel.pendingPlant.collectAsState()
+    val pendingPlant by findPlantsViewModel.pendingPlant.collectAsState()
     val savedLocations by savedPlacesViewModel.savedLocations.collectAsState()
     var showSwitchLocationDialog by remember { mutableStateOf(false) }
 
@@ -66,17 +69,31 @@ fun FindPlantsScreen(
         containerColor = Color.Transparent,
         topBar = {
             TopAppBar(
-                title = { Text("Finn nye planter") }
+                title = {
+                    Text(
+                        text = "Finn nye planter",
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = Color(0xFF2E7D32)
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFFE8F5E2)
+                )
             )
         },
 
         bottomBar = { BottomNavBar(navController = navController) }
 
     ) { innerPadding ->
-        Box(modifier = Modifier.padding(innerPadding)) {
+        Box(modifier = Modifier
+                .padding(innerPadding)
+                .background(Color(0xFFE8F5E2))
+        ) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 items(plants) { plant ->
                     SimplePlantCard(
@@ -126,8 +143,8 @@ fun FindPlantsScreen(
         SavePlantDialog(
             plant = plant,
             savedLocations = savedLocations,
-            onConfirm = { location -> myPlantsViewModel.confirmAddPlant(plant, location) },
-            onDismiss = { myPlantsViewModel.dismissAddPlant() }
+            onConfirm = { location -> findPlantsViewModel.confirmAddPlant(plant, location) },
+            onDismiss = { findPlantsViewModel.dismissAddPlant() }
         )
     }
 

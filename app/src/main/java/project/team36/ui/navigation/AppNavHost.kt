@@ -19,6 +19,7 @@ import project.team36.ui.plant.PlantDetailsScreen
 import project.team36.ui.plant.PlantDetailsViewModel
 import project.team36.data.plant.PlantRepository
 import project.team36.ui.findplants.SavePlantDialog
+import project.team36.ui.myplaces.MyPlacesScreen
 import project.team36.ui.landingpage.LandingPageScreen
 import project.team36.ui.landingpage.LandingPageViewModel
 
@@ -33,11 +34,11 @@ fun AppNavHost(
     myPlantsViewModel: MyPlantsViewModel,
     plantRepository: PlantRepository,
     savedPlacesViewModel: SavedPlacesViewModel,
-    plantDetailsViewModel: PlantDetailsViewModel, // SJEKK OM DENNE SKAL VÆRE HER
+    plantDetailsViewModel: PlantDetailsViewModel
     landingPageViewModel: LandingPageViewModel,
 ) {
 
-    val myPlantsViewModel: MyPlantsViewModel = viewModel()
+    //val myPlantsViewModel: MyPlantsViewModel = viewModel() *Solveig: Slette denne?
 
     NavHost(
         navController = navController,
@@ -63,7 +64,6 @@ fun AppNavHost(
             val locationName = backStackEntry.arguments?.getString("locationName") ?: ""
             FindPlantsScreen(
                 findPlantsViewModel = findPlantsViewModel,
-                myPlantsViewModel = myPlantsViewModel,
                 navController = navController,
                 savedPlacesViewModel = savedPlacesViewModel,
                 locationName = locationName
@@ -81,13 +81,13 @@ fun AppNavHost(
             val plantName = backStackEntry.arguments?.getString("plantName") ?: return@composable
             val action = backStackEntry.arguments?.getString("action") ?: ""
             val savedLocations = savedPlacesViewModel.savedLocations.collectAsState()
-            val pendingPlant = myPlantsViewModel.pendingPlant.collectAsState()
+            val pendingPlant = findPlantsViewModel.pendingPlant.collectAsState()
             PlantDetailsScreen(
                 plantName = plantName,
                 viewModel = plantDetailsViewModel,
                 onBackClick = { navController.popBackStack() },
                 onAddPlant = if (action == "add") {
-                    { plantDetailsViewModel.plant.value?.let { myPlantsViewModel.requestAddPlant(it) } }
+                    { plantDetailsViewModel.plant.value?.let { findPlantsViewModel.requestAddPlant(it) } }
                 } else null, //jeg (viktoria) endra litt på dette slik at appen kan buildes og kjøres
                 onDeletePlant = if (action == "delete") {
                     { myPlantsViewModel.removePlantByName(plantName) }
@@ -99,13 +99,21 @@ fun AppNavHost(
                     plant = plant,
                     savedLocations = savedLocations.value,
                     onConfirm = { location ->
-                        myPlantsViewModel.confirmAddPlant(plant, location)
+                        findPlantsViewModel.confirmAddPlant(plant, location)
                         savedPlacesViewModel.selectLocation(location)
                         navController.navigate("myPlants")     
                     },
-                    onDismiss = { myPlantsViewModel.dismissAddPlant() }
+                    onDismiss = { findPlantsViewModel.dismissAddPlant() }
                 )
             }
+        }
+        composable("myPlaces") {
+            MyPlacesScreen(
+                navController = navController,
+                savedPlacesViewModel = savedPlacesViewModel,
+                onLocationCardClick = { navController.navigate("myPlants") },
+                onAddPlaceClick = { navController.navigate("map") }
+            )
         }
     }
 }
