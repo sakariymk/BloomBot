@@ -9,7 +9,6 @@ import project.team36.data.plant.PlantDataSource
 import project.team36.ui.map.MapViewModel
 import project.team36.model.ai.*
 import retrofit2.HttpException
-
 class HybridAiRepository(
     private val claudeApi: ClaudeApi,
     private val mcpClient: MetMcpClient,
@@ -17,7 +16,6 @@ class HybridAiRepository(
     private val frostClientId: String,
     private val claudeApiKey: String
 ) {
-
     private val frostTool = ClaudeTool(
         name = "get_current_frost_status",
         description = "Henter nåværende temperatur for å sjekke om det er frostfare akkurat nå.",
@@ -44,17 +42,35 @@ class HybridAiRepository(
         )
     )
 
+    // Nytt: alert-verktøy uten påkrevde parametere
+    private val alertTool = ClaudeTool(
+        name = "get_weather_alerts",
+        description = "Henter aktive ekstremværvarsler fra Meteorologisk institutt for Norge. Bruk dette for å advare brukeren om farlige værforhold.",
+        input_schema = ToolInputSchema(
+            type = "object",
+            properties = emptyMap(),
+            required = emptyList()
+        )
+    )
+
     suspend fun getPlantRecommendations(lat: Double, lon: Double): String {
+        // Sørg for at MCP-tilkoblingen er oppe før vi starter
+        try {
+            mcpClient.connect()
+        } catch (e: Exception) {
+            return "Kunne ikke koble til værtjenesten: ${e.message}"
+        }
+
         val plants = try { plantDataSource.fetchPlants() } catch (e: Exception) { emptyList() }
 
-        // FIKSEN ER HER NEDE: Bruker it.climateZone
         val plantsText = plants.take(15).joinToString("\n") {
             "- ${it.name}: Sone ${it.climateZone}, Frostsikker: ${it.isFrostResistant}"
         }
 
         val systemPrompt = """
             Du er en hageekspert i Norge. Brukeren er på lokasjonen Lat: $lat, Lon: $lon.
-            Du SKAL bruke verktøyene dine for å sjekke vær og frost før du gir råd.
+            Du SKAL bruke verktøyene dine for å sjekke vær, frost og aktive varsler før du gir råd.
+            Hvis det er aktive ekstremværvarsler, skal du nevne disse tydelig først.
             Baser rådene dine på disse plantene:
             $plantsText
             Svar kort og vennlig på norsk.
@@ -71,11 +87,12 @@ class HybridAiRepository(
                     model = "claude-sonnet-4-5",
                     system = systemPrompt,
                     messages = conversation,
-                    tools = listOf(frostTool, weatherTool)
+                    tools = listOf(frostTool, weatherTool, alertTool) // alertTool lagt til
                 )
             )
 
-            if (response.stop_reason == "tool_use") {
+            // Loop for å håndtere flere tool_use-runder (Claude kan kalle flere verktøy)
+            while (response.stop_reason == "tool_use") {
                 conversation.add(ClaudeMessage("assistant", response.content))
 
                 val toolUseBlocks = response.content.filter { it.type == "tool_use" }
@@ -91,13 +108,14 @@ class HybridAiRepository(
                     val resultText = when (toolName) {
                         "get_current_frost_status" -> {
                             val station = getNearestStation(rLat, rLon, frostClientId)
-                            if (station != null) "Temp på ${station.name}: ${getTemperatures(station.id, frostClientId)}°C" else "Ingen stasjon funnet."
+                            if (station != null)
+                                "Temp på ${station.name}: ${getTemperatures(station.id, frostClientId)}°C"
+                            else
+                                "Ingen stasjon funnet."
                         }
-                        //Endret kun kall her til faktisk MCPserver -Therese
-                        "weatherforecast" -> {
-                            mcpClient.getForecast(rLat,rLon)
-                        }
-                        else -> "Ukjent verktøy."
+                        "weatherforecast" -> mcpClient.getForecast(rLat, rLon)
+                        "get_weather_alerts" -> mcpClient.getAlerts() // Nytt
+                        else -> "Ukjent verktøy: $toolName"
                     }
 
                     toolResultBlocks.add(
@@ -121,7 +139,8 @@ class HybridAiRepository(
                 )
             }
 
-            response.content.firstOrNull { it.type == "text" }?.text ?: "AI-en ga et svar uten tekst."
+            response.content.firstOrNull { it.type == "text" }?.text
+                ?: "AI-en ga et svar uten tekst."
 
         } catch (e: HttpException) {
             "AI-feil: ${e.code()} - ${e.response()?.errorBody()?.string()}"
