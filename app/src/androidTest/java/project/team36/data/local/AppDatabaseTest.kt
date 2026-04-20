@@ -42,6 +42,8 @@ class AppDatabaseTest : TestCase() {
         db.close()
     }
 
+
+
     @Test
     fun writeAndReadLocation() = runBlocking {
         val location = SavedLocation(name = "Hjem", lat = 59.8, lon = 10.9, address = "Solveien 61")
@@ -49,6 +51,7 @@ class AppDatabaseTest : TestCase() {
         val locations = locationDao.getAllLocations().first()
         assertTrue(locations.any { it.name == "Hjem" })
     }
+
 
     // For mye specs og usikker på siste versjon av disse, så lager test senere
 //    @Test

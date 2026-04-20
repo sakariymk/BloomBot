@@ -39,6 +39,14 @@ class MyPlantsViewModel(
         }
     }
 
+    // for å slette plante basert på navn, brukes i AppNavHost på PlantDetailsScreen
+    fun removePlantByName(plantName: String) {
+        viewModelScope.launch {
+            val plant = plants.value.find { it.name == plantName }
+            plant?.let { repository.deletePlant(it) }
+        }
+    }
+
     //når en bruker vil lagre plante
     fun requestAddPlant(plant: PlantInfo) {
         _pendingPlant.value = plant

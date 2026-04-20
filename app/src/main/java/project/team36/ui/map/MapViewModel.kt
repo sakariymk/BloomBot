@@ -51,9 +51,11 @@ data class MapUiState(
     val placeNameInput: String = "",
     val selectedSavedLocation: SavedLocation? = null,
     val aiResponse: String? = null,
-    val isAiLoading: Boolean = false
-)
+    val isAiLoading: Boolean = false,
+    val isFutureAiLoading: Boolean = false,
 
+    val rawApiData: String? = null
+)
 
 class MapViewModelFactory(
     private val repository: HybridAiRepository
@@ -66,8 +68,6 @@ class MapViewModelFactory(
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
-
-
 
 class MapViewModel(private val repository: HybridAiRepository) : ViewModel() {
 
@@ -82,12 +82,25 @@ class MapViewModel(private val repository: HybridAiRepository) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MapUiState())
     val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()
-    private var hasInitializedCamera = false //for at kameraet skal ikke zoome sykt mye rundt når man beveger på seg
+    private var hasInitializedCamera = false
 
     private val searchEngine = SearchEngine.createSearchEngine(
         ApiType.SEARCH_BOX,
         SearchEngineSettings()
     )
+
+    // <------ ENDRING: Funksjoner for RAW API testing
+    fun fetchRawApiData(location: SavedLocation) {
+        _uiState.value = _uiState.value.copy(isAiLoading = true, rawApiData = null)
+        viewModelScope.launch {
+            val rawData = repository.getRawApiTest(location)
+            _uiState.value = _uiState.value.copy(isAiLoading = false, rawApiData = rawData)
+        }
+    }
+
+    fun dismissRawApiData() {
+        _uiState.value = _uiState.value.copy(rawApiData = null)
+    }
 
     fun onLocationReady() {
         if (!hasInitializedCamera) {
@@ -162,7 +175,6 @@ class MapViewModel(private val repository: HybridAiRepository) : ViewModel() {
         })
     }
 
-    //Lagre stedet i DB og legge til sone
     private var mapboxMap: MapboxMap? = null
 
     fun onMapReady(map: MapboxMap) {
@@ -170,8 +182,6 @@ class MapViewModel(private val repository: HybridAiRepository) : ViewModel() {
         Log.d("ZONE_TEST", "Kart klart!")
     }
 
-    //Hente klimasone for koordinatet på valgt sted ved å spørre klimasonelaget via queryRenderedFeatures. suspendCoroutine for å få gjort
-    //den asynkrone Mapbox funksjonen om til suspend-funksjon og returnere en verdi
     suspend fun getClimateZone(
         lng: Double,
         lat: Double
@@ -235,23 +245,24 @@ class MapViewModel(private val repository: HybridAiRepository) : ViewModel() {
         _uiState.value = _uiState.value.copy(selectedSavedLocation = null)
     }
 
-    fun fetchAiAdvice(lat: Double, lon: Double) {
-        // Skrur på "laster..."-visningen i UI-et
+    // <------ ENDRING: Fikset parameter til SavedLocation
+    fun fetchAiAdvice(location: SavedLocation) {
         _uiState.value = _uiState.value.copy(isAiLoading = true, aiResponse = null)
-
         viewModelScope.launch {
-            // Venter på at Claude skal tenke ferdig (og sjekke været)
-            val response = repository.getPlantRecommendations(lat, lon)
-
-            // Skrur av "laster..." og lagrer Claude sitt svar!
-            _uiState.value = _uiState.value.copy(
-                isAiLoading = false,
-                aiResponse = response
-            )
+            val response = repository.getPlantRecommendations(location)
+            _uiState.value = _uiState.value.copy(isAiLoading = false, aiResponse = response)
         }
     }
 
-    // En liten funksjon for å lukke AI-svaret igjen:
+    // <------ ENDRING: Lagt til Viewmodel funksjon for fremtidig råd
+    fun fetchFutureAiAdvice(location: SavedLocation) {
+        _uiState.value = _uiState.value.copy(isFutureAiLoading = true, aiResponse = null)
+        viewModelScope.launch {
+            val response = repository.getFuturePlantRecommendations(location)
+            _uiState.value = _uiState.value.copy(isFutureAiLoading = false, aiResponse = response)
+        }
+    }
+
     fun dismissAiAdvice() {
         _uiState.value = _uiState.value.copy(aiResponse = null)
     }

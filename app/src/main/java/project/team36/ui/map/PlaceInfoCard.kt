@@ -40,21 +40,27 @@ import project.team36.model.location.SavedLocation
 @Composable
 fun PlaceInfoCard(
     location: SavedLocation,
-    // NYE PARAMETERE FOR AI:
-    onGetAiAdvice: (Double, Double) -> Unit,
+    // <------ ENDRING: Fikset at onGetAiAdvice krever SavedLocation, og la til onGetFutureAiAdvice parameter!
+    onGetAiAdvice: (SavedLocation) -> Unit,
+    onGetFutureAiAdvice: (SavedLocation) -> Unit,
     aiResponse: String?,
     isAiLoading: Boolean,
+    isFutureAiLoading: Boolean,
     onDismissAi: () -> Unit,
-    // EKSISTERENDE PARAMETERE:
     onDismiss: () -> Unit,
     onEdit: (String) -> Unit,
     onDelete: () -> Unit,
-    navController: NavHostController //DENNE GIR ERROR; IGNORER!
+    navController: NavHostController,
+
+
+    // <------ ENDRING: Nye parametere for test-knappen
+    onGetRawApiData: (SavedLocation) -> Unit,
+    rawApiData: String?,
+    onDismissRawApi: () -> Unit
 ) {
     var showEditDialog by rememberSaveable { mutableStateOf((false)) }
     var editedName by rememberSaveable { mutableStateOf(location.name ?: "")}
 
-    //dette er boks hvis bruker vil redigere stedet man har lagra
     if (showEditDialog) {
         AlertDialog(
             onDismissRequest = { showEditDialog = false },
@@ -80,7 +86,6 @@ fun PlaceInfoCard(
         )
     }
 
-    // NY BOKS: Dette er popupen som viser rådet fra Claude når den er ferdig
     if (aiResponse != null) {
         AlertDialog(
             onDismissRequest = onDismissAi,
@@ -92,13 +97,25 @@ fun PlaceInfoCard(
         )
     }
 
-    //dette viser selve lokasjon og litt info
+    // <------ ENDRING: Popup for RAW API data
+    if (rawApiData != null) {
+        AlertDialog(
+            onDismissRequest = onDismissRawApi,
+            title = { Text("RAW API Data 🛠") },
+            text = { Text(rawApiData, modifier = Modifier.verticalScroll(rememberScrollState())) },
+            confirmButton = {
+                TextButton(onClick = onDismissRawApi) { Text("Lukk") }
+            }
+        )
+    }
+
     Dialog(onDismissRequest = onDismiss) {
         Column(
             modifier = Modifier
                 .shadow(elevation = 4.dp, spotColor = Color(0x40000000), ambientColor = Color(0x40000000))
                 .width(316.dp)
-                .height(290.dp) // ØKT HØYDE FRA 230 TIL 290 FOR Å FÅ PLASS TIL KNAPPEN
+                // <------ ENDRING: Økte til 340 for å gi nok plass til begge AI knappene pent over hverandre
+                .height(340.dp)
                 .background(color = Color(0xFFE8F8E3), shape = RoundedCornerShape(size = 15.dp))
                 .fillMaxSize()
         ) {
@@ -107,28 +124,21 @@ fun PlaceInfoCard(
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                //viser custom navn, adresse hvis brukeren ikke har redigert navnet
                 Text(text = location.name ?: "Ukjent", fontWeight = FontWeight.Bold, fontSize = 18.sp)
 
-                //viser adressen
                 Text(
                     text = location.address ?: "Ingen adresse",
                     modifier = Modifier.padding(top = 4.dp),
                     color = Color(0xFF6F8069)
                 )
 
-
-                //flytter den "lukk" knappen helt nederst
                 Spacer(modifier = Modifier.weight(1f))
 
-
-                //TODO: Fikse navigasjon til "Mine planter" screen
-                //"Se mine planter" knapp
                 Button(
-                    onClick = { navController.navigate("myPlants")}, //KOMMER FEIL, IGNORER DEN
+                    onClick = { navController.navigate("myPlants")},
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                        .padding(6.dp)
+                        .padding(4.dp)
                         .shadow(
                             elevation = 4.dp,
                             spotColor = Color(0x40000000),
@@ -137,8 +147,8 @@ fun PlaceInfoCard(
                         .width(193.dp)
                         .height(42.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White,  // bakgrunnsfarge
-                        contentColor = Color.Black     // tekstfarge
+                        containerColor = Color.White,
+                        contentColor = Color.Black
                     ),
                     shape = RoundedCornerShape(23.5.dp)
                 ) {
@@ -149,13 +159,11 @@ fun PlaceInfoCard(
                     )
                 }
 
-
-                //"Rediger lokasjon" knapp
                 Button(
-                    onClick = {showEditDialog = true}, //knappen gjør at edit dialog kommer opp
+                    onClick = {showEditDialog = true},
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                        .padding(6.dp)
+                        .padding(4.dp)
                         .shadow(
                             elevation = 4.dp,
                             spotColor = Color(0x40000000),
@@ -164,8 +172,8 @@ fun PlaceInfoCard(
                         .width(193.dp)
                         .height(42.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White,  // bakgrunnsfarge
-                        contentColor = Color.Black     // tekstfarge
+                        containerColor = Color.White,
+                        contentColor = Color.Black
                     ),
                     shape = RoundedCornerShape(23.5.dp)
                 ) {
@@ -176,15 +184,15 @@ fun PlaceInfoCard(
                     )
                 }
 
-                // NY AI-KNAPP
+                // AI-KNAPP 1: Vanlig
                 Button(
                     onClick = {
-                        // Henter koordinatene for denne spesifikke plassen og sender til viewmodel
-                        onGetAiAdvice(location.lat ?: 0.0, location.lon ?: 0.0)
+                        // <------ ENDRING: Sender nå bare inn location!
+                        onGetAiAdvice(location)
                     },
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                        .padding(6.dp)
+                        .padding(4.dp)
                         .shadow(
                             elevation = 4.dp,
                             spotColor = Color(0x40000000),
@@ -192,9 +200,9 @@ fun PlaceInfoCard(
                         )
                         .width(193.dp)
                         .height(42.dp),
-                    enabled = !isAiLoading, // Låser knappen mens vi venter på svar
+                    enabled = !isAiLoading,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF4CAF50), // Mørkere grønnfarge
+                        containerColor = Color(0xFF4CAF50),
                         contentColor = Color.White
                     ),
                     shape = RoundedCornerShape(23.5.dp)
@@ -210,7 +218,72 @@ fun PlaceInfoCard(
                     }
                 }
 
-                //knapp for å lukke boksen
+                // <------ ENDRING: NY TEST-KNAPP FOR RAW API
+                Button(
+                    onClick = {
+                        onGetRawApiData(location)
+                    },
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(4.dp)
+                        .shadow(
+                            elevation = 4.dp,
+                            spotColor = Color(0x40000000),
+                            ambientColor = Color(0x40000000)
+                        )
+                        .width(193.dp)
+                        .height(42.dp),
+                    enabled = !isAiLoading,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.DarkGray, // Mørk grå for å vise at det er en dev-knapp
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(23.5.dp)
+                ) {
+                    if (isAiLoading) {
+                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                    } else {
+                        Text(
+                            text = "🛠 Test RAW API",
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight(400)
+                        )
+                    }
+                }
+
+                // <------ ENDRING: NY AI-KNAPP 2 for FREMTIDIG RÅD
+                Button(
+                    onClick = {
+                        onGetFutureAiAdvice(location)
+                    },
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(4.dp)
+                        .shadow(
+                            elevation = 4.dp,
+                            spotColor = Color(0x40000000),
+                            ambientColor = Color(0x40000000)
+                        )
+                        .width(193.dp)
+                        .height(42.dp),
+                    enabled = !isFutureAiLoading,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF2E7D32), // Litt mørkere grønn for å skille dem
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(23.5.dp)
+                ) {
+                    if (isFutureAiLoading) {
+                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                    } else {
+                        Text(
+                            text = "🔮 Fremtids-Råd",
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight(400)
+                        )
+                    }
+                }
+
                 TextButton(
                     onClick = onDismiss,
                     modifier = Modifier
