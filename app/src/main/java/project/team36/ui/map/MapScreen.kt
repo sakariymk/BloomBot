@@ -20,6 +20,15 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,17 +45,30 @@ import androidx.navigation.NavHostController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.mapbox.geojson.Feature
+import com.mapbox.geojson.FeatureCollection
+import com.mapbox.geojson.Polygon
+import com.mapbox.maps.extension.compose.MapboxMap
 import com.mapbox.maps.extension.compose.MapEffect
 import com.mapbox.maps.extension.compose.annotation.generated.PointAnnotation
 import com.mapbox.maps.extension.compose.annotation.rememberIconImage
 import com.mapbox.maps.extension.style.expressions.dsl.generated.literal
+import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
+import com.mapbox.maps.plugin.locationcomponent.location
+import com.mapbox.maps.extension.style.expressions.dsl.generated.*
 import com.mapbox.maps.extension.style.layers.addLayer
 import com.mapbox.maps.extension.style.layers.generated.fillLayer
+import com.mapbox.maps.extension.style.layers.getLayer
 import com.mapbox.maps.extension.style.sources.addSource
+import com.mapbox.maps.extension.style.sources.generated.geoJsonSource
 import com.mapbox.maps.extension.style.sources.generated.vectorSource
 import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
 import com.mapbox.maps.plugin.locationcomponent.location
+import com.mapbox.maps.extension.style.sources.getSourceAs
+import com.mapbox.maps.extension.style.sources.generated.GeoJsonSource
 import project.team36.R
+import project.team36.data.mcp.WeatherAlert
+import project.team36.ui.navigation.BottomNavBar
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -86,26 +108,7 @@ fun MapScreen(
             )
         },
         bottomBar = {
-            NavigationBar{
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { navController.navigate("map")},
-                    icon = { },
-                    label = { Text("Kart")}
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { navController.navigate("myPlaces") },
-                    icon = { },
-                    label = { Text("Mine steder")}
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "ukjent"}") },
-                    icon = { }, //fyller ut med icon senere!
-                    label = { Text("Oppdag planter")}
-                )
-            }
+            BottomNavBar(navController = navController, savedPlacesViewModel)
         }
     ) { innerPadding ->
         Box(modifier = modifier
@@ -113,7 +116,7 @@ fun MapScreen(
             .padding(innerPadding)) {
 
             MapboxMap(
-                modifier = modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
                 mapViewportState = mapViewportState,
                 scaleBar = {}
             ) {
@@ -124,6 +127,9 @@ fun MapScreen(
                             locationPuck = createDefault2DPuck(withBearing = true)
                             enabled = true
                             puckBearingEnabled = false
+                        }
+                        mapView.location.addOnIndicatorPositionChangedListener { point ->
+                            viewModel.updateUserPosition(point.latitude(), point.longitude())
                         }
                         viewModel.onLocationReady()
                         viewModel.onMapReady(mapView.mapboxMap)
@@ -139,6 +145,54 @@ fun MapScreen(
                             Log.d("ZONE_TEST", "Klimasone source og lag lagt til!")
                         }
                     }
+
+                    MapEffect(uiState.locationAlerts) { mapView ->
+                        val style = mapView.mapboxMap.getStyle() ?: return@MapEffect
+                        val sourceId = "alerts-source"
+                        val layerId = "alerts-layer"
+
+                        if (uiState.locationAlerts.isEmpty()) {
+                            if (style.getLayer(layerId) != null) style.removeStyleLayer(layerId)
+                            if (style.getSourceAs<GeoJsonSource>(sourceId) != null) style.removeStyleSource(sourceId)
+                            return@MapEffect
+                        }
+
+                        try {
+                            val features = uiState.locationAlerts.flatMap { alert ->
+                                alert.polygons.map { poly ->
+                                    val points = poly.map { Point.fromLngLat(it.second, it.first) }
+                                    val closedPoints = if (points.isNotEmpty() && points.first() != points.last()) {
+                                        points + points.first()
+                                    } else points
+                                    Feature.fromGeometry(Polygon.fromLngLats(listOf(closedPoints))).apply {
+                                        addStringProperty("severity", alert.severity)
+                                    }
+                                }
+                            }
+                            val featureCollection = FeatureCollection.fromFeatures(features)
+                            val existingSource = style.getSourceAs<GeoJsonSource>(sourceId)
+                            if (existingSource != null) {
+                                existingSource.featureCollection(featureCollection)
+                            } else {
+                                style.addSource(geoJsonSource(sourceId) { featureCollection(featureCollection) })
+                                if (style.getLayer(layerId) == null) {
+                                    style.addLayer(fillLayer(layerId, sourceId) {
+                                        fillColor(match {
+                                            get { literal("severity") }
+                                            literal("Moderate"); color(android.graphics.Color.parseColor("#FFD700"))
+                                            literal("Severe"); color(android.graphics.Color.parseColor("#FF8C00"))
+                                            literal("Extreme"); color(android.graphics.Color.parseColor("#FF0000"))
+                                            color(android.graphics.Color.parseColor("#FFD700"))
+                                        })
+                                        fillOpacity(0.4)
+                                        fillOutlineColor(android.graphics.Color.DKGRAY)
+                                    })
+                                }
+                            }
+                        } catch (e: Exception) {
+                            Log.e("MapError", "Tegnefeil: ${e.message}")
+                        }
+                    }
                 }
 
                 uiState.selectedResult?.coordinate?.let { coord ->
@@ -148,6 +202,7 @@ fun MapScreen(
                     )
                     PointAnnotation(point = coord) {
                         iconImage = marker
+                        //interactionsState.onClicked { viewModel.onSavedLocationClicked(location); true } usikker på om denne trengs? merge-konflikt -Therese
                     }
                 }
 
@@ -184,8 +239,15 @@ fun MapScreen(
                         .padding( start = 16.dp, end = 16.dp)
                         .wrapContentHeight()
                 )
+
+                if (uiState.locationAlerts.isNotEmpty()) {
+                    AlertBanner(uiState.locationAlerts.first())
+                }
             }
 
+
+            //Boks som spør om brukeren vil legge til lokasjonen i mine steder
+            // kun vises showSaveDialog er true, fra viewmodel
             if (uiState.showSaveDialog) {
                 AlertDialog(
                     onDismissRequest = { viewModel.dismissSaveDialog() },
@@ -202,6 +264,8 @@ fun MapScreen(
             }
         }
 
+
+        //viser planteinfocard når pin blir trykket på av brukeren
         uiState.selectedSavedLocation?.let { location ->
             PlaceInfoCard(
                 location = location,
@@ -228,6 +292,26 @@ fun MapScreen(
                 },
                 navController = navController as NavHostController
             )
+        }
+    }
+}
+
+@Composable
+fun AlertBanner(alert: WeatherAlert) {
+    Surface(
+        modifier = Modifier.fillMaxWidth().padding(16.dp).heightIn(max = 200.dp),
+        color = MaterialTheme.colorScheme.errorContainer,
+        shape = MaterialTheme.shapes.medium,
+        tonalElevation = 6.dp
+    ) {
+        Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.Top) {
+            Icon(Icons.Default.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.error)
+            Spacer(Modifier.width(12.dp))
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                Text(text = alert.event, style = MaterialTheme.typography.titleMedium)
+                Spacer(Modifier.height(4.dp))
+                Text(text = alert.description, style = MaterialTheme.typography.bodySmall)
+            }
         }
     }
 }

@@ -32,14 +32,10 @@ fun AppNavHost(
     mapViewModel: MapViewModel,
     findPlantsViewModel: FindPlantsViewModel,
     myPlantsViewModel: MyPlantsViewModel,
-    plantRepository: PlantRepository,
     savedPlacesViewModel: SavedPlacesViewModel,
     plantDetailsViewModel: PlantDetailsViewModel,
     landingPageViewModel: LandingPageViewModel,
 ) {
-
-    //val myPlantsViewModel: MyPlantsViewModel = viewModel() *Solveig: Slette denne?
-
     NavHost(
         navController = navController,
         startDestination = "landingpage", //HER ENDRER JEG BARE TIL LANDINGPAGE FOR Å SE DEN PÅ APPEN

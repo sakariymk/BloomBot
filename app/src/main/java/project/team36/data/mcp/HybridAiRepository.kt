@@ -22,9 +22,8 @@ class HybridAiRepository(
     // <------ ENDRING: Denne heter nå LocationRepository, fordi vi bruker Room Database
     private val plantDataSource: LocationRepository,
     private val frostClientId: String,
-    private val claudeApiKey: String,
+    private val claudeApiKey: String
 ) {
-
     private val frostTool = ClaudeTool(
         name = "get_current_frost_status",
         description = "Henter nåværende vær.",
@@ -48,6 +47,17 @@ class HybridAiRepository(
                 "longitude" to PropertyDefinition("number", "Lengdegrad")
             ),
             required = listOf("latitude", "longitude")
+        )
+    )
+
+    // Nytt: alert-verktøy uten påkrevde parametere
+    private val alertTool = ClaudeTool(
+        name = "get_weather_alerts",
+        description = "Henter aktive ekstremværvarsler fra Meteorologisk institutt for Norge. Bruk dette for å advare brukeren om farlige værforhold.",
+        input_schema = ToolInputSchema(
+            type = "object",
+            properties = emptyMap(),
+            required = emptyList()
         )
     )
 
@@ -105,13 +115,13 @@ class HybridAiRepository(
                 "- ${it.name}: Sone: ${it.climateZone}, Lysbehov: ${it.light}, Vann Per Uke: ${it.waterPerWeek}, Frostsikker: ${it.isFrostResistant}"
             }
         }
-
         val systemPrompt = """
             Du er en profesjonell og velformulert hageekspert i Norge som skal gi råd til en hobbygartner/bruker.
             Du får værinformasjon fra en API som heter FROST, du får følgende koordinater Lat: $lat, Lon: $lon.
             Du får informasjon om relevante planter på koordinatene.
             Du SKAL bruke verktøyene dine for å sjekke nåværende vær som du får fra FROST API tool'en før du gir råd.
             Skriv også opp værinformasjonen du får for dagen slik at man får en oversikt.
+            Hvis det er aktive ekstremværvarsler, skal du nevne disse tydelig først.
             Baser rådene dine på disse plantene:
             $plantsText
             Svar konkret, strukturert og på Norsk.
@@ -128,7 +138,7 @@ class HybridAiRepository(
                     model = "claude-sonnet-4-5",
                     system = systemPrompt,
                     messages = conversation,
-                    tools = listOf(frostTool)
+                    tools = listOf(frostTool, weatherTool, alertTool) // alertTool lagt til
                 )
             )
 
@@ -161,6 +171,8 @@ class HybridAiRepository(
                                 "Ingen Frost-stasjon funnet i nærheten."
                             }
                         }
+                        "weatherforecast" -> mcpClient.getForecast(rLat, rLon)
+                        "get_weather_alerts" -> mcpClient.getAlerts() // Nytt
                         else -> "Ukjent verktøy."
                     }
 
@@ -284,7 +296,8 @@ class HybridAiRepository(
                 )
             }
 
-            response.content.firstOrNull { it.type == "text" }?.text ?: "AI-en ga et svar uten tekst."
+            response.content.firstOrNull { it.type == "text" }?.text
+                ?: "AI-en ga et svar uten tekst."
 
         } catch (e: HttpException) {
             "AI-feil: ${e.code()} - ${e.response()?.errorBody()?.string()}"

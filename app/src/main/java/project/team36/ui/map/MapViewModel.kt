@@ -3,6 +3,7 @@ package project.team36.ui.map
 import androidx.lifecycle.ViewModel
 import android.util.Log
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.mapbox.maps.dsl.cameraOptions
 import com.mapbox.maps.extension.compose.animation.viewport.MapViewportState
 import com.mapbox.search.SearchEngineSettings
@@ -18,17 +19,19 @@ import com.mapbox.search.SearchSelectionCallback
 import com.mapbox.search.ApiType
 import com.mapbox.search.ResponseInfo
 import com.mapbox.search.SearchEngine
-import project.team36.data.ai.HybridAiRepository
-import project.team36.model.plant.PlantInfo
 import java.util.UUID
-import androidx.lifecycle.viewModelScope
 import com.mapbox.geojson.Point
 import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.RenderedQueryGeometry
 import com.mapbox.maps.RenderedQueryOptions
 import kotlinx.coroutines.launch
+import project.team36.data.ai.HybridAiRepository
+import project.team36.data.mcp.MetWeatherRepository
+import project.team36.data.mcp.WeatherAlert
 import project.team36.model.location.SavedLocation
+import project.team36.model.plant.PlantInfo
 import project.team36.ui.map.ClimateZoneConfig.LAYER_ID
+import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -53,23 +56,31 @@ data class MapUiState(
     val aiResponse: String? = null,
     val isAiLoading: Boolean = false,
     val isFutureAiLoading: Boolean = false,
-
-    val rawApiData: String? = null
+    val weatherAlerts: List<WeatherAlert> = emptyList(),
+    val locationAlerts: List<WeatherAlert> = emptyList(),
+    val rawApiData: String? = null,
+    val isAlertLoading: Boolean = false
 )
 
 class MapViewModelFactory(
-    private val repository: HybridAiRepository
+    private val repository: HybridAiRepository,
+    private val weatherRepository: MetWeatherRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MapViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return MapViewModel(repository) as T
+            return MapViewModel(repository, weatherRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
 
-class MapViewModel(private val repository: HybridAiRepository) : ViewModel() {
+
+
+class MapViewModel(
+    private val repository: HybridAiRepository,
+    private val weatherRepository: MetWeatherRepository
+) : ViewModel() {
 
     val mapViewportState = MapViewportState().apply {
         setCameraOptions {
@@ -82,12 +93,25 @@ class MapViewModel(private val repository: HybridAiRepository) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MapUiState())
     val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()
-    private var hasInitializedCamera = false
+    private var hasInitializedCamera = false //for at kameraet skal ikke zoome sykt mye rundt når man beveger på seg
 
+    private var hasLoadedAlerts = false
     private val searchEngine = SearchEngine.createSearchEngine(
         ApiType.SEARCH_BOX,
         SearchEngineSettings()
     )
+
+    fun updateUserPosition(lat: Double, lon: Double) {
+        if (!hasLoadedAlerts) {
+            hasLoadedAlerts = true
+            fetchAlerts(lat, lon)
+        } else {
+            val currentAlerts = _uiState.value.weatherAlerts.filter { alert ->
+                alert.polygons.any { polygon -> weatherRepository.isPointInPolygon(lat, lon, polygon) }
+            }
+            _uiState.value = _uiState.value.copy(locationAlerts = currentAlerts)
+        }
+    }
 
     // <------ ENDRING: Funksjoner for RAW API testing
     fun fetchRawApiData(location: SavedLocation) {
@@ -106,6 +130,26 @@ class MapViewModel(private val repository: HybridAiRepository) : ViewModel() {
         if (!hasInitializedCamera) {
             hasInitializedCamera = true
             mapViewportState.transitionToFollowPuckState()
+        }
+    }
+
+    fun fetchAlerts(userLat: Double, userLon: Double) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isAlertLoading = true)
+            try {
+                val allAlerts = weatherRepository.getAllAlerts()
+                val local = allAlerts.filter { alert ->
+                    alert.polygons.any { polygon -> weatherRepository.isPointInPolygon(userLat, userLon, polygon) }
+                }
+                _uiState.value = _uiState.value.copy(
+                    weatherAlerts = allAlerts,
+                    locationAlerts = local,
+                    isAlertLoading = false
+                )
+            } catch (e: Exception) {
+                Log.e("ALERTS", "Feil ved henting av varsler: ${e.message}")
+                _uiState.value = _uiState.value.copy(isAlertLoading = false)
+            }
         }
     }
 
@@ -213,7 +257,6 @@ class MapViewModel(private val repository: HybridAiRepository) : ViewModel() {
     fun confirmSavePlace(savedPlacesViewModel: SavedPlacesViewModel) {
         val result = _uiState.value.selectedResult ?: return
         val name = _uiState.value.placeNameInput.ifEmpty { result.name }
-
         viewModelScope.launch {
             val zone = getClimateZone(
                 lng = result.coordinate.longitude(),
@@ -230,6 +273,7 @@ class MapViewModel(private val repository: HybridAiRepository) : ViewModel() {
                     zone = zone ?: 0
                 )
             )
+            //dismissSaveDialog bør kalles her, ikke i mapscreen direkte?
         }
     }
 
@@ -263,6 +307,7 @@ class MapViewModel(private val repository: HybridAiRepository) : ViewModel() {
         }
     }
 
+    // En liten funksjon for å lukke AI-svaret igjen:
     fun dismissAiAdvice() {
         _uiState.value = _uiState.value.copy(aiResponse = null)
     }

@@ -39,13 +39,15 @@ import project.team36.ui.myplants.MyPlantsViewModel
 import project.team36.ui.plant.PlantDetailsViewModel
 import project.team36.ui.theme.Team36Theme
 
+
 class MapViewModelFactory(
-    private val repository: HybridAiRepository
+    private val repository: HybridAiRepository,
+    private val weatherRepository: MetWeatherRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MapViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return MapViewModel(repository) as T
+            return MapViewModel(repository, weatherRepository) as T
         }
         throw IllegalArgumentException("Ukjent ViewModel klasse")
     }
@@ -128,7 +130,6 @@ class MainActivity : ComponentActivity() {
 
         }
 
-
         val metWeatherRepository = MetWeatherRepository(mcpClient)
 
         val hybridAiRepository = HybridAiRepository(
@@ -138,7 +139,6 @@ class MainActivity : ComponentActivity() {
             plantDataSource = locationRepository,
             frostClientId = frostClientId,
             claudeApiKey = claudeKey
-
         )
 
         setContent {
@@ -161,7 +161,7 @@ class MainActivity : ComponentActivity() {
                 )
 
                 val mapViewModel: MapViewModel = viewModel(
-                    factory = MapViewModelFactory(hybridAiRepository)
+                    factory = MapViewModelFactory(hybridAiRepository, metWeatherRepository)
                 )
 
                 // plantDetailsScreen ViewModel --> sjekk om den skal ligge her
