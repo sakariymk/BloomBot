@@ -179,7 +179,6 @@ class MainActivity : ComponentActivity() {
                     findPlantsViewModel = findPlantsViewModel,
                     myPlantsViewModel = myPlantsViewModel,
                     savedPlacesViewModel = savedPlacesViewModel,
-                    plantRepository = plantRepository,
                     plantDetailsViewModel = plantDetailsViewModel,
                     landingPageViewModel = landingPageViewModel
                 )
