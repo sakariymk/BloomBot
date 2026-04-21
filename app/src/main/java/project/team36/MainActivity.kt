@@ -5,15 +5,11 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -115,7 +111,7 @@ class MainActivity : ComponentActivity() {
         val metRetrofit = Retrofit.Builder()
             .baseUrl("https://api.met.no/")
             .build()
-        val metWeatherApi = metRetrofit.create(MetWeatherApi::class.java)
+        val metWeatherApi = metRetrofit.create(MetWeatherApi::class.java) //TODO: se om dette trengs?
 
         val claudeKey = "***FJERNET***"
         val frostClientId = "08b40da1-9456-4846-988a-e5283cf731cb"
@@ -168,6 +164,7 @@ class MainActivity : ComponentActivity() {
                 val plantDetailsViewModel: PlantDetailsViewModel = viewModel(
                     factory = object : ViewModelProvider.Factory {
                         override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                            @Suppress("UNCHECKED_CAST")
                             return PlantDetailsViewModel(plantRepository) as T
                         }
                     }
