@@ -256,7 +256,9 @@ fun MapScreen(
                     confirmButton = {
                         TextButton(
                             onClick = {
-                                viewModel.confirmSavePlace(savedPlacesViewModel)
+                                viewModel.confirmSavePlace(savedPlacesViewModel) {
+                                    navController.navigate("myPlaces")
+                                }
                                 viewModel.dismissSaveDialog()
                             }) { Text("Ja") } },
                     dismissButton = {TextButton(onClick = {viewModel.dismissSaveDialog()}) { Text("Nei") }}
