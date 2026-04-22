@@ -20,6 +20,7 @@ import project.team36.ui.findplants.FindPlantsViewModel
 import project.team36.data.ai.ClaudeApi
 import project.team36.data.ai.HybridAiRepository
 import project.team36.data.klima.MetWeatherApi
+import project.team36.data.klima.frost.FrostRepository
 import project.team36.data.local.AppDatabase
 import project.team36.data.local.LocationRepository
 import project.team36.data.mcp.MetMcpClient
@@ -65,12 +66,13 @@ class FindPlantsViewModelFactory(
 
 class MyPlantsViewModelFactory(
     private val repository: LocationRepository,
-    private val savedPlacesViewModel: SavedPlacesViewModel
+    private val savedPlacesViewModel: SavedPlacesViewModel,
+    private val frostRepository: FrostRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MyPlantsViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return MyPlantsViewModel(repository, savedPlacesViewModel) as T
+            return MyPlantsViewModel(repository, savedPlacesViewModel, frostRepository) as T
         }
         throw IllegalArgumentException("Ukjent ViewModel klasse")
     }
@@ -82,6 +84,7 @@ class MainActivity : ComponentActivity() {
 
         val dataSource = PlantDataSource(this)
         val plantRepository = PlantRepository(dataSource)
+        val frostRepository = FrostRepository()
 
         //Database og repo
         val db = AppDatabase.getDatabase(this)
@@ -153,7 +156,7 @@ class MainActivity : ComponentActivity() {
                 )
 
                 val myPlantsViewModel: MyPlantsViewModel = viewModel(
-                    factory = MyPlantsViewModelFactory(locationRepository, savedPlacesViewModel)
+                    factory = MyPlantsViewModelFactory(locationRepository, savedPlacesViewModel, frostRepository)
                 )
 
                 val mapViewModel: MapViewModel = viewModel(

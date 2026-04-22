@@ -16,4 +16,11 @@ class FrostRepository {
 
     }
 
+    suspend fun getPrecipitationSinceLastUsed(
+        lat: Double,
+        lon: Double,
+        lastWatered: String
+    ): Map<String, Double>? {
+        return getPrecipitationSinceLastUsed(lat, lon, clientId, lastWatered)
+    }
 }
