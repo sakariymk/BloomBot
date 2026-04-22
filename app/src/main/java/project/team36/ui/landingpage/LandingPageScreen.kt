@@ -14,12 +14,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -50,8 +54,20 @@ fun LandingPageScreen(
     }
 
     Scaffold(
+        containerColor = Color(0xFFE8F8E3),
         topBar = {
-            TopAppBar(title = { Text("Hjem") })
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Hjem",
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = Color(0xFF2E7D32)
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color(0xFFE8F5E2)
+                )
+            )
         },
 
         bottomBar = { BottomNavBar(navController = navController, savedPlacesViewModel) }
