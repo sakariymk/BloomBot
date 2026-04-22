@@ -40,4 +40,8 @@ class LocationRepository(
     suspend fun updatePlant(plant: SavedPlant) {
         savedPlantDao.update(plant)
     }
+
+    fun getAllPlants(): Flow<List<SavedPlant>> {
+        return savedPlantDao.getAllPlants()
+    }
 }

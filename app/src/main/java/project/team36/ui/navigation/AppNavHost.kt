@@ -70,6 +70,7 @@ fun AppNavHost(
                 navController = navController,
                 savedPlacesViewModel = savedPlacesViewModel,
                 landingPageViewModel = landingPageViewModel,
+                myPlantsViewModel = myPlantsViewModel
             )
         }
         // plantDetailScreen
