@@ -29,7 +29,7 @@ class PlantRepository(
         val savedPlantNames = savedPlants.map { it.name }.toSet()
 
         return cachedPlants.filter {
-            it.climateZone <= location.zone && it.name !in savedPlantNames
+            it.climateZone >= location.zone && it.name !in savedPlantNames
         }
     }
 
@@ -39,14 +39,13 @@ class PlantRepository(
         if (cachedPlants.isEmpty()) {
             cachedPlants = plantDataSource.fetchPlants()
         }
-
         val plant = cachedPlants.find { it.name == plantName }
             ?: return emptyList()
 
         val allLocations = locationRepository.allLocations.first()
 
         return allLocations
-            .filter { it.zone >= plant.climateZone }
+            .filter { plant.climateZone >= it.zone }
             .mapNotNull { it.name }
     }
 }

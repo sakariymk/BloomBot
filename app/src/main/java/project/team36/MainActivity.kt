@@ -80,12 +80,12 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val dataSource = PlantDataSource(this)
-        val plantRepository = PlantRepository(dataSource)
-
-        //Database og repo
         val db = AppDatabase.getDatabase(this)
         val locationRepository = LocationRepository(db.savedLocationDao(), db.savedPlantDao())
+
+
+        val dataSource = PlantDataSource(this)
+        val plantRepository = PlantRepository(dataSource, locationRepository)
 
 
         val contentType = "application/json".toMediaType()
