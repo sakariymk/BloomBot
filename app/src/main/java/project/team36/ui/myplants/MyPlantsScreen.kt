@@ -1,6 +1,7 @@
 package project.team36.ui.myplants
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -8,10 +9,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Eco
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -173,7 +177,7 @@ fun MyPlantsScreen(
         // Finn ut hvordan sende informasjon om hvor du kommer fra
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "ukjent"}") },
+                onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "Ukjent sted"}") },
                 icon = { Icon(Icons.Default.Add, contentDescription = "Nytt sted") },
                 text = { Text("Ny plante") },
                 containerColor = Color(0xFF2D5A27),
@@ -186,18 +190,88 @@ fun MyPlantsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(Color(0xFFE8F5E2)),
+                .background(Color(0xFFE8F5E2))
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            // Vi mater inn riktig liste, og tegner opp nøyaktig det elementet vi er på.
-            items(plants){ plant ->
-                PlantCard(
-                    plant = plant,
-                    needsWater = myPlantsViewModel.needsWater(plant),
-                    daysUntilWatering = myPlantsViewModel.daysUntilWatering(plant),
-                    onMarkAsWatered = { myPlantsViewModel.markAsWatered(plant) },
-                    navController = navController
+            if (plants.isEmpty()) {
+                item {
+                    EmptyPlantCard(
+                        onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "Ukjent sted"}")}
+                    )
+                }
+            } else {
+                // Vi mater inn riktig liste, og tegner opp nøyaktig det elementet vi er på.
+                items(plants){ plant ->
+                    PlantCard(
+                        plant = plant,
+                        needsWater = myPlantsViewModel.needsWater(plant),
+                        daysUntilWatering = myPlantsViewModel.daysUntilWatering(plant),
+                        onMarkAsWatered = { myPlantsViewModel.markAsWatered(plant) },
+                        navController = navController
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun EmptyPlantCard(
+    onClick: () -> Unit
+){
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(
+                width = 2.dp,
+                color = Color(0xFF2E7D32),
+                shape = RoundedCornerShape(16.dp)
+            ),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+                .height(IntrinsicSize.Min),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(80.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color(0xFF2E7D32)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Eco,
+                    contentDescription = "Ikon av plante",
+                    tint = Color(0xFFE8F5E2),
+                    modifier = Modifier.size(40.dp)
                 )
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "Ingen planter i denne hagen enda.\nGro din første plante!",
+                    fontSize = 14.sp,
+                    color = Color.Black
+                )
+                Button(
+                    onClick = onClick ,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF2E7D32)
+                    ),
+                    shape = RoundedCornerShape(50),
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Legg til")
+                    Spacer(Modifier.width(6.dp))
+                    Text("Ny Plante")
+                    Spacer(Modifier.weight(1f))
+                }
             }
         }
     }
@@ -218,3 +292,4 @@ fun SavedPlant.toPlantInfo(): PlantInfo = PlantInfo(
     imageRes = this.imageRes,
     description = this.description
 )
+
