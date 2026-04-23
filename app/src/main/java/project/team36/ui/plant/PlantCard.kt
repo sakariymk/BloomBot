@@ -4,54 +4,50 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import project.team36.R
+import project.team36.data.mcp.WeatherAlert
 import project.team36.model.location.SavedPlant
-import project.team36.model.plant.LightType
-import project.team36.model.plant.SoilType
 
-// Farger for kortet - se om de kan lagres i Theme=
-private val ColorAlert = Color(0xFFFF9EA0) //varslingstag
-private val ColorButtons = Color(0xFFB5DBFF) //knapper
-private val ColorBackground = Color(0xFFE8F8E3) //bakgrunn på seksjoner
+// Farger for kortet
+private val ColorAlert = Color(0xFFFF9EA0) // varslingstag
+private val ColorButtons = Color(0xFFB5DBFF) // knapper
+private val ColorBackground = Color(0xFFE8F8E3) // bakgrunn på seksjoner
+
 @Composable
 fun PlantCard(
     plant: SavedPlant,
     needsWater: Boolean,
     daysUntilWatering: Long,
     onMarkAsWatered: () -> Unit,
+    alerts: List<WeatherAlert>,
     navController: NavController
 ) {
     var expanded by remember { mutableStateOf(false) }
-
     val imageId = if (plant.imageRes != 0) plant.imageRes else R.drawable.defaultplant
 
-    // HUSK å legge til "les mer" button
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -104,32 +100,13 @@ fun PlantCard(
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                //Chip for vannestatus
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .background(
-                            if (needsWater) ColorAlert else ColorButtons,
-                            RoundedCornerShape(50)
-                        )
-                        .padding(horizontal = 12.dp, vertical = 6.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.wateringcan),
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(14.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = if (needsWater) "Må vannes" else "",
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.White
-                    )
+                // Chip for vannestatus
+                if (needsWater) {
+                    StatusChip(text = "Må vannes", color = ColorAlert)
                 }
             }
-            //Utvidet kort
+
+            // Utvidet kort
             AnimatedVisibility(visible = expanded) {
                 Column(
                     modifier = Modifier
@@ -137,7 +114,7 @@ fun PlantCard(
                         .padding(top = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    //Vanningsseksjon
+                    // Vanningsseksjon
                     InfoSection(
                         title = "Vanningsbehov",
                         subtitle = if (daysUntilWatering <= 0L) "Må vannes nå" else "$daysUntilWatering dager til neste vanning",
@@ -145,23 +122,22 @@ fun PlantCard(
                         buttonColor = ColorButtons,
                         onButtonClick = onMarkAsWatered
                     )
-                    //Gjødsel eventuelt
+
+                    // Farevarsler (Værvarsel)
+                    WeatherSection(alerts = alerts, plant = plant)
+
+                    // Gjødsel (valgfritt)
                     InfoSection(
                         title = "Gjødsel",
                         subtitle = "13 dager til gjødsling",
-                        buttonText = "Jeg har gjødslet",
+                        buttonText = "Gjødslet",
                         buttonColor = ColorButtons,
-                        onButtonClick = { /* TODO */ } //finn ut om vi skal ha gjødsling?
+                        onButtonClick = { /* TODO */ }
                     )
-
-                    //Værsvarsel som vi må revampe heftig når det er klart
-                    WeatherSection()
 
                     Button(
                         onClick = { navController.navigate("plantDetailsScreen/${plant.name}/delete") },
-                        modifier = Modifier
-                            .align(Alignment.Start)
-                            .padding(top = 8.dp),
+                        modifier = Modifier.align(Alignment.Start),
                         colors = ButtonDefaults.buttonColors(containerColor = ColorBackground)
                     ) {
                         Text(
@@ -172,6 +148,7 @@ fun PlantCard(
                     }
                 }
             }
+
             // Knapp for utvidelse eller lukking
             IconButton(
                 onClick = { expanded = !expanded },
@@ -180,12 +157,35 @@ fun PlantCard(
                     .size(36.dp)
             ) {
                 Icon(
-                    imageVector = if (expanded) Icons.Default.ExpandLess
-                    else Icons.Default.ExpandMore,
+                    imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
                     contentDescription = if (expanded) "Lukk" else "Åpne"
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun StatusChip(text: String, color: Color) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .background(color, RoundedCornerShape(50))
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.wateringcan),
+            contentDescription = null,
+            tint = Color.White,
+            modifier = Modifier.size(14.dp)
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text = text,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color.White
+        )
     }
 }
 
@@ -226,8 +226,9 @@ private fun InfoSection(
         ) {
             Text(
                 text = buttonText,
-                fontSize = 13.sp,
-                color = Color.Black
+                fontSize = 12.sp,
+                color = Color.Black,
+                fontWeight = FontWeight.Medium
             )
         }
     }
@@ -235,29 +236,85 @@ private fun InfoSection(
 
 @Composable
 private fun WeatherSection(
-    alerts: List<String> = emptyList() //TODO: bytt til riktig list når Sakariye er klar med parsing
+    alerts: List<WeatherAlert>,
+    plant: SavedPlant
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background((ColorBackground), RoundedCornerShape(12.dp))
-            .padding(horizontal = 14.dp, vertical = 10.dp)
+            .background(ColorBackground, RoundedCornerShape(12.dp))
+            .padding(12.dp)
     ) {
         Text(
             text = "Værvarsel",
             fontSize = 14.sp,
             fontWeight = FontWeight.SemiBold,
-            color = Color.Black
+            color = Color.Black,
+            modifier = Modifier.padding(bottom = 8.dp)
         )
-        //TODO: må byttes ut når vi kan hente farevarsler
+
+        if (alerts.isEmpty()) {
+            Text(
+                text = "Ingen dårlig vær i sikte for dine planter.",
+                fontSize = 13.sp,
+                color = Color.Gray
+            )
+        } else {
+            alerts.forEach { alert ->
+                PlantAlertInfo(alert = alert, plant = plant)
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+    }
+}
+
+@Composable
+fun PlantAlertInfo(alert: WeatherAlert, plant: SavedPlant) {
+    val isDangerous = alert.isDangerousForPlant(plant.isFrostResistant)
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .background(alert.color.copy(alpha = 0.2f))
+            .border(1.dp, alert.color, RoundedCornerShape(8.dp))
+            .padding(10.dp)
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = if (isDangerous) Icons.Default.Warning else Icons.Default.Info,
+                contentDescription = null,
+                tint = alert.color,
+                modifier = Modifier.size(18.dp)
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                text = alert.event.uppercase(),
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 13.sp,
+                color = Color.Black
+            )
+        }
+
         Text(
-            text = "Ingen dårlig vær i sikte.",
-            fontSize = 13.sp,
-            color = Color.Gray
+            text = alert.description,
+            fontSize = 12.sp,
+            color = Color.DarkGray,
+            modifier = Modifier.padding(top = 4.dp),
+            lineHeight = 16.sp
+        )
+
+        Text(
+            text = if (isDangerous) "Kritisk for denne planten!" else "Planten bør tåle dette",
+            fontWeight = FontWeight.Bold,
+            fontSize = 12.sp,
+            color = if (isDangerous) Color(0xFFD32F2F) else Color(0xFF2E7D32),
+            modifier = Modifier.padding(top = 6.dp)
         )
     }
 }
 
+/*
 @Preview(showBackground = true)
 @Composable
 fun PlantCardPreview() {
@@ -289,3 +346,4 @@ fun PlantCardPreview() {
         )
     }
 }
+*/
