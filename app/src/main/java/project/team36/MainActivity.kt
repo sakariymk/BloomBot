@@ -168,7 +168,7 @@ class MainActivity : ComponentActivity() {
                     factory = object : ViewModelProvider.Factory {
                         override fun <T : ViewModel> create(modelClass: Class<T>): T {
                             @Suppress("UNCHECKED_CAST")
-                            return PlantDetailsViewModel(plantRepository) as T
+                            return PlantDetailsViewModel(plantRepository, locationRepository) as T
                         }
                     }
                 )

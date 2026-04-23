@@ -59,15 +59,8 @@ fun PlantDetailsScreen(
     //onAddClick: () -> Unit, //jeg (viktoria) endra litt på dette slik at appen kan buildes og kjøres
     onAddPlant: (() -> Unit)? = null, //jeg (viktoria) endra litt på dette slik at appen kan buildes og kjøres
     onDeletePlant: (() -> Unit)? = null //jeg (viktoria) endra litt på dette slik at appen kan buildes og kjøres,
-
-    // boolean-parameter for om det er plantdetailsscreen på mine planter eller oppdag planter
-
 ) {
     val scrollState = rememberScrollState()
-
-    LaunchedEffect(plantName) { // kalles en gang når skjermen vises
-        viewModel.loadPlant(plantName)
-    }
 
     val plant by viewModel.plant.collectAsStateWithLifecycle()
 
@@ -226,7 +219,7 @@ fun PlantingMonthBar(plantingMonth: Set<Int>) {
 @Preview(showBackground = true)
 @Composable
 fun PlantDetailsScreenPreview() {
-    val fakePlant = PlantInfo(
+    val fakePlant = PlantDetails(
         name = "Lilje",
         soil = setOf(SoilType.SAND, SoilType.CHALK),
         light = setOf(LightType.FULL),
@@ -247,7 +240,7 @@ fun PlantDetailsScreenPreview() {
 }
 
 @Composable
-fun PlantDetailsScreenPreview_Content(plant: PlantInfo) {
+fun PlantDetailsScreenPreview_Content(plant: PlantDetails) {
     Column(
         modifier = Modifier
             .fillMaxSize()

@@ -12,20 +12,22 @@ import project.team36.data.plant.PlantRepository
 import project.team36.model.location.SavedLocation
 import project.team36.model.location.SavedPlant
 import project.team36.ui.map.SavedPlacesViewModel
+import project.team36.ui.plant.PlantDetails
+import project.team36.ui.plant.toPlantDetails
 
 class FindPlantsViewModel (
     private val plantRepository: PlantRepository,
     private val locationRepository: LocationRepository,
     private val savedPlacesViewModel: SavedPlacesViewModel
 ) : ViewModel() {
-    private val _plants = MutableStateFlow<List<PlantInfo>>(emptyList())
-    val plants: StateFlow<List<PlantInfo>> = _plants.asStateFlow()
+    private val _plants = MutableStateFlow<List<PlantDetails>>(emptyList())
+    val plants: StateFlow<List<PlantDetails>> = _plants.asStateFlow()
 
-    private val _pendingPlant = MutableStateFlow<PlantInfo?>(null)
-    val pendingPlant: StateFlow<PlantInfo?> = _pendingPlant.asStateFlow()
+    private val _pendingPlant = MutableStateFlow<PlantDetails?>(null)
+    val pendingPlant: StateFlow<PlantDetails?> = _pendingPlant.asStateFlow()
 
     init {
-        _plants.value = plantRepository.initiatePlants()
+        _plants.value = plantRepository.initiatePlants().map { it.toPlantDetails() }
     }
 
     //Legg til plante i en location
@@ -53,12 +55,12 @@ class FindPlantsViewModel (
     }
 
     //Når plante legges til i en location
-    fun onPlantAdded(plant: PlantInfo) {
+    fun onPlantAdded(plant: PlantDetails) {
         _plants.value -= plant
     }
 
     //når en bruker vil lagre plante -- bør ikke alt under gå på FindPlantsViewModel kanskje? for riktig sted for logikk
-    fun requestAddPlant(plant: PlantInfo) {
+    fun requestAddPlant(plant: PlantDetails) {
         _pendingPlant.value = plant
     }
 
@@ -67,7 +69,7 @@ class FindPlantsViewModel (
     }
 
     //når bruker har valgt plante og lokasjon
-    fun confirmAddPlant(plant: PlantInfo, location: SavedLocation) {
+    fun confirmAddPlant(plant: PlantDetails, location: SavedLocation) {
         viewModelScope.launch {
             locationRepository.insertPlant(
                 SavedPlant(
