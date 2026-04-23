@@ -1,5 +1,4 @@
 package project.team36.data.klima.frost
-import io.ktor.client.HttpClient
 import project.team36.model.frost.WeatherData
 
 class FrostRepository {
@@ -16,4 +15,11 @@ class FrostRepository {
 
     }
 
+    suspend fun getPrecipitationSinceLastUsed(
+        lat: Double,
+        lon: Double,
+        lastWatered: String
+    ): Map<String, Double>? {
+        return getPrecipitationSinceLastUsed(lat, lon, clientId, lastWatered)
+    }
 }

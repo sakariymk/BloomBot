@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -24,11 +22,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -48,7 +47,6 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.Polygon
-import com.mapbox.maps.extension.compose.MapboxMap
 import com.mapbox.maps.extension.compose.MapEffect
 import com.mapbox.maps.extension.compose.annotation.generated.PointAnnotation
 import com.mapbox.maps.extension.compose.annotation.rememberIconImage
@@ -62,12 +60,11 @@ import com.mapbox.maps.extension.style.layers.getLayer
 import com.mapbox.maps.extension.style.sources.addSource
 import com.mapbox.maps.extension.style.sources.generated.geoJsonSource
 import com.mapbox.maps.extension.style.sources.generated.vectorSource
-import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
-import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.extension.style.sources.getSourceAs
 import com.mapbox.maps.extension.style.sources.generated.GeoJsonSource
 import project.team36.R
 import project.team36.data.mcp.WeatherAlert
+import project.team36.ui.myplants.MyPlantsViewModel
 import project.team36.ui.navigation.BottomNavBar
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
@@ -76,7 +73,8 @@ fun MapScreen(
     modifier: Modifier = Modifier,
     viewModel: MapViewModel = viewModel(),
     savedPlacesViewModel: SavedPlacesViewModel,
-    navController: NavController
+    myPlantsViewModel: MyPlantsViewModel,
+    navController: NavController,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val savedLocations by savedPlacesViewModel.savedLocations.collectAsStateWithLifecycle()
@@ -101,6 +99,15 @@ fun MapScreen(
                         fontWeight = FontWeight.Normal,
                         color = Color(0xFF2E7D32)
                     )
+                },
+                navigationIcon = {
+                    IconButton(onClick = {navController.popBackStack()}) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Lukk skjermen",
+                            tint = Color(0xFF2E7D32)
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFFE8F5E2)
@@ -256,7 +263,9 @@ fun MapScreen(
                     confirmButton = {
                         TextButton(
                             onClick = {
-                                viewModel.confirmSavePlace(savedPlacesViewModel)
+                                viewModel.confirmSavePlace(savedPlacesViewModel) {
+                                    navController.navigate("myPlaces")
+                                }
                                 viewModel.dismissSaveDialog()
                             }) { Text("Ja") } },
                     dismissButton = {TextButton(onClick = {viewModel.dismissSaveDialog()}) { Text("Nei") }}
@@ -287,7 +296,7 @@ fun MapScreen(
                     viewModel.dismissPlaceInfo()
                 },
                 onDelete = {
-                    savedPlacesViewModel.deleteLocation(location)
+                    myPlantsViewModel.deleteLocation(location)
                     viewModel.dismissPlaceInfo()
                 },
                 navController = navController as NavHostController

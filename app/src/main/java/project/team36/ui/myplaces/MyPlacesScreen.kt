@@ -1,6 +1,5 @@
 package project.team36.ui.myplaces
 
-import android.view.RoundedCorner
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,20 +17,19 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -58,6 +56,20 @@ fun MyPlacesScreen (
 ) {
     val savedLocations by savedPlacesViewModel.savedLocations.collectAsState()
     val selectedLocation by savedPlacesViewModel.selectedLocation.collectAsStateWithLifecycle()
+    val showMaxLocationsDialog by savedPlacesViewModel.showMaxLocationsDialog.collectAsState()
+
+    if (showMaxLocationsDialog) {
+        AlertDialog(
+            onDismissRequest = { savedPlacesViewModel.dismissMaxLocationsDialog() },
+            title = { Text("Maks antall steder nådd") },
+            text = { Text("Du kan maksimum ha 5 steder lagret. Slett et sted for å legge til et nytt.") },
+            confirmButton = {
+                TextButton(onClick = { savedPlacesViewModel.dismissMaxLocationsDialog() }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
 
     Scaffold(
         containerColor = Color.Transparent,
@@ -79,7 +91,11 @@ fun MyPlacesScreen (
 
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = { onAddPlaceClick() },
+                onClick = {
+                    if (savedPlacesViewModel.onAddLocationClicked()) {
+                        onAddPlaceClick()
+                    }
+                },
                 icon = { Icon(Icons.Default.Add, contentDescription = "Nytt sted") },
                 text = { Text("Nytt sted") },
                 containerColor = Color(0xFF2D5A27),
