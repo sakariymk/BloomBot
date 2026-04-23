@@ -27,9 +27,14 @@ import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -50,6 +55,7 @@ import project.team36.model.plant.SoilType
 import project.team36.ui.theme.Team36Theme
 import project.team36.R
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlantDetailsScreen(
     plantName: String,
@@ -70,87 +76,92 @@ fun PlantDetailsScreen(
 
     val plant by viewModel.plant.collectAsStateWithLifecycle()
 
-    plant?.let { p ->
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xFFDFEAC0))
-                .verticalScroll(scrollState)
-        ) {
-            //Tilbake-knapp
-            Box(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .size(48.dp)
-                    .clip(CircleShape)
-                    .background(Color.White)
-                    .clickable { onBackClick() },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Tilbake"
+    Scaffold(
+        containerColor = Color(0xFFDFEAC0),
+        topBar = {
+            TopAppBar(
+                title = {},
+                navigationIcon = {
+                    IconButton(onClick = { onBackClick()} ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Tilbake"
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent
                 )
-            }
-
-            //Plante-headerbilde
-            Image(
-                painter = painterResource(p.imageRes), // Må ordne placeholderbilde
-                contentDescription = p.name,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(220.dp)
-                    .padding(horizontal = 16.dp)
-                    .clip(RoundedCornerShape(16.dp))
             )
+        }
+    ) { innerPadding ->
+        plant?.let { p ->
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // navn + "Legg til"-knapp
-
-            Row(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxSize()
+                    .background(Color(0xFFDFEAC0))
+                    .verticalScroll(scrollState)
+                    .padding(innerPadding)
             ) {
-                Text(
-                    text = p.name,
-                    fontSize = 36.sp,
-                    fontWeight = FontWeight.Normal
+                //Plante-headerbilde
+                Image(
+                    painter = painterResource(p.imageRes), // Må ordne placeholderbilde
+                    contentDescription = p.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(220.dp)
+                        .padding(horizontal = 16.dp)
+                        .clip(RoundedCornerShape(16.dp))
                 )
-                if (onAddPlant != null) {
-                    OutlinedButton(
-                        onClick = { onAddPlant() },
-                        shape = RoundedCornerShape(50),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = Color.White
-                        ),
-                        border = BorderStroke(0.dp, Color.Transparent)
-                    ) {
-                        Text("Legg til i hage")
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Navn + "Legg til"-knapp
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = p.name,
+                        fontSize = 36.sp,
+                        fontWeight = FontWeight.Normal
+                    )
+                    if (onAddPlant != null) {
+                        OutlinedButton(
+                            onClick = { onAddPlant() },
+                            shape = RoundedCornerShape(50),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                containerColor = Color.White
+                            ),
+                            border = BorderStroke(0.dp, Color.Transparent)
+                        ) {
+                            Text("Legg til i hage")
+                        }
+                    } else if (onDeletePlant != null) {
+                        OutlinedButton(
+                            onClick = {
+                                onDeletePlant()
+                                onBackClick()
+                            },
+                            shape = RoundedCornerShape(50),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                containerColor = Color.White
+                            ),
+                            border = BorderStroke(0.dp, Color.Transparent)
+                        ) {
+                            Text("Fjern plante fra hage")
+                        }
                     }
-                } else if (onDeletePlant != null) {
-                    OutlinedButton(
-                        onClick = {
-                            onDeletePlant()
-                            onBackClick()
-                                  },
-                        shape = RoundedCornerShape(50),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = Color.White
-                        ),
-                        border = BorderStroke(0.dp, Color.Transparent)
-                    ) {
-                        Text("Fjern plante fra hage")
-                    }
+
+
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
-
-
-                Spacer(modifier = Modifier.height(8.dp))
             }
         }
     }

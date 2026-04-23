@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import project.team36.data.klima.frost.FrostRepository
 import project.team36.data.local.LocationRepository
+import project.team36.model.location.SavedLocation
 import project.team36.model.location.SavedPlant
 import project.team36.ui.map.SavedPlacesViewModel
 import java.time.Instant
@@ -76,6 +77,20 @@ class MyPlantsViewModel(
             System.currentTimeMillis() - plant.lastWateredDate
         )
         return (plant.maxDaysWithoutWater.toLong() - daysSince).coerceAtLeast(0)
+    }
+
+    //Slett location
+    fun deleteLocation(location: SavedLocation) {
+        viewModelScope.launch {
+            repository.deleteLocation(location)
+        }
+    }
+
+    // Endre navn på location
+    fun renameLocation(location: SavedLocation, newName: String) {
+        viewModelScope.launch {
+            repository.updateLocation(location.copy(name = newName))
+        }
     }
 
     fun loadPrecipitationForLocation(lat: Double, lon: Double) {
