@@ -31,7 +31,6 @@ import project.team36.data.mcp.WeatherAlert
 import project.team36.model.location.SavedLocation
 import project.team36.model.plant.PlantInfo
 import project.team36.ui.map.ClimateZoneConfig.LAYER_ID
-import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
