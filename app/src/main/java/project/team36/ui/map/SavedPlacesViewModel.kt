@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import project.team36.data.local.LocationRepository
 import project.team36.model.location.SavedLocation
-import project.team36.model.location.SavedPlant
 
 
 //Flyttet savedPlaces til en egen viewmodel, så flere skjermer har tilgang til lagrede steder
@@ -29,6 +28,9 @@ class SavedPlacesViewModel(
     //Location valgt
     private val _selectedLocation = MutableStateFlow<SavedLocation?>(null)
     val selectedLocation: StateFlow<SavedLocation?> = _selectedLocation.asStateFlow()
+
+    private val _showMaxLocationsDialog = MutableStateFlow(false)
+    val showMaxLocationsDialog: StateFlow<Boolean> = _showMaxLocationsDialog.asStateFlow()
 
     //Velg location, som kan brukes av dropdown osv
     fun selectLocation(location: SavedLocation) {
@@ -51,6 +53,20 @@ class SavedPlacesViewModel(
 
     fun updateSelectedLocationName(newName: String) {
         _selectedLocation.update { it?.copy(name = newName) }
+    }
+
+    //Sjekke om det er mulig å legge til flere steder, grense er på 5
+    fun onAddLocationClicked(): Boolean {
+        return if (savedLocations.value.size >= 5) {
+            _showMaxLocationsDialog.value = true
+            false
+        } else {
+            true
+        }
+    }
+
+    fun dismissMaxLocationsDialog() {
+        _showMaxLocationsDialog.value = false
     }
 }
 

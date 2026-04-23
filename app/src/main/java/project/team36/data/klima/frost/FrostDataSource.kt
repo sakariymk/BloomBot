@@ -123,3 +123,33 @@ suspend fun getDurationSunShine(stationId : String, clientId : String, date : St
         null
     }
 }
+//Funksjon for å hjelpe tracke nedbør siden sist bruk for vanningsstatus på planter.
+suspend fun getPrecipitationSinceLastUsed(
+    lat: Double,
+    lon: Double,
+    clientId: String,
+    lastWatered: String
+): Map<String, Double>? {
+    val station = getNearestStation(lat, lon, clientId) ?: return null
+    val url = "https://frost.met.no/observations/v0.jsonld"
+
+    return try {
+        val response = client.get(url) {
+            basicAuth(clientId, "")
+            parameter("sources", station.id)
+            parameter("elements", "sum(precipitation_amount PT1H)")
+            parameter("referencetime", "$lastWatered/now")
+        }
+        if (response.status == HttpStatusCode.OK) {
+            val observationResponse: ObservationResponse = response.body()
+            observationResponse.data
+                .groupBy { it.referenceTime.substring(0, 10) }
+                .mapValues { (_, obs) ->
+                    obs.flatMap { it.observations }.sumOf { it.value }
+                }
+        } else null
+    } catch (e: Exception) {
+        println("Error fetching precipitation: ${e.message}")
+        null
+    }
+}

@@ -17,7 +17,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel  // NY: import for viewModel()
 import androidx.navigation.NavController
 import com.mapbox.maps.extension.style.expressions.dsl.generated.image
 import project.team36.ui.map.SavedPlacesViewModel
@@ -42,6 +41,13 @@ fun MyPlantsScreen(
     //hent planter for valgt sted
     val plants by myPlantsViewModel.plants.collectAsStateWithLifecycle()
 
+    LaunchedEffect(selectedLocation) {
+        selectedLocation?.let {
+            val lat = it.lat ?: return@let
+            val lon = it.lon ?: return@let
+            myPlantsViewModel.loadPrecipitationForLocation(lat, lon)
+        }
+    }
 
     Scaffold(
         containerColor = Color.Transparent,
@@ -183,14 +189,6 @@ fun MyPlantsScreen(
                 .background(Color(0xFFE8F5E2)),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-//            item { // Fjerne dropdown
-//                LocationDropdown(
-//                    savedLocations = savedLocations,
-//                    selectedLocation = selectedLocation,
-//                    onLocationSelected = { savedPlacesViewModel.selectLocation(it) }
-//                )
-//            }
-
             // Vi mater inn riktig liste, og tegner opp nøyaktig det elementet vi er på.
             items(plants){ plant ->
                 PlantCard(
