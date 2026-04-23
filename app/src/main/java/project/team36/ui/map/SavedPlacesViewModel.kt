@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import project.team36.data.local.LocationRepository
 import project.team36.model.location.SavedLocation
@@ -41,18 +42,15 @@ class SavedPlacesViewModel(
         }
     }
 
-    //Slett location
-    fun deleteLocation(location: SavedLocation) {
-        viewModelScope.launch {
-            repository.deleteLocation(location)
-        }
-    }
-
     //Oppdater location
     fun updateLocation(location: SavedLocation) {
         viewModelScope.launch {
             repository.updateLocation(location)
         }
+    }
+
+    fun updateSelectedLocationName(newName: String) {
+        _selectedLocation.update { it?.copy(name = newName) }
     }
 }
 

@@ -34,13 +34,6 @@ class MyPlantsViewModel(
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    //Slette plante
-    fun removePlant(plant: SavedPlant) {
-        viewModelScope.launch {
-            repository.deletePlant(plant)
-        }
-    }
-
     // for å slette plante basert på navn, brukes i AppNavHost på PlantDetailsScreen
     fun removePlantByName(plantName: String) {
         viewModelScope.launch {
@@ -72,5 +65,19 @@ class MyPlantsViewModel(
             System.currentTimeMillis() - plant.lastWateredDate
         )
         return (plant.maxDaysWithoutWater.toLong() - daysSince).coerceAtLeast(0)
+    }
+
+    //Slett location
+    fun deleteLocation(location: SavedLocation) {
+        viewModelScope.launch {
+            repository.deleteLocation(location)
+        }
+    }
+
+    // Endre navn på location
+    fun renameLocation(location: SavedLocation, newName: String) {
+        viewModelScope.launch {
+            repository.updateLocation(location.copy(name = newName))
+        }
     }
 }

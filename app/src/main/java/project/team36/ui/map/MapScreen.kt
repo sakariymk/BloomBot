@@ -70,6 +70,7 @@ import com.mapbox.maps.extension.style.sources.getSourceAs
 import com.mapbox.maps.extension.style.sources.generated.GeoJsonSource
 import project.team36.R
 import project.team36.data.mcp.WeatherAlert
+import project.team36.ui.myplants.MyPlantsViewModel
 import project.team36.ui.navigation.BottomNavBar
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
@@ -78,6 +79,7 @@ fun MapScreen(
     modifier: Modifier = Modifier,
     viewModel: MapViewModel = viewModel(),
     savedPlacesViewModel: SavedPlacesViewModel,
+    myPlantsViewModel: MyPlantsViewModel,
     navController: NavController,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -298,7 +300,7 @@ fun MapScreen(
                     viewModel.dismissPlaceInfo()
                 },
                 onDelete = {
-                    savedPlacesViewModel.deleteLocation(location)
+                    myPlantsViewModel.deleteLocation(location)
                     viewModel.dismissPlaceInfo()
                 },
                 navController = navController as NavHostController
