@@ -222,7 +222,6 @@ class MapViewModel(
 
     fun onMapReady(map: MapboxMap) {
         mapboxMap = map
-        Log.d("ZONE_TEST", "Kart klart!")
     }
 
     suspend fun getClimateZone(
@@ -253,7 +252,7 @@ class MapViewModel(
         }
     }
 
-    fun confirmSavePlace(savedPlacesViewModel: SavedPlacesViewModel) {
+    fun confirmSavePlace(savedPlacesViewModel: SavedPlacesViewModel, onSaved: () -> Unit) {
         val result = _uiState.value.selectedResult ?: return
         val name = _uiState.value.placeNameInput.ifEmpty { result.name }
         viewModelScope.launch {
@@ -262,7 +261,6 @@ class MapViewModel(
                 lat = result.coordinate.latitude()
             )
 
-            Log.d("ZONE_TEST", "Hentet sone: $zone for $name")
             savedPlacesViewModel.addLocation(
                 SavedLocation(
                     name = name,
@@ -272,7 +270,8 @@ class MapViewModel(
                     zone = zone ?: 0
                 )
             )
-            //dismissSaveDialog bør kalles her, ikke i mapscreen direkte?
+            dismissSaveDialog()
+            onSaved()
         }
     }
 
