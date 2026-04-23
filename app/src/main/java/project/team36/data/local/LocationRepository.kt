@@ -40,4 +40,5 @@ class LocationRepository(
     suspend fun updatePlant(plant: SavedPlant) {
         savedPlantDao.update(plant)
     }
+
 }

@@ -5,14 +5,10 @@ import kotlinx.serialization.json.*
 import kotlinx.coroutines.flow.first
 import java.text.SimpleDateFormat
 import java.util.*
-import project.team36.data.klima.MetWeatherApi
-import project.team36.data.klima.frost.getNearestStation
-import project.team36.data.klima.frost.getTemperatures
 import project.team36.data.mcp.MetMcpClient
 // <------ ENDRING: Endret fra PlantDataSource til LocationRepository og SavedLocation
 import project.team36.data.local.LocationRepository
 import project.team36.model.location.SavedLocation
-import project.team36.ui.map.MapViewModel
 import project.team36.model.ai.*
 import retrofit2.HttpException
 

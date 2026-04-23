@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import project.team36.data.local.LocationRepository
 import project.team36.model.location.SavedLocation
-import project.team36.model.location.SavedPlant
 
 
 //Flyttet savedPlaces til en egen viewmodel, så flere skjermer har tilgang til lagrede steder
