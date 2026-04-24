@@ -22,6 +22,7 @@ import project.team36.ui.plant.PlantCard
 import project.team36.model.location.SavedLocation
 import project.team36.model.location.SavedPlant
 import project.team36.model.plant.PlantInfo
+import project.team36.ui.landingpage.LandingPageViewModel
 import project.team36.ui.navigation.BottomNavBar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -29,7 +30,8 @@ import project.team36.ui.navigation.BottomNavBar
 fun MyPlantsScreen(
     navController: NavController,
     savedPlacesViewModel: SavedPlacesViewModel,
-    myPlantsViewModel: MyPlantsViewModel
+    myPlantsViewModel: MyPlantsViewModel,
+    landingPageViewModel : LandingPageViewModel
 ) {
 
     val savedLocations by savedPlacesViewModel.savedLocations.collectAsStateWithLifecycle()
@@ -38,6 +40,7 @@ fun MyPlantsScreen(
     //hent planter for valgt sted
     val plants by myPlantsViewModel.plants.collectAsStateWithLifecycle()
 
+    val landingUiState by landingPageViewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
         containerColor = Color.Transparent,
@@ -88,10 +91,15 @@ fun MyPlantsScreen(
 
             // Vi mater inn riktig liste, og tegner opp nøyaktig det elementet vi er på.
             items(plants){ plant ->
+                val alertsForLocation = selectedLocation?.let {loc ->
+                    landingUiState.locationAlerts[loc.id]
+                } ?: emptyList()
+
                 PlantCard(
                     plant = plant,
                     needsWater = myPlantsViewModel.needsWater(plant),
                     daysUntilWatering = myPlantsViewModel.daysUntilWatering(plant),
+                    alerts = alertsForLocation,
                     onMarkAsWatered = { myPlantsViewModel.markAsWatered(plant) },
                     navController = navController
                 )
