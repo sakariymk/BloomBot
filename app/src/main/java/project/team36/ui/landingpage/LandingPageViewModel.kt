@@ -11,6 +11,8 @@ import project.team36.data.mcp.MetWeatherRepository
 import project.team36.data.mcp.WeatherForecast
 import project.team36.model.location.SavedLocation
 import kotlin.jvm.java
+import project.team36.data.ai.HybridAiRepository
+import project.team36.model.ai.AiRecommendationResponse
 
 
 
@@ -23,7 +25,10 @@ data class WeatherUiState(
 
 data class LandingPageUiState(
     val locationForecasts: Map<Long, WeatherUiState?> = emptyMap(),
-    val isWeatherLoading: Boolean = false
+    val isWeatherLoading: Boolean = false,
+    val aiResponse: AiRecommendationResponse? = null,
+    val isAiLoading: Boolean = false,
+    val isFutureAiLoading: Boolean = false
 )
 
 private fun weatherSymbolToDescription(symbol: String): String {
@@ -59,12 +64,32 @@ private fun WeatherForecast.toUiState() = WeatherUiState(
 
 
 class LandingPageViewModel(
-    private val weatherRepository: MetWeatherRepository
+    private val weatherRepository: MetWeatherRepository,
+    private val aiRepository: HybridAiRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LandingPageUiState())
     val uiState: StateFlow<LandingPageUiState> = _uiState.asStateFlow()
 
+    fun fetchAiAdvice(location: SavedLocation) {
+        _uiState.value = _uiState.value.copy(isAiLoading = true, aiResponse = null)
+        viewModelScope.launch {
+            val response = aiRepository.getPlantRecommendations(location)
+            _uiState.value = _uiState.value.copy(isAiLoading = false, aiResponse = response)
+        }
+    }
+
+    fun fetchFutureAiAdvice(location: SavedLocation) {
+        _uiState.value = _uiState.value.copy(isFutureAiLoading = true, aiResponse = null)
+        viewModelScope.launch {
+            val response = aiRepository.getFuturePlantRecommendations(location)
+            _uiState.value = _uiState.value.copy(isFutureAiLoading = false, aiResponse = response)
+        }
+    }
+
+    fun dismissAiAdvice() {
+        _uiState.value = _uiState.value.copy(aiResponse = null)
+    }
     fun loadWeatherForLocations(locations: List<SavedLocation>) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isWeatherLoading = true)
@@ -86,12 +111,13 @@ class LandingPageViewModel(
 }
 
 class LandingPageViewModelFactory(
-    private val weatherRepository: MetWeatherRepository
+    private val weatherRepository: MetWeatherRepository,
+    private val aiRepository: HybridAiRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(LandingPageViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return LandingPageViewModel(weatherRepository) as T
+            return LandingPageViewModel(weatherRepository, aiRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

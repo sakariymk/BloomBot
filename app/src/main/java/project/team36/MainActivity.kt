@@ -143,7 +143,7 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
 
                 val landingPageViewModel: LandingPageViewModel = viewModel(
-                    factory = LandingPageViewModelFactory(metWeatherRepository)
+                    factory = LandingPageViewModelFactory(metWeatherRepository, hybridAiRepository)
                 )
 
                 val savedPlacesViewModel: SavedPlacesViewModel = viewModel(

@@ -28,6 +28,7 @@ import kotlinx.coroutines.launch
 import project.team36.data.ai.HybridAiRepository
 import project.team36.data.mcp.MetWeatherRepository
 import project.team36.data.mcp.WeatherAlert
+import project.team36.model.ai.AiRecommendationResponse
 import project.team36.model.location.SavedLocation
 import project.team36.model.plant.PlantInfo
 import project.team36.ui.map.ClimateZoneConfig.LAYER_ID
@@ -52,7 +53,7 @@ data class MapUiState(
     val showSaveDialog: Boolean = false,
     val placeNameInput: String = "",
     val selectedSavedLocation: SavedLocation? = null,
-    val aiResponse: String? = null,
+    val aiResponse: AiRecommendationResponse? = null,
     val isAiLoading: Boolean = false,
     val isFutureAiLoading: Boolean = false,
     val weatherAlerts: List<WeatherAlert> = emptyList(),
