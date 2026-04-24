@@ -8,14 +8,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
@@ -69,8 +66,8 @@ fun LandingPageScreen(
                     plant.locationId == location.id && myPlantsViewModel.needsWater(plant)
                 }
                 .map { plant -> plant to myPlantsViewModel.getWateringText(plant) }
-            }
         }
+    }
 
     LaunchedEffect(Unit) { locationPermission.launchPermissionRequest() }
 
@@ -121,7 +118,8 @@ fun LandingPageScreen(
                     indicator = {}
                 ) {
                     savedLocations.forEachIndexed { index, location ->
-                        val hasAlert = (uiState.locationAlerts[location.id] ?: emptyList()).isNotEmpty()
+                        val hasAlert =
+                            (uiState.locationAlerts[location.id] ?: emptyList()).isNotEmpty()
                         Tab(
                             selected = selectedTabIndex == index,
                             onClick = { selectedTabIndex = index },
@@ -144,10 +142,11 @@ fun LandingPageScreen(
                 }
 
 
-
                 // Innhold for valgt lokasjon
-                val selectedLocation = savedLocations.getOrNull(selectedTabIndex) ?: savedLocations[0]
-                val alertsForSelectedLocation = uiState.locationAlerts[selectedLocation.id] ?: emptyList()
+                val selectedLocation =
+                    savedLocations.getOrNull(selectedTabIndex) ?: savedLocations[0]
+                val alertsForSelectedLocation =
+                    uiState.locationAlerts[selectedLocation.id] ?: emptyList()
                 val forecastForSelectedLocation = uiState.locationForecasts[selectedLocation.id]
 
                 Spacer(modifier = Modifier.height(8.dp))
