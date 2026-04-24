@@ -23,6 +23,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DeviceThermostat
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -32,12 +33,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.RichTooltip
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -47,45 +52,44 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import io.modelcontextprotocol.kotlin.sdk.types.Icon
+import kotlinx.coroutines.launch
 import project.team36.model.plant.LightType
 import project.team36.model.plant.PlantInfo
 import project.team36.model.plant.SoilType
 import project.team36.ui.theme.Team36Theme
 import project.team36.R
+import project.team36.model.plant.displayName
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlantDetailsScreen(
+    navController: NavController,
     plantName: String,
-    viewModel: PlantDetailsViewModel,
+    plantDetailsViewModel: PlantDetailsViewModel,
     onBackClick: () -> Unit,
-    //onAddClick: () -> Unit, //jeg (viktoria) endra litt på dette slik at appen kan buildes og kjøres
-    onAddPlant: (() -> Unit)? = null, //jeg (viktoria) endra litt på dette slik at appen kan buildes og kjøres
-    onDeletePlant: (() -> Unit)? = null //jeg (viktoria) endra litt på dette slik at appen kan buildes og kjøres,
-
-    // boolean-parameter for om det er plantdetailsscreen på mine planter eller oppdag planter
-
+    onAddPlant: (() -> Unit)? = null,
+    onDeletePlant: (() -> Unit)? = null
 ) {
     val scrollState = rememberScrollState()
-
-    LaunchedEffect(plantName) { // kalles en gang når skjermen vises
-        viewModel.loadPlant(plantName)
-    }
-
-    val plant by viewModel.plant.collectAsStateWithLifecycle()
+    val plants by plantDetailsViewModel.plant.collectAsStateWithLifecycle()
 
     Scaffold(
-        containerColor = Color(0xFFDFEAC0),
+        containerColor = Color(0xFFE8F5E2),
         topBar = {
             TopAppBar(
-                title = {},
+                title = { },
                 navigationIcon = {
-                    IconButton(onClick = { onBackClick()} ) {
+                    IconButton( onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Tilbake"
+                            contentDescription = "Tilbake",
+                            tint = Color(0xFF2E7D32)
                         )
                     }
                 },
@@ -95,19 +99,16 @@ fun PlantDetailsScreen(
             )
         }
     ) { innerPadding ->
-        plant?.let { p ->
-
+        plants?.let { plant ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0xFFDFEAC0))
-                    .verticalScroll(scrollState)
                     .padding(innerPadding)
+                    .verticalScroll(scrollState)
             ) {
-                //Plante-headerbilde
                 Image(
-                    painter = painterResource(p.imageRes), // Må ordne placeholderbilde
-                    contentDescription = p.name,
+                    painter = painterResource(plant.imageRes),
+                    contentDescription = plant.name,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -118,8 +119,6 @@ fun PlantDetailsScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Navn + "Legg til"-knapp
-
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -128,9 +127,10 @@ fun PlantDetailsScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = p.name,
+                        text = plant.name,
                         fontSize = 36.sp,
-                        fontWeight = FontWeight.Normal
+                        fontWeight = FontWeight.Normal,
+                        color = Color(0xFF2E7D32)
                     )
                     if (onAddPlant != null) {
                         OutlinedButton(
@@ -141,7 +141,7 @@ fun PlantDetailsScreen(
                             ),
                             border = BorderStroke(0.dp, Color.Transparent)
                         ) {
-                            Text("Legg til i hage")
+                            Text("Legg til i hage", color = Color(0xFF2E7D32))
                         }
                     } else if (onDeletePlant != null) {
                         OutlinedButton(
@@ -159,8 +159,82 @@ fun PlantDetailsScreen(
                         }
                     }
 
-
-                    Spacer(modifier = Modifier.height(8.dp))
+                }
+                PlantInfoCard(title = "Plantingsmåned") {
+                    Text("Dette er de ideelle månedene å plante denne planten.")
+                    PlantingMonthBar(plantingMonth = plant.plantingMonth)
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                PlantInfoCard(title = "Herdighetssone") {
+                    Text("Herdighetssone sier noe om hvor planten vil trives best med tanke på lokalklima.")
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.DeviceThermostat,
+                            contentDescription = null,
+                            tint = Color(0xFF5A7A3A)
+                        )
+                        Text(
+                            "H${plant.climateZone}",
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 16.sp
+                        )
+                    }
+                    HardinessZoneTooltip(climatezone = plant.climateZone)
+                }
+                PlantInfoCard("Solforhold") {
+                    Text("Ulike planter har ulike behov for sol, noen trives best med full sollys, mens andre foretrekker mer skygge for å trives best.")
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        plant.light.forEach { lightType ->
+                            OutlinedButton(
+                                onClick = {},
+                                shape = RoundedCornerShape(50),
+                                border = BorderStroke(1.dp, Color.LightGray)
+                            ) {
+                                Text(
+                                    text = lightType.displayName,
+                                    color = Color.Black
+                                )
+                            }
+                        }
+                    }
+                }
+                PlantInfoCard(title = "Vanning") {
+                    Text("Vi registrerer om det har regnet, slik at du kan få påminnelse om vanning dersom det ikke har regnet tilstrekkelig.")
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.WaterDrop,
+                            contentDescription = null,
+                            tint = Color(0xFF5A7A3A)
+                        )
+                        Text(
+                            "Vannes ca. hver ${plant.maxDaysWithoutWater}. dag",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp
+                        )
+                    }
+                }
+                PlantInfoCard(title = "Jordtype") {
+                    Text("Jorden planten trives aller best i når det gjelder struktur, sammensetning, næringsinnhold og surhetsgrad. Valg av jordtype avhenger av plantens behov, men generelt trives de fleste planter i en luftig, næringsrik jord med god drenering ")
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        plant.soil.forEach { soilType ->
+                            OutlinedButton(
+                                onClick = {},
+                                shape = RoundedCornerShape(50),
+                                border = BorderStroke(1.dp, Color.LightGray)
+                            ) {
+                                Text(
+                                    text = soilType.displayName,
+                                    color = Color.Black
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -196,6 +270,9 @@ fun PlantingMonthBar(plantingMonth: Set<Int>) {
     val sorted = plantingMonth.sorted()
     val label = sorted.map { monthNames[it - 1] }.let { "${it.first()}-${it.last()}" }
 
+    val startFraction = (sorted.first() - 1) / 12f
+    val widthFraction = (sorted.last() - sorted.first() + 1) / 12f
+
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -205,21 +282,18 @@ fun PlantingMonthBar(plantingMonth: Set<Int>) {
             Text("jun", fontSize = 12.sp, color = Color.Gray)
             Text("des", fontSize = 12.sp, color = Color.Gray)
         }
-        Box(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(20.dp)
                 .clip(RoundedCornerShape(50))
                 .background(Color(0xFFB0C080))
         ) {
-            val startFraction = (sorted.first() - 1) / 12f
-            val endFraction = sorted.last() / 12f
-
+            Spacer(modifier = Modifier.fillMaxWidth(startFraction))
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .fillMaxWidth(endFraction)
-                    .padding(start = (startFraction * 100).dp)
+                    .fillMaxWidth(widthFraction / (1f - startFraction))
                     .clip(RoundedCornerShape(50))
                     .background(Color(0xFF5A7A3A)),
                 contentAlignment = Alignment.Center
@@ -228,15 +302,64 @@ fun PlantingMonthBar(plantingMonth: Set<Int>) {
             }
         }
     }
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HardinessZoneTooltip(climatezone: Int) {
+    val tooltipState= rememberTooltipState(isPersistent = true)
+    val scope = rememberCoroutineScope()
 
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        TooltipBox(
+            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+            tooltip = {
+                RichTooltip(
+                    title = { Text("Herdighetssoner") },
+                    action = {
+                        TextButton(onClick = {scope.launch { tooltipState.dismiss() }}) {
+                            Text("Lukk")
+                        }
+                    },
+                    colors = TooltipDefaults.richTooltipColors(
+                        containerColor = Color(0xFFE8F8E3),
+                        titleContentColor = Color(0xFF2D5A27),
+                        contentColor = Color.Black,
+                        actionContentColor = Color(0xFF2D5A27)
+                    )
+                ) {
+                    Text("Herdighetstallene må betraktes som en rettesnor som kan gi hjelp når du skal velge planter, men de gir ingen garanti om et godt resultat. Det er tryggest å plante i tråd med klimasoneangivelsene, men på lune steder kan det likevel være forsøket verdt å prøve med planter som ut fra det grove kartet tilsynelatende ikke skulle klare seg. \\nSom hovedregel kan du gå for planter som er merket med den herdighetssonen du bor i – og alle tallene over. For eksempel trives en plante med herdighetssone 8 i alle soner, mens herdighetssone 4 trives i sone 1 til 4. ")
+                }
+            },
+            state = tooltipState
+        ) {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                OutlinedButton(
+                    onClick = { scope.launch { tooltipState.show() } },
+                    shape = RoundedCornerShape(50),
+                    border = BorderStroke(1.dp, Color.LightGray),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = Color(0xFFE8F8E3)
+                    ),
+                ) {
+                    Text("Herdighetssone forklart", color = Color.Black)
+                }
+            }
 
+        }
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun PlantDetailsScreenPreview() {
-    val fakePlant = PlantInfo(
+    val fakePlant = PlantDetails(
         name = "Lilje",
         soil = setOf(SoilType.SAND, SoilType.CHALK),
         light = setOf(LightType.FULL),
@@ -257,7 +380,7 @@ fun PlantDetailsScreenPreview() {
 }
 
 @Composable
-fun PlantDetailsScreenPreview_Content(plant: PlantInfo) {
+fun PlantDetailsScreenPreview_Content(plant: PlantDetails) {
     Column(
         modifier = Modifier
             .fillMaxSize()

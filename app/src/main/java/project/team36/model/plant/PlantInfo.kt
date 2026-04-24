@@ -21,3 +21,19 @@ data class PlantInfo(
     val imageRes: Int,
     val description: String,
     )
+
+val SoilType.displayName: String
+    get() = when (this) {
+        SoilType.SOIL -> "Jord"
+        SoilType.CHALK -> "Kalkjord"
+        SoilType.CLAY -> "Leire"
+        SoilType.LOAM -> "Leirjord"
+        SoilType.SAND -> "Sand"
+    }
+
+val LightType.displayName: String
+    get() = when(this) {
+        LightType.SHADE -> "Skygge"
+        LightType.PARTIAL -> "Delvis skygge"
+        LightType.FULL -> "Solrikt"
+    }
