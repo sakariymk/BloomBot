@@ -52,7 +52,8 @@ fun AppNavHost(
             MyPlantsScreen(
                 navController = navController,
                 savedPlacesViewModel = savedPlacesViewModel,
-                myPlantsViewModel = myPlantsViewModel
+                myPlantsViewModel = myPlantsViewModel,
+                landingPageViewModel = landingPageViewModel
             )
         }
         composable("findPlants/{locationName}") { backStackEntry ->
@@ -69,6 +70,7 @@ fun AppNavHost(
                 navController = navController,
                 savedPlacesViewModel = savedPlacesViewModel,
                 landingPageViewModel = landingPageViewModel,
+                myPlantsViewModel = myPlantsViewModel
             )
         }
         // plantDetailScreen
@@ -117,7 +119,7 @@ fun AppNavHost(
                 navController = navController,
                 savedPlacesViewModel = savedPlacesViewModel,
                 onLocationCardClick = { navController.navigate("myPlants") },
-                onAddPlaceClick = { navController.navigate("map") }
+                onAddPlaceClick = { navController.navigate("map") },
             )
         }
     }

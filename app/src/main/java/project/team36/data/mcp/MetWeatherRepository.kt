@@ -1,6 +1,7 @@
 package project.team36.data.mcp
 
 import android.util.Log
+import androidx.compose.ui.graphics.Color
 import org.json.JSONObject
 
 data class WeatherForecast(
@@ -53,16 +54,26 @@ class MetWeatherRepository (private val mcpClient: MetMcpClient) {
         val blocks = text.split(Regex("(?=#\\s*Event:)")).filter { it.isNotBlank() }
 
         fun extract(block: String, key: String): String {
-            val regex = Regex("$key:\\s*([\\s\\S]*?)(?=\\n\\s*#|\\n\\s*###|\\n\\s*####|$)")
+            val regex = Regex("$key:\\s*([\\s\\S]*?)(?=\\n\\s*[A-Z][a-z]+:|\\n\\s*#|$)")
             return regex.find(block)?.groupValues?.get(1)?.trim()
-                ?.replace(Regex("\\n\\s*"), " ") ?: ""
+                ?.replace(Regex("\\s+"), " ") ?: ""
         }
 
         return blocks.mapNotNull { block ->
-            val event = extract(block, "# Event").ifBlank { return@mapNotNull null }
+            val event = extract(block, "Event").ifBlank { extract(block, "# Event") }
+            if (event.isBlank()) return@mapNotNull null
+
             val severity = extract(block, "Severity").ifBlank { "Unknown" }
-            val description = extract(block, "Description").substringBefore("Consequences: ").trim()
-            val area = extract(block, "### Area")
+            val awarenessLevel = extract(block, "Awareness level").ifBlank { "Unknown" }
+
+            // Fjerner alt før "Consequences" eller "Instruction"
+            val rawDescription = extract(block, "Description")
+            val cleanDescription = rawDescription
+                .split("Consequences:")[0]
+                .split("Instruction:")[0]
+                .trim()
+
+            val area = extract(block, "Area")
 
             val polygons = Regex("#### Polygons[\\s\\S]*?(?=###|# Event|$)")
                 .find(block)?.value
@@ -80,32 +91,47 @@ class MetWeatherRepository (private val mcpClient: MetMcpClient) {
                     }.map { it.toList() }.toList()
                 } ?: emptyList()
 
-            WeatherAlert(event, severity, description, area, polygons)
+            WeatherAlert(event, severity, cleanDescription, awarenessLevel, area, polygons)
         }
     }
 
     fun isPointInPolygon(lat: Double, lon: Double, polygon: List<Pair<Double, Double>>): Boolean {
-        var inside = false
-        var j = polygon.lastIndex
-        for (i in polygon.indices) {
-            val xi = polygon[i].second; val yi = polygon[i].first
-            val xj = polygon[j].second; val yj = polygon[j].first
+        if (polygon.isEmpty()) return false
 
-            val intersect = ((yi > lat) != (yj > lat)) &&
-                    (lon < (xj - xi) * (lat - yi) / (yj - yi + 0.00000001) + xi)
-            if (intersect) inside = !inside
-            j = i
+        var intersectCount = 0
+        for (i in 0 until polygon.size) {
+            val p1 = polygon[i]
+            val p2 = polygon[(i + 1) % polygon.size] // Dette håndterer lukking av polygonet automatisk
+
+            if (((p1.first > lat) != (p2.first > lat)) &&
+                (lon < (p2.second - p1.second) * (lat - p1.first) / (p2.first - p1.first) + p1.second)
+            ) {
+                intersectCount++
+            }
         }
-        return inside
+        return intersectCount % 2 != 0
     }
 }
 
 data class WeatherAlert(
     val event: String,
-    val severity: String,      // f.eks. "Moderat", "Alvorlig", "Ekstrem"
+    val severity: String,
     val description: String,
-    val area : String = "",
+    val awarenessLevel: String,
+    val area: String = "",
     val polygons: List<List<Pair<Double, Double>>> = emptyList()
+) {
+    val color: Color
+        get() = when {
+            awarenessLevel.contains("Red", ignoreCase = true) -> Color(0xFFFF5252)
+            awarenessLevel.contains("Orange", ignoreCase = true) -> Color(0xFFFFAB40)
+            else -> Color(0xFFFFD740) // Gul
+        }
 
-)
-
+    // Sjekker om varselet er kritisk for planter (vet ikke om vi trenger det, men kan høre med team)
+    fun isDangerousForPlant(isFrostResistant: Boolean): Boolean {
+        val dangerousKeywords = listOf("snø", "frost", "is", "lavtrykk", "storm", "kulde")
+        val isWeatherDangerous = dangerousKeywords.any { event.lowercase().contains(it) }
+        return isWeatherDangerous && !isFrostResistant
+    }
+}

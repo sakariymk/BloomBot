@@ -164,8 +164,4 @@ fun FindPlantsScreen(
     }
 
 
-
-
-
 }
-
