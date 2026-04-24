@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Warning
@@ -52,12 +53,14 @@ fun LandingPageScreen(
     landingPageViewModel: LandingPageViewModel,
     myPlantsViewModel: MyPlantsViewModel
 ) {
+    val backgroundColor = Color(0xFFE8F5E9)
+    val tabButtonColor = Color(0xFF386633)
+
     val uiState by landingPageViewModel.uiState.collectAsStateWithLifecycle()
     val savedLocations by savedPlacesViewModel.savedLocations.collectAsStateWithLifecycle()
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val locationPermission = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
     val allPlants by myPlantsViewModel.allPlants.collectAsStateWithLifecycle()
-
 
     val plantsByLocation = remember(savedLocations, allPlants) {
         savedLocations.associateWith { location ->
@@ -78,7 +81,7 @@ fun LandingPageScreen(
     }
 
     Scaffold(
-        containerColor = Color(0xFFE8F8E3),
+        containerColor = backgroundColor,
         topBar = {
             TopAppBar(
                 title = {
@@ -91,11 +94,8 @@ fun LandingPageScreen(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFE8F5E2))
             )
         },
-
         bottomBar = { BottomNavBar(navController = navController, savedPlacesViewModel) }
-
     ) { innerPadding ->
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -109,7 +109,6 @@ fun LandingPageScreen(
                     style = MaterialTheme.typography.bodyMedium
                 )
             } else {
-                // Tabs
                 ScrollableTabRow(
                     selectedTabIndex = selectedTabIndex,
                     edgePadding = 16.dp,
@@ -118,14 +117,32 @@ fun LandingPageScreen(
                     indicator = {}
                 ) {
                     savedLocations.forEachIndexed { index, location ->
-                        val hasAlert =
-                            (uiState.locationAlerts[location.id] ?: emptyList()).isNotEmpty()
+                        val hasAlert = (uiState.locationAlerts[location.id] ?: emptyList()).isNotEmpty()
+                        val isSelected = selectedTabIndex == index
                         Tab(
                             selected = selectedTabIndex == index,
                             onClick = { selectedTabIndex = index },
+
+                            modifier = Modifier
+                                .padding(end = 8.dp)
+                                .height(40.dp)
+                                .background(
+                                    color = if (isSelected) tabButtonColor else Color.White,
+                                    shape = CircleShape
+                                )
+                                .border(
+                                    width = 1.dp,
+                                    color = tabButtonColor,
+                                    shape = CircleShape
+                                ),
                             text = {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Text(location.name ?: "Sted")
+                                    Text(
+                                        text = location.name ?: "Sted",
+                                        color = if (isSelected) Color.White else tabButtonColor,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.Medium
+                                    )
                                     if (hasAlert) {
                                         Spacer(Modifier.width(4.dp))
                                         Icon(
@@ -141,32 +158,29 @@ fun LandingPageScreen(
                     }
                 }
 
-
-                // Innhold for valgt lokasjon
-                val selectedLocation =
-                    savedLocations.getOrNull(selectedTabIndex) ?: savedLocations[0]
-                val alertsForSelectedLocation =
-                    uiState.locationAlerts[selectedLocation.id] ?: emptyList()
-                val forecastForSelectedLocation = uiState.locationForecasts[selectedLocation.id]
+                val selectedLocation = savedLocations.getOrNull(selectedTabIndex) ?: savedLocations[0]
+                val alertsForSelectedLocation: List<WeatherAlert> = uiState.locationAlerts[selectedLocation.id] ?: emptyList()
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                WeatherCard(
-                    weatherUiState = uiState.locationForecasts[selectedLocation.id],
-                    isLoading = uiState.isWeatherLoading,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
+                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    Text(text = "Værvarsel", style = MaterialTheme.typography.labelLarge)
 
-                if (alertsForSelectedLocation.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                        alertsForSelectedLocation.forEach { alert ->
-                            LocationAlertBanner(alert)
-                            Spacer(modifier = Modifier.height(8.dp))
+                    WeatherCard(
+                        weatherUiState = uiState.locationForecasts[selectedLocation.id],
+                        isLoading = uiState.isWeatherLoading,
+                    )
+
+                    if (alertsForSelectedLocation.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Column {
+                            alertsForSelectedLocation.forEach { alert ->
+                                LocationAlertBanner(alert)
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
                         }
                     }
                 }
-
                 Spacer(modifier = Modifier.height(16.dp))
 
                 DailyTasksCard(
