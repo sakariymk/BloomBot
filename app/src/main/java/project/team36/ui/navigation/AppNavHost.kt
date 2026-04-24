@@ -86,8 +86,9 @@ fun AppNavHost(
             }
 
             PlantDetailsScreen(
+                navController = navController,
                 plantName = plantName,
-                viewModel = plantDetailsViewModel,
+                plantDetailsViewModel = plantDetailsViewModel,
                 onBackClick = { navController.popBackStack() },
                 onAddPlant = if (action == "add") {
                     { plantDetailsViewModel.plant.value?.let { findPlantsViewModel.requestAddPlant(it) } }
