@@ -1,21 +1,33 @@
 package project.team36.ui.myplaces
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowForwardIos
+import androidx.compose.material.icons.filled.Eco
+import androidx.compose.material.icons.filled.House
+import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
@@ -34,13 +46,16 @@ import androidx.navigation.NavController
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.room.util.TableInfo
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.mapbox.maps.extension.style.expressions.dsl.generated.color
 import project.team36.model.location.SavedLocation
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.navigation.BottomNavBar
@@ -115,15 +130,9 @@ fun MyPlacesScreen (
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 if (savedLocations.isEmpty()) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "Ingen steder lagt til enda",
-                            color = Color.Gray
-                        )
-                    }
+                    EmptyLocationCard (
+                        onAddPlaceClick = { navController.navigate("map") }
+                    )
                 } else {
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         items(savedLocations) { location ->
@@ -144,7 +153,69 @@ fun MyPlacesScreen (
     }
 }
 
-// Card for display av stedsnavn i MyPlaces
+// Card displayed when app has no saved locations
+@Composable
+fun EmptyLocationCard(
+    onAddPlaceClick: () -> Unit
+){
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(
+                width = 2.dp,
+                color = Color(0xFF2E7D32),
+                shape = RoundedCornerShape(16.dp)
+            ),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+                .height(IntrinsicSize.Min),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(80.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color(0xFF2E7D32)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.House,
+                    contentDescription = "Ikon av hus",
+                    tint = Color(0xFFE8F5E2),
+                    modifier = Modifier.size(40.dp)
+                )
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "Du har ingen lagrede steder enda.\nLegg til din første hage!",
+                    fontSize = 14.sp,
+                    color = Color.Black
+                )
+                Button(
+                    onClick = onAddPlaceClick,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF2E7D32)
+                    ),
+                    shape = RoundedCornerShape(50),
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Legg til hage")
+                    Spacer(Modifier.width(6.dp))
+                    Text("Ny hage")
+                    Spacer(Modifier.weight(1f))
+                }
+            }
+        }
+    }
+}
+
+// Card displaying location name
 @Composable
 fun LocationCard (
     location: SavedLocation,

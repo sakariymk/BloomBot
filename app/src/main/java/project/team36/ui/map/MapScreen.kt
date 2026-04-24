@@ -22,6 +22,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.ui.Alignment
@@ -60,6 +64,7 @@ import com.mapbox.maps.extension.style.sources.getSourceAs
 import com.mapbox.maps.extension.style.sources.generated.GeoJsonSource
 import project.team36.R
 import project.team36.data.mcp.WeatherAlert
+import project.team36.ui.myplants.MyPlantsViewModel
 import project.team36.ui.navigation.BottomNavBar
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
@@ -68,7 +73,8 @@ fun MapScreen(
     modifier: Modifier = Modifier,
     viewModel: MapViewModel = viewModel(),
     savedPlacesViewModel: SavedPlacesViewModel,
-    navController: NavController
+    myPlantsViewModel: MyPlantsViewModel,
+    navController: NavController,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val savedLocations by savedPlacesViewModel.savedLocations.collectAsStateWithLifecycle()
@@ -93,6 +99,15 @@ fun MapScreen(
                         fontWeight = FontWeight.Normal,
                         color = Color(0xFF2E7D32)
                     )
+                },
+                navigationIcon = {
+                    IconButton(onClick = {navController.popBackStack()}) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Lukk skjermen",
+                            tint = Color(0xFF2E7D32)
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFFE8F5E2)
@@ -281,7 +296,7 @@ fun MapScreen(
                     viewModel.dismissPlaceInfo()
                 },
                 onDelete = {
-                    savedPlacesViewModel.deleteLocation(location)
+                    myPlantsViewModel.deleteLocation(location)
                     viewModel.dismissPlaceInfo()
                 },
                 navController = navController as NavHostController

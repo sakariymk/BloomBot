@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,8 +56,14 @@ fun FindPlantsScreen(
     val plants by findPlantsViewModel.plants.collectAsState()
     val pendingPlant by findPlantsViewModel.pendingPlant.collectAsState()
     val savedLocations by savedPlacesViewModel.savedLocations.collectAsState()
+    val currentLocation = savedLocations.find { it.name == locationName }
     var showSwitchLocationDialog by remember { mutableStateOf(false) }
 
+    LaunchedEffect(currentLocation) {
+        currentLocation?.let {
+            findPlantsViewModel.loadRecommendedPlants(it)
+        }
+    }
     Scaffold(
         containerColor = Color.Transparent,
         topBar = {
@@ -155,4 +162,10 @@ fun FindPlantsScreen(
             onDismiss = { showSwitchLocationDialog = false }
         )
     }
+
+
+
+
+
 }
+

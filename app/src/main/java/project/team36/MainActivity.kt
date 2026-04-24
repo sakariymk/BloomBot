@@ -89,7 +89,6 @@ class MainActivity : ComponentActivity() {
         val frostRepository = FrostRepository()
 
 
-
         val contentType = "application/json".toMediaType()
         val jsonConfig = Json {
             ignoreUnknownKeys = true

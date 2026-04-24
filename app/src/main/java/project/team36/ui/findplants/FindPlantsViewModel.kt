@@ -1,10 +1,12 @@
 package project.team36.ui.findplants
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import project.team36.data.local.LocationRepository
 import project.team36.model.plant.PlantInfo
@@ -90,6 +92,19 @@ class FindPlantsViewModel (
                 )
             )
             _pendingPlant.value = null
+        }
+    }
+
+    fun loadRecommendedPlants(location: SavedLocation) {
+        viewModelScope.launch {
+            locationRepository.getPlantsForLocation(location.id)
+                .first()
+                .let { savedPlants ->
+                    Log.d("FindPlants", "Location zone: ${location.zone}, savedPlants: ${savedPlants.size}")
+                    val result = plantRepository.recommendPlants(location, savedPlants)
+                    Log.d("FindPlants", "Recommended plants: ${result.size}")
+                    _plants.value = result
+                }
         }
     }
 
