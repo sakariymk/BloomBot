@@ -102,6 +102,7 @@ class FindPlantsViewModel (
                 .let { savedPlants ->
                     Log.d("FindPlants", "Location zone: ${location.zone}, savedPlants: ${savedPlants.size}")
                     val result = plantRepository.recommendPlants(location, savedPlants)
+                        .map { it.toPlantDetails() }
                     Log.d("FindPlants", "Recommended plants: ${result.size}")
                     _plants.value = result
                 }
