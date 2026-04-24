@@ -1,31 +1,32 @@
 package project.team36.ui.myplants
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+rt kotlinx.coroutines.flow.StateFlow
+import project.team36.data.klima.frost.FrostRepository
 import project.team36.data.local.LocationRepository
+import project.team36.model.location.SavedLocation
 import project.team36.model.location.SavedPlant
-import project.team36.model.plant.PlantInfo
-import project.team36.ui.map.SavedPlace
 import project.team36.ui.map.SavedPlacesViewModel
+import java.time.Instant
+import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 
 class MyPlantsViewModel(
     private val repository: LocationRepository,
-    savedPlacesViewModel: SavedPlacesViewModel,
+    private val savedPlacesViewModel: SavedPlacesViewModel,
+    private val frostRepository: FrostRepository
 ) : ViewModel() {
 
-    //Flyttet disse til FindPlantsViewModel, gjenstår å se om det ødelegger appen.. -T
-//    private val _pendingPlant = MutableStateFlow<PlantInfo?>(null)
-//    val pendingPlant: StateFlow<PlantInfo?> = _pendingPlant.asStateFlow()
+    private val _precipitationPerDay = MutableStateFlow<Map<String, Double>>(emptyMap())
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val plants = savedPlacesViewModel.selectedLocation
@@ -70,7 +71,16 @@ class MyPlantsViewModel(
         val daysSince = TimeUnit.MILLISECONDS.toDays(
             System.currentTimeMillis() - plant.lastWateredDate
         )
-        return daysSince >= plant.maxDaysWithoutWater
+        if (daysSince < plant.maxDaysWithoutWater) return false
+
+        //Sjekk for om det har regnet nok per dag siden sist vanning, definerer det til 5mm ila en dag som terskel
+        val today = LocalDate.now()
+        val relevantDays = (0 until plant.maxDaysWithoutWater).map {
+            today.minusDays(it.toLong()).toString()
+        }
+        return relevantDays.any { day ->
+            (_precipitationPerDay.value[day] ?: 0.0) < 5.0
+        }
     }
 
     fun daysUntilWatering(plant: SavedPlant): Long {
@@ -78,6 +88,20 @@ class MyPlantsViewModel(
             System.currentTimeMillis() - plant.lastWateredDate
         )
         return (plant.maxDaysWithoutWater.toLong() - daysSince).coerceAtLeast(0)
+    }
+
+    //Slett location
+    fun deleteLocation(location: SavedLocation) {
+        viewModelScope.launch {
+            repository.deleteLocation(location)
+        }
+    }
+
+    // Endre navn på location
+    fun renameLocation(location: SavedLocation, newName: String) {
+        viewModelScope.launch {
+            repository.updateLocation(location.copy(name = newName))
+        }
     }
 
     fun getWateringText(plant: SavedPlant): String {
@@ -90,4 +114,22 @@ class MyPlantsViewModel(
             else -> "Flere ganger per uke"
         }
     }
+
+    fun loadPrecipitationForLocation(lat: Double, lon: Double) {
+        viewModelScope.launch {
+            val lastWatered = plants.value
+                .minOfOrNull { it.lastWateredDate }
+                ?: return@launch
+
+            val rainPerDay = frostRepository.getPrecipitationSinceLastUsed(
+                lat = lat,
+                lon = lon,
+                lastWatered = lastWatered.toIso8601()
+            )
+            _precipitationPerDay.value = rainPerDay ?: emptyMap()
+        }
+    }
 }
+
+//For å få riktig tidsformat fra siste vanningsdato lagret for hver plante
+fun Long.toIso8601(): String = Instant.ofEpochMilli(this).toString()

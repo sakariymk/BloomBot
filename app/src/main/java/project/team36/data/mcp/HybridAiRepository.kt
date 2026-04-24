@@ -5,15 +5,14 @@ import kotlinx.serialization.json.*
 import kotlinx.coroutines.flow.first
 import java.text.SimpleDateFormat
 import java.util.*
-import project.team36.data.klima.MetWeatherApi
-import project.team36.data.klima.frost.getNearestStation
-import project.team36.data.klima.frost.getTemperatures
 import project.team36.data.mcp.MetMcpClient
 // <------ ENDRING: Endret fra PlantDataSource til LocationRepository og SavedLocation
 import project.team36.data.local.LocationRepository
 import project.team36.model.location.SavedLocation
-import project.team36.ui.map.MapViewModel
 import project.team36.model.ai.*
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+import android.util.Log
 import retrofit2.HttpException
 
 class HybridAiRepository(
@@ -21,25 +20,12 @@ class HybridAiRepository(
     private val mcpClient: MetMcpClient,
     // <------ ENDRING: Denne heter nå LocationRepository, fordi vi bruker Room Database
     private val plantDataSource: LocationRepository,
-    private val frostClientId: String,
     private val claudeApiKey: String
 ) {
-    private val frostTool = ClaudeTool(
-        name = "get_current_frost_status",
-        description = "Henter nåværende vær.",
-        input_schema = ToolInputSchema(
-            type = "object",
-            properties = mapOf(
-                "latitude" to PropertyDefinition("number", "Breddegrad"),
-                "longitude" to PropertyDefinition("number", "Lengdegrad")
-            ),
-            required = listOf("latitude", "longitude")
-        )
-    )
 
     private val weatherTool = ClaudeTool(
         name = "weatherforecast",
-        description = "Henter værmeldingen for de neste dagene.",
+        description = "Henter værinformasjon for i dag de kommende dagene.",
         input_schema = ToolInputSchema(
             type = "object",
             properties = mapOf(
@@ -61,31 +47,13 @@ class HybridAiRepository(
         )
     )
 
+    private val jsonParser = Json { ignoreUnknownKeys = true; isLenient = true }
+
     // <------ ENDRING: Ny funksjon for å hente RAW data for testing
     suspend fun getRawApiTest(location: SavedLocation): String {
         val lat = location.lat ?: 0.0
         val lon = location.lon ?: 0.0
         val builder = java.lang.StringBuilder()
-
-        builder.append("=== FROST API ===\n")
-        try {
-            val currentTime = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).toString()
-
-            // Bruker din nye FrostRepository!
-            val frostRepo = project.team36.data.klima.frost.FrostRepository()
-            val weatherData = frostRepo.getFullWeatherForLocation(lat, lon, currentTime)
-
-            if (weatherData != null) {
-                builder.append("Stasjon ID: ${weatherData.stationId}\n")
-                builder.append("Nåværende Temperatur: ${weatherData.temperature} °C\n")
-                builder.append("Nedbør (i dag): ${weatherData.precipitation} mm\n")
-                builder.append("Soltimer (i dag): ${weatherData.sunshineHours}\n")
-            } else {
-                builder.append("Ingen Frost-stasjon funnet i nærheten.\n")
-            }
-        } catch (e: Exception) {
-            builder.append("Feil ved Frost API: ${e.message}\n")
-        }
 
         builder.append("\n=== MET WEATHER API (Via MCP) ===\n")
         try {
@@ -100,14 +68,12 @@ class HybridAiRepository(
     }
 
     // <------ ENDRING: Endret funksjonen til å ta imot hele SavedLocation i stedet for to Double-verdier
-    suspend fun getPlantRecommendations(location: SavedLocation): String {
+    suspend fun getPlantRecommendations(location: SavedLocation): AiRecommendationResponse? {
         val lat = location.lat ?: 0.0
         val lon = location.lon ?: 0.0
 
-        // <------ ENDRING: Henter fra database basert på ID, og bruker .first()
         val plants = try { plantDataSource.getPlantsForLocation(location.id).first() } catch (e: Exception) { emptyList() }
 
-        // <------ ENDRING: Sjekker om listen er tom, og oppdaterer meldingen basert på databasen
         val plantsText = if (plants.isEmpty()) {
             "Brukeren har foreløpig ingen planter på denne lokasjonen. Gi generelle hageråd for dette området."
         } else {
@@ -115,20 +81,32 @@ class HybridAiRepository(
                 "- ${it.name}: Sone: ${it.climateZone}, Lysbehov: ${it.light}, Vann Per Uke: ${it.waterPerWeek}, Frostsikker: ${it.isFrostResistant}"
             }
         }
+
+        // <------ ENDRING: Ledeteksten tvinger Claude til å svare i JSON
         val systemPrompt = """
             Du er en profesjonell og velformulert hageekspert i Norge som skal gi råd til en hobbygartner/bruker.
-            Du får værinformasjon fra en API som heter FROST, du får følgende koordinater Lat: $lat, Lon: $lon.
-            Du får informasjon om relevante planter på koordinatene.
-            Du SKAL bruke verktøyene dine for å sjekke nåværende vær som du får fra FROST API tool'en før du gir råd.
-            Skriv også opp værinformasjonen du får for dagen slik at man får en oversikt.
-            Hvis det er aktive ekstremværvarsler, skal du nevne disse tydelig først.
-            Baser rådene dine på disse plantene:
-            $plantsText
-            Svar konkret, strukturert og på Norsk.
+            Du får dagens værinformasjon fra en API som heter MetWeather, du får følgende koordinater Lat: $lat, Lon: $lon.
+            Du får informasjon om relevante planter på koordinatene, basert på disse plantene:  $plantsText.
+            
+            Skriv først dagens vær på formen:
+            Temperatur:
+            Nedbør:
+            Solskinnstimer:
+            Vind:
+            
+            VIKTIG REGEL for følgende repons: Du MÅ returnere svaret ditt UTELUKKENDE som et gyldig JSON-objekt. 
+            Ikke skriv noe annen tekst, ingen introduksjon, ingen markdown-blokker, bare ren JSON som matcher nøyaktig denne strukturen:
+            {
+              "weatherSummary": "Oppsummering av været for dagen og evt. ekstremværvarsler",
+              "plantAdvice": [
+                { "plantName": "Plantenavn", "advice": "Spesifikt råd for denne planten basert på været" }
+              ],
+              "generalTasks": ["Generell oppgave 1", "Generell oppgave 2"]
+            }
         """.trimIndent()
 
         val conversation = mutableListOf(
-            ClaudeMessage("user", listOf(ContentBlock(type = "text", text = "Hva bør jeg gjøre basert på informasjonen, plantene, været? Vis været og anbefalinger.")))
+            ClaudeMessage("user", listOf(ContentBlock(type = "text", text = "Hva bør jeg gjøre i hagen nå? Svar KUN med JSON.")))
         )
 
         return try {
@@ -138,11 +116,10 @@ class HybridAiRepository(
                     model = "claude-sonnet-4-5",
                     system = systemPrompt,
                     messages = conversation,
-                    tools = listOf(frostTool, weatherTool, alertTool) // alertTool lagt til
+                    tools = listOf(weatherTool, alertTool)
                 )
             )
 
-            // <------ ENDRING: Endret fra 'if' til 'while' for at Claude kan bruke flere verktøy etter hverandre
             var toolLoops = 0
             while (response.stop_reason == "tool_use" && toolLoops < 3) {
                 toolLoops++
@@ -159,57 +136,46 @@ class HybridAiRepository(
                     val rLon = inputJson?.get("longitude")?.jsonPrimitive?.double ?: lon
 
                     val resultText = when (toolName) {
-                        "get_current_frost_status" -> {
-                            // <------ ENDRING: Bruker den nye FrostRepository for å gi AI-en temp, nedbør og sol!
-                            val currentTime = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).toString()
-                            val frostRepo = project.team36.data.klima.frost.FrostRepository()
-                            val weatherData = frostRepo.getFullWeatherForLocation(rLat, rLon, currentTime)
-
-                            if (weatherData != null) {
-                                "Stasjon ID: ${weatherData.stationId}. Temp: ${weatherData.temperature}°C, Nedbør (i dag): ${weatherData.precipitation} mm, Soltimer (i dag): ${weatherData.sunshineHours}"
-                            } else {
-                                "Ingen Frost-stasjon funnet i nærheten."
-                            }
+                        "weatherforecast" -> {
+                            val weatherRepo = project.team36.data.mcp.MetWeatherRepository(mcpClient)
+                            val forecast = weatherRepo.getParsedForecast(rLat, rLon)
+                            "Værvarsel: ${forecast?.temperature}°C, ${forecast?.weatherSymbol}, Vind: ${forecast?.windSpeed} m/s, Nedbør: ${forecast?.precipitation} mm."
                         }
-                        "weatherforecast" -> mcpClient.getForecast(rLat, rLon)
-                        "get_weather_alerts" -> mcpClient.getAlerts() // Nytt
                         else -> "Ukjent verktøy."
                     }
 
                     toolResultBlocks.add(
-                        ContentBlock(
-                            type = "tool_result",
-                            tool_use_id = toolId,
-                            content = resultText
-                        )
+                        ContentBlock(type = "tool_result", tool_use_id = toolId, content = resultText)
                     )
                 }
 
                 conversation.add(ClaudeMessage("user", toolResultBlocks))
 
-                // <------ ENDRING: Sender med 'tools'-parameteren i oppfølgingskallet slik at den kan sjekke været PÅ NYTT
                 response = claudeApi.sendMessage(
                     apiKey = claudeApiKey,
                     request = ClaudeRequest(
                         model = "claude-sonnet-4-5",
                         system = systemPrompt,
                         messages = conversation,
-                        tools = listOf(frostTool)
+                        tools = listOf(weatherTool, alertTool)
                     )
                 )
             }
 
-            response.content.firstOrNull { it.type == "text" }?.text ?: "AI-en ga et svar uten tekst."
+            // <------ ENDRING: Ekstraher teksten, rens bort evt. markdown (```json ... ```) og parse til objekt
+            val rawText = response.content.firstOrNull { it.type == "text" }?.text ?: return null
+            val cleanJson = rawText.replace(Regex("```json|```"), "").trim()
 
-        } catch (e: HttpException) {
-            "AI-feil: ${e.code()} - ${e.response()?.errorBody()?.string()}"
+            jsonParser.decodeFromString<AiRecommendationResponse>(cleanJson)
+
         } catch (e: Exception) {
-            "Feil: ${e.message}"
+            Log.e("AI_ERROR", "Feil ved parsing av AI-JSON: ${e.message}")
+            null
         }
     }
 
-    // <------ ENDRING: Lagt til funksjonen for FREMTIDIG råd
-    suspend fun getFuturePlantRecommendations(location: SavedLocation): String {
+    // <------ ENDRING: Returtypen er AiRecommendationResponse?
+    suspend fun getFuturePlantRecommendations(location: SavedLocation): AiRecommendationResponse? {
         val lat = location.lat ?: 0.0
         val lon = location.lon ?: 0.0
 
@@ -223,19 +189,37 @@ class HybridAiRepository(
             }
         }
 
+        // <------ ENDRING: Stram JSON-prompt også for fremtidsvarsler
         val systemPrompt = """
             Du er en profesjonell og velformulert hageekspert i Norge som skal gi råd til en hobbygartner/bruker.
-            Du får fremtidig værinformasjon fra en API som heter Met Weather, du får følgende koordinater Lat: $lat, Lon: $lon.
-            Du får informasjon om relevante planter på koordinatene.
-            Du SKAL bruke verktøyene dine for å sjekke fremtidig vær som du får fra Weather API tool'en før du gir råd.
-            Skriv også opp værinformasjonen du får for de kommende dagene slik at man får en oversikt.
-            Baser rådene dine på disse plantene:
-            $plantsText
-            Svar konkret, strukturert og på Norsk.
+            Du får dagens og kommende dagenes værinformasjon fra en API som heter MetWeather, du får følgende koordinater Lat: $lat, Lon: $lon.
+            Du får informasjon om relevante planter på koordinatene, basert på disse plantene:  $plantsText.
+            
+            Skriv først dagens vær på formen:
+            Temperatur:
+            Nedbør:
+            Solskinnstimer:
+            Vind:
+            
+            Så for de kommende et par antall dager på formen:
+            Temperatur:
+            Nedbør:
+            Solskinnstimer:
+            Vind:
+            
+            VIKTIG REGEL for følgende respons: Du MÅ returnere svaret ditt UTELUKKENDE som et gyldig JSON-objekt. 
+            Ikke skriv noe annen tekst, ingen introduksjon, ingen markdown-blokker, bare ren JSON som matcher nøyaktig denne strukturen:
+            {
+              "weatherSummary": "Oppsummering av været for de kommende dagene",
+              "plantAdvice": [
+                { "plantName": "Plantenavn", "advice": "Spesifikt fremtidsråd for denne planten basert på været" }
+              ],
+              "generalTasks": ["Fremtidig oppgave 1", "Fremtidig oppgave 2"]
+            }
         """.trimIndent()
 
         val conversation = mutableListOf(
-            ClaudeMessage("user", listOf(ContentBlock(type = "text", text = "Hva bør jeg gjøre basert på informasjonen, plantene, været? Vis været og anbefalinger.")))
+            ClaudeMessage("user", listOf(ContentBlock(type = "text", text = "Hva bør jeg gjøre i hagen fremover? Svar KUN med JSON.")))
         )
 
         return try {
@@ -266,7 +250,6 @@ class HybridAiRepository(
 
                     val resultText = when (toolName) {
                         "weatherforecast" -> {
-                            // <------ ENDRING: Bruker MetWeatherRepository her for å bygge en tekststreng for været
                             val weatherRepo = project.team36.data.mcp.MetWeatherRepository(mcpClient)
                             val forecast = weatherRepo.getParsedForecast(rLat, rLon)
                             "Værvarsel: ${forecast?.temperature}°C, ${forecast?.weatherSymbol}, Vind: ${forecast?.windSpeed} m/s, Nedbør: ${forecast?.precipitation} mm."
@@ -275,11 +258,7 @@ class HybridAiRepository(
                     }
 
                     toolResultBlocks.add(
-                        ContentBlock(
-                            type = "tool_result",
-                            tool_use_id = toolId,
-                            content = resultText
-                        )
+                        ContentBlock(type = "tool_result", tool_use_id = toolId, content = resultText)
                     )
                 }
 
@@ -296,13 +275,15 @@ class HybridAiRepository(
                 )
             }
 
-            response.content.firstOrNull { it.type == "text" }?.text
-                ?: "AI-en ga et svar uten tekst."
+            // <------ ENDRING: Ekstraher og parse JSON for fremtidsvarsel
+            val rawText = response.content.firstOrNull { it.type == "text" }?.text ?: return null
+            val cleanJson = rawText.replace(Regex("```json|```"), "").trim()
 
-        } catch (e: HttpException) {
-            "AI-feil: ${e.code()} - ${e.response()?.errorBody()?.string()}"
+            jsonParser.decodeFromString<AiRecommendationResponse>(cleanJson)
+
         } catch (e: Exception) {
-            "Feil: ${e.message}"
+            Log.e("AI_ERROR", "Feil ved parsing av AI-JSON: ${e.message}")
+            null
         }
     }
 }

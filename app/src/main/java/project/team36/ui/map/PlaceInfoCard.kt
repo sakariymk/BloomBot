@@ -1,6 +1,7 @@
 package project.team36.ui.map
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -43,7 +44,7 @@ fun PlaceInfoCard(
     // <------ ENDRING: Fikset at onGetAiAdvice krever SavedLocation, og la til onGetFutureAiAdvice parameter!
     onGetAiAdvice: (SavedLocation) -> Unit,
     onGetFutureAiAdvice: (SavedLocation) -> Unit,
-    aiResponse: String?,
+    aiResponse: project.team36.model.ai.AiRecommendationResponse?,
     isAiLoading: Boolean,
     isFutureAiLoading: Boolean,
     onDismissAi: () -> Unit,
@@ -89,10 +90,43 @@ fun PlaceInfoCard(
     if (aiResponse != null) {
         AlertDialog(
             onDismissRequest = onDismissAi,
-            title = { Text("Hageråd fra Claude 🌱") },
-            text = { Text(aiResponse, modifier = Modifier .verticalScroll(rememberScrollState())) },
+            title = { Text("Hageråd fra Claude 🌱", fontWeight = FontWeight.Bold) },
+            text = {
+                Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    // 1. Væroppsummering
+                    Column {
+                        Text("Været:", fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
+                        Text(aiResponse.weatherSummary)
+                    }
+
+                    // 2. Planteråd
+                    if (aiResponse.plantAdvice.isNotEmpty()) {
+                        Column {
+                            Text("Dine planter:", fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
+                            aiResponse.plantAdvice.forEach { advice ->
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text("• ${advice.plantName}", fontWeight = FontWeight.SemiBold)
+                                Text(advice.advice, modifier = Modifier.padding(start = 12.dp), color = Color.DarkGray)
+                            }
+                        }
+                    }
+
+                    // 3. Generelle oppgaver
+                    if (aiResponse.generalTasks.isNotEmpty()) {
+                        Column {
+                            Text("Hageoppgaver:", fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
+                            aiResponse.generalTasks.forEach { task ->
+                                Text("- $task", modifier = Modifier.padding(start = 4.dp))
+                            }
+                        }
+                    }
+                }
+            },
             confirmButton = {
-                TextButton(onClick = onDismissAi) { Text("OK") }
+                TextButton(onClick = onDismissAi) { Text("Lukk", color = Color(0xFF2E7D32)) }
             }
         )
     }

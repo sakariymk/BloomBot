@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit
 import project.team36.ui.findplants.FindPlantsViewModel
 import project.team36.data.ai.ClaudeApi
 import project.team36.data.ai.HybridAiRepository
-import project.team36.data.klima.MetWeatherApi
+import project.team36.data.klima.frost.FrostRepository
 import project.team36.data.local.AppDatabase
 import project.team36.data.local.LocationRepository
 import project.team36.data.mcp.MetMcpClient
@@ -65,12 +65,13 @@ class FindPlantsViewModelFactory(
 
 class MyPlantsViewModelFactory(
     private val repository: LocationRepository,
-    private val savedPlacesViewModel: SavedPlacesViewModel
+    private val savedPlacesViewModel: SavedPlacesViewModel,
+    private val frostRepository: FrostRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MyPlantsViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return MyPlantsViewModel(repository, savedPlacesViewModel) as T
+            return MyPlantsViewModel(repository, savedPlacesViewModel, frostRepository) as T
         }
         throw IllegalArgumentException("Ukjent ViewModel klasse")
     }
@@ -81,11 +82,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val dataSource = PlantDataSource(this)
-        val plantRepository = PlantRepository(dataSource)
-
-        //Database og repo
         val db = AppDatabase.getDatabase(this)
         val locationRepository = LocationRepository(db.savedLocationDao(), db.savedPlantDao())
+        val plantRepository = PlantRepository(dataSource, locationRepository)
+        val frostRepository = FrostRepository()
 
 
         val contentType = "application/json".toMediaType()
@@ -111,7 +111,6 @@ class MainActivity : ComponentActivity() {
         val metRetrofit = Retrofit.Builder()
             .baseUrl("https://api.met.no/")
             .build()
-        val metWeatherApi = metRetrofit.create(MetWeatherApi::class.java) //TODO: se om dette trengs?
 
         val claudeKey = "***FJERNET***"
         val frostClientId = "08b40da1-9456-4846-988a-e5283cf731cb"
@@ -133,7 +132,6 @@ class MainActivity : ComponentActivity() {
             mcpClient = mcpClient,
             // <------ ENDRING: Vi sender inn locationRepository (lokal database) i stedet for dataSource (CSV)
             plantDataSource = locationRepository,
-            frostClientId = frostClientId,
             claudeApiKey = claudeKey
         )
 
@@ -142,7 +140,7 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
 
                 val landingPageViewModel: LandingPageViewModel = viewModel(
-                    factory = LandingPageViewModelFactory(metWeatherRepository)
+                    factory = LandingPageViewModelFactory(metWeatherRepository, hybridAiRepository)
                 )
 
                 val savedPlacesViewModel: SavedPlacesViewModel = viewModel(
@@ -153,7 +151,7 @@ class MainActivity : ComponentActivity() {
                 )
 
                 val myPlantsViewModel: MyPlantsViewModel = viewModel(
-                    factory = MyPlantsViewModelFactory(locationRepository, savedPlacesViewModel)
+                    factory = MyPlantsViewModelFactory(locationRepository, savedPlacesViewModel, frostRepository)
                 )
 
                 val mapViewModel: MapViewModel = viewModel(

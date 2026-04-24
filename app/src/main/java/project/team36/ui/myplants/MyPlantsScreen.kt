@@ -1,28 +1,33 @@
 package project.team36.ui.myplants
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Eco
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel  // NY: import for viewModel()
 import androidx.navigation.NavController
+import com.mapbox.maps.extension.style.expressions.dsl.generated.image
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.plant.PlantCard
 import project.team36.model.location.SavedLocation
 import project.team36.model.location.SavedPlant
 import project.team36.model.plant.PlantInfo
-import project.team36.ui.landingpage.LandingPageViewModel
 import project.team36.ui.navigation.BottomNavBar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,8 +35,7 @@ import project.team36.ui.navigation.BottomNavBar
 fun MyPlantsScreen(
     navController: NavController,
     savedPlacesViewModel: SavedPlacesViewModel,
-    myPlantsViewModel: MyPlantsViewModel,
-    landingPageViewModel : LandingPageViewModel
+    myPlantsViewModel: MyPlantsViewModel
 ) {
 
     val savedLocations by savedPlacesViewModel.savedLocations.collectAsStateWithLifecycle()
@@ -40,7 +44,13 @@ fun MyPlantsScreen(
     //hent planter for valgt sted
     val plants by myPlantsViewModel.plants.collectAsStateWithLifecycle()
 
-    val landingUiState by landingPageViewModel.uiState.collectAsStateWithLifecycle()
+    LaunchedEffect(selectedLocation) {
+        selectedLocation?.let {
+            val lat = it.lat ?: return@let
+            val lon = it.lon ?: return@let
+            myPlantsViewModel.loadPrecipitationForLocation(lat, lon)
+        }
+    }
 
     Scaffold(
         containerColor = Color.Transparent,
@@ -54,6 +64,107 @@ fun MyPlantsScreen(
                         color = Color(0xFF2E7D32)
                     )
                 },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigate("myPlaces")} ) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Tilbake",
+                            tint = Color(0xFF2E7D32)
+                        )
+                    }
+                },
+                actions = {
+
+                    var expanded by remember { mutableStateOf(false) }
+                    var showDeleteDialog by remember { mutableStateOf(false) }
+                    var showRenameDialog by remember { mutableStateOf(false) }
+                    var newLocationName by remember { mutableStateOf("") }
+
+                    Box {
+                        IconButton(onClick = {expanded = true }) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Rediger sted",
+                                tint = Color(0xFF2E7D32)
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false}
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Bytt navn") },
+                                onClick = {
+                                    expanded = false
+                                    newLocationName = selectedLocation?.name ?: ""
+                                    showRenameDialog = true
+                                },
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Slett sted") },
+                                onClick = {
+                                    showDeleteDialog = true
+                                    expanded = false
+                                }
+                            )
+                            if (showDeleteDialog) {
+                                AlertDialog(
+                                    title = { Text("Ønsker du å slette stedet?") },
+                                    text = { Text("Du vil miste alle lagrede planter på dette stedet.") },
+                                    onDismissRequest = { showDeleteDialog = false},
+                                    confirmButton = {
+                                        TextButton(
+                                            onClick = {
+                                                selectedLocation?.let { myPlantsViewModel.deleteLocation(it) }
+                                                navController.navigate("myPlaces")
+                                                showDeleteDialog = false
+                                            }
+                                        ) { Text("Slett") }
+                                    },
+                                    dismissButton = {
+                                        TextButton(onClick = { showDeleteDialog = false} ) {
+                                            Text("Behold sted")
+                                        }
+                                    }
+                                )
+                            }
+                            if (showRenameDialog) {
+                                AlertDialog(
+                                    title = { Text("Bytt navn på stedet") },
+                                    text = {
+                                        OutlinedTextField(
+                                            value = newLocationName,
+                                            onValueChange = { newLocationName = it },
+                                            label = { Text("Nytt navn") },
+                                            singleLine = true
+                                        )
+                                    },
+                                    onDismissRequest = { showRenameDialog = false },
+                                    confirmButton = {
+                                        TextButton(
+                                            onClick = {
+                                                selectedLocation?.let {
+                                                    myPlantsViewModel.renameLocation(it, newLocationName)
+                                                }
+                                                savedPlacesViewModel.updateSelectedLocationName(newLocationName)
+                                                showRenameDialog = false
+                                                navController.navigate("myPlants") {
+                                                    popUpTo("myPlaces") { inclusive = false }
+                                                }
+                                            },
+                                            enabled = newLocationName.isNotBlank()
+                                        ) { Text("Lagre") }
+                                    },
+                                    dismissButton = {
+                                        TextButton(onClick =  { showRenameDialog = false }) {
+                                            Text("Avbryt")
+                                        }
+                                    }
+                                )
+                            }
+                        }
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFFE8F5E2)
                 )
@@ -65,7 +176,7 @@ fun MyPlantsScreen(
         // Finn ut hvordan sende informasjon om hvor du kommer fra
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "ukjent"}") },
+                onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "Ukjent sted"}") },
                 icon = { Icon(Icons.Default.Add, contentDescription = "Nytt sted") },
                 text = { Text("Ny plante") },
                 containerColor = Color(0xFF2D5A27),
@@ -78,71 +189,88 @@ fun MyPlantsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(Color(0xFFE8F5E2)),
+                .background(Color(0xFFE8F5E2))
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-//            item { // Fjerne dropdown
-//                LocationDropdown(
-//                    savedLocations = savedLocations,
-//                    selectedLocation = selectedLocation,
-//                    onLocationSelected = { savedPlacesViewModel.selectLocation(it) }
-//                )
-//            }
-
-            // Vi mater inn riktig liste, og tegner opp nøyaktig det elementet vi er på.
-            items(plants){ plant ->
-                val alertsForLocation = selectedLocation?.let {loc ->
-                    landingUiState.locationAlerts[loc.id]
-                } ?: emptyList()
-
-                PlantCard(
-                    plant = plant,
-                    needsWater = myPlantsViewModel.needsWater(plant),
-                    daysUntilWatering = myPlantsViewModel.daysUntilWatering(plant),
-                    alerts = alertsForLocation,
-                    onMarkAsWatered = { myPlantsViewModel.markAsWatered(plant) },
-                    navController = navController
-                )
+            if (plants.isEmpty()) {
+                item {
+                    EmptyPlantCard(
+                        onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "Ukjent sted"}")}
+                    )
+                }
+            } else {
+                // Vi mater inn riktig liste, og tegner opp nøyaktig det elementet vi er på.
+                items(plants){ plant ->
+                    PlantCard(
+                        plant = plant,
+                        needsWater = myPlantsViewModel.needsWater(plant),
+                        daysUntilWatering = myPlantsViewModel.daysUntilWatering(plant),
+                        onMarkAsWatered = { myPlantsViewModel.markAsWatered(plant) },
+                        navController = navController
+                    )
+                }
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LocationDropdown(
-    savedLocations: List<SavedLocation>,
-    selectedLocation: SavedLocation?,
-    onLocationSelected: (SavedLocation) -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = !expanded }
+fun EmptyPlantCard(
+    onClick: () -> Unit
+){
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(
+                width = 2.dp,
+                color = Color(0xFF2E7D32),
+                shape = RoundedCornerShape(16.dp)
+            ),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
-        TextField(
-            value = selectedLocation?.name ?: "Velg sted",
-            onValueChange = {},
-            readOnly = true,
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+        Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .menuAnchor()
-        )
-
-        ExposedDropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
+                .padding(16.dp)
+                .height(IntrinsicSize.Min),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            savedLocations.forEach { location ->
-                DropdownMenuItem(
-                    text = { Text(location.name ?: "Ukjent") },
-                    onClick = {
-                        onLocationSelected(location)
-                        expanded = false
-                    }
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(80.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color(0xFF2E7D32)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Eco,
+                    contentDescription = "Ikon av plante",
+                    tint = Color(0xFFE8F5E2),
+                    modifier = Modifier.size(40.dp)
                 )
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "Ingen planter i denne hagen enda.\nGro din første plante!",
+                    fontSize = 14.sp,
+                    color = Color.Black
+                )
+                Button(
+                    onClick = onClick ,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF2E7D32)
+                    ),
+                    shape = RoundedCornerShape(50),
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Legg til")
+                    Spacer(Modifier.width(6.dp))
+                    Text("Ny Plante")
+                    Spacer(Modifier.weight(1f))
+                }
             }
         }
     }

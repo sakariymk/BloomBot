@@ -3,8 +3,6 @@ package project.team36.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -17,7 +15,6 @@ import project.team36.ui.myplants.MyPlantsScreen
 import project.team36.ui.myplants.MyPlantsViewModel
 import project.team36.ui.plant.PlantDetailsScreen
 import project.team36.ui.plant.PlantDetailsViewModel
-import project.team36.data.plant.PlantRepository
 import project.team36.ui.findplants.SavePlantDialog
 import project.team36.ui.myplaces.MyPlacesScreen
 import project.team36.ui.landingpage.LandingPageScreen
@@ -46,7 +43,8 @@ fun AppNavHost(
                 modifier = modifier,
                 viewModel = mapViewModel,
                 navController = navController,
-                savedPlacesViewModel = savedPlacesViewModel
+                savedPlacesViewModel = savedPlacesViewModel,
+                myPlantsViewModel = myPlantsViewModel
             )
         }
         composable ("myPlants"){

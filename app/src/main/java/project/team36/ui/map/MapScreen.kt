@@ -17,6 +17,16 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,6 +43,9 @@ import androidx.navigation.NavHostController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.mapbox.geojson.Feature
+import com.mapbox.geojson.FeatureCollection
+import com.mapbox.geojson.Polygon
 import com.mapbox.maps.extension.compose.MapEffect
 import com.mapbox.maps.extension.compose.annotation.generated.PointAnnotation
 import com.mapbox.maps.extension.compose.annotation.rememberIconImage
@@ -43,7 +56,11 @@ import com.mapbox.maps.extension.style.layers.addLayer
 import com.mapbox.maps.extension.style.layers.generated.fillLayer
 import com.mapbox.maps.extension.style.sources.addSource
 import com.mapbox.maps.extension.style.sources.generated.vectorSource
+import com.mapbox.maps.extension.style.sources.getSourceAs
+import com.mapbox.maps.extension.style.sources.generated.GeoJsonSource
 import project.team36.R
+import project.team36.data.mcp.WeatherAlert
+import project.team36.ui.myplants.MyPlantsViewModel
 import project.team36.ui.navigation.BottomNavBar
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
@@ -52,7 +69,8 @@ fun MapScreen(
     modifier: Modifier = Modifier,
     viewModel: MapViewModel = viewModel(),
     savedPlacesViewModel: SavedPlacesViewModel,
-    navController: NavController
+    myPlantsViewModel: MyPlantsViewModel,
+    navController: NavController,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val savedLocations by savedPlacesViewModel.savedLocations.collectAsStateWithLifecycle()
@@ -77,6 +95,15 @@ fun MapScreen(
                         fontWeight = FontWeight.Normal,
                         color = Color(0xFF2E7D32)
                     )
+                },
+                navigationIcon = {
+                    IconButton(onClick = {navController.popBackStack()}) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Lukk skjermen",
+                            tint = Color(0xFF2E7D32)
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFFE8F5E2)
@@ -104,8 +131,9 @@ fun MapScreen(
                             enabled = true
                             puckBearingEnabled = false
                         }
-
-
+                        mapView.location.addOnIndicatorPositionChangedListener { point ->
+                            viewModel.updateUserPosition(point.latitude(), point.longitude())
+                        }
                         viewModel.onLocationReady()
                         viewModel.onMapReady(mapView.mapboxMap)
 
@@ -175,7 +203,9 @@ fun MapScreen(
                     confirmButton = {
                         TextButton(
                             onClick = {
-                                viewModel.confirmSavePlace(savedPlacesViewModel)
+                                viewModel.confirmSavePlace(savedPlacesViewModel) {
+                                    navController.navigate("myPlaces")
+                                }
                                 viewModel.dismissSaveDialog()
                             }) { Text("Ja") }
                     },

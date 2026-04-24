@@ -42,6 +42,10 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.navigation.BottomNavBar
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.unit.sp
 import project.team36.ui.myplants.MyPlantsViewModel
 import project.team36.data.mcp.WeatherAlert
 
@@ -171,6 +175,38 @@ fun LandingPageScreen(
                         isLoading = uiState.isWeatherLoading,
                     )
 
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Button(
+                        onClick = { landingPageViewModel.fetchAiAdvice(selectedLocation) }, // FIKSET: location -> selectedLocation
+                        modifier = Modifier.fillMaxWidth().height(42.dp),
+                        enabled = !uiState.isAiLoading && !uiState.isFutureAiLoading,
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        if (uiState.isAiLoading) {
+                            CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                        } else {
+                            Text("✨ Dagens Råd", fontSize = 13.sp)
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Button(
+                        onClick = { landingPageViewModel.fetchFutureAiAdvice(selectedLocation) }, // FIKSET: location -> selectedLocation
+                        modifier = Modifier.fillMaxWidth().height(42.dp),
+                        enabled = !uiState.isAiLoading && !uiState.isFutureAiLoading,
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        if (uiState.isFutureAiLoading) {
+                            CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                        } else {
+                            Text("🔮 Fremtids-Råd", fontSize = 13.sp)
+                        }
+                    }
+
                     if (alertsForSelectedLocation.isNotEmpty()) {
                         Spacer(modifier = Modifier.height(12.dp))
                         Column {
@@ -181,6 +217,51 @@ fun LandingPageScreen(
                         }
                     }
                 }
+
+
+                if (uiState.aiResponse != null) {
+                    AlertDialog(
+                        onDismissRequest = { landingPageViewModel.dismissAiAdvice() },
+                        title = { Text("Hageråd fra Claude 🌱", fontWeight = FontWeight.Bold) },
+                        text = {
+                            Column(
+                                modifier = Modifier.verticalScroll(rememberScrollState()),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Column {
+                                    Text("Været:", fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
+                                    Text(uiState.aiResponse!!.weatherSummary)
+                                }
+
+                                if (uiState.aiResponse!!.plantAdvice.isNotEmpty()) {
+                                    Column {
+                                        Text("Dine planter:", fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
+                                        uiState.aiResponse!!.plantAdvice.forEach { advice ->
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                            Text("• ${advice.plantName}", fontWeight = FontWeight.SemiBold)
+                                            Text(advice.advice, modifier = Modifier.padding(start = 12.dp), color = Color.DarkGray)
+                                        }
+                                    }
+                                }
+
+                                if (uiState.aiResponse!!.generalTasks.isNotEmpty()) {
+                                    Column {
+                                        Text("Hageoppgaver:", fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
+                                        uiState.aiResponse!!.generalTasks.forEach { task ->
+                                            Text("- $task", modifier = Modifier.padding(start = 4.dp))
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        confirmButton = {
+                            TextButton(onClick = { landingPageViewModel.dismissAiAdvice() }) {
+                                Text("Lukk", color = Color(0xFF2E7D32))
+                            }
+                        }
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(16.dp))
 
                 DailyTasksCard(
