@@ -1,6 +1,7 @@
 package project.team36.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -78,16 +79,26 @@ fun AppNavHost(
             val action = backStackEntry.arguments?.getString("action") ?: ""
             val savedLocations = savedPlacesViewModel.savedLocations.collectAsState()
             val pendingPlant = findPlantsViewModel.pendingPlant.collectAsState()
+
+            LaunchedEffect(plantName) {
+                if (action == "add") {
+                    plantDetailsViewModel.loadPlant(plantName)
+                } else {
+                    plantDetailsViewModel.loadSavedPlant(plantName, myPlantsViewModel.plants.value)
+                }
+            }
+
             PlantDetailsScreen(
+                navController = navController,
                 plantName = plantName,
-                viewModel = plantDetailsViewModel,
+                plantDetailsViewModel = plantDetailsViewModel,
                 onBackClick = { navController.popBackStack() },
                 onAddPlant = if (action == "add") {
                     { plantDetailsViewModel.plant.value?.let { findPlantsViewModel.requestAddPlant(it) } }
-                } else null, //jeg (viktoria) endra litt på dette slik at appen kan buildes og kjøres
+                } else null,
                 onDeletePlant = if (action == "delete") {
                     { myPlantsViewModel.removePlantByName(plantName) }
-                } else null//jeg (viktoria) endra litt på dette slik at appen kan buildes og kjøres
+                } else null
             )
 
             pendingPlant.value?.let { plant ->

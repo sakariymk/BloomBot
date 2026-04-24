@@ -12,6 +12,7 @@ junitJunit = "4.12"
 foundation = "1.10.6"
 lifecycleRuntimeCompose = "2.10.0"
 foundationVersion = "1.11.0"
+junitKtx = "1.3.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -32,6 +33,7 @@ androidx-compose-foundation = { group = "androidx.compose.foundation", name = "f
 junit-junit = { group = "junit", name = "junit", version.ref = "junitJunit" }
 androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleRuntimeCompose" }
 androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundationVersion" }
+androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
