@@ -3,6 +3,7 @@ package project.team36.ui.navigation
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -22,12 +23,22 @@ fun BottomNavBar(navController: NavController, savedPlacesViewModel : SavedPlace
     val selectedLocation by savedPlacesViewModel.selectedLocation.collectAsState()
     val locationName = selectedLocation?.name ?: ""
 
+
+    val navItemColors = NavigationBarItemDefaults.colors(
+        selectedIconColor = Color.White,
+        unselectedIconColor = Color.White,
+        selectedTextColor = Color.White,
+        unselectedTextColor = Color.White,
+        indicatorColor = Color(0xFF3A5A54)
+    )
+
     NavigationBar(
         containerColor = Color(0xFF243B37)
     ) {
         NavigationBarItem(
             selected = activeRoute == "landingpage",
             onClick = {navController.navigate("landingpage")},
+            colors = navItemColors,
             icon = {
                 Icon(
                     painter = painterResource(
@@ -44,6 +55,7 @@ fun BottomNavBar(navController: NavController, savedPlacesViewModel : SavedPlace
         NavigationBarItem(
             selected = activeRoute == "myPlaces",
             onClick = {navController.navigate("myPlaces")},
+            colors = navItemColors,
             icon = {
                 Icon(
                     painter = painterResource(
@@ -60,6 +72,7 @@ fun BottomNavBar(navController: NavController, savedPlacesViewModel : SavedPlace
         NavigationBarItem(
             selected = activeRoute?.startsWith("findPlants") == true,
             onClick = { navController.navigate("findPlants/$locationName") },
+            colors = navItemColors,
             icon = {
                 Icon(
                     painter = painterResource(

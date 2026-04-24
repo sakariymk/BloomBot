@@ -27,4 +27,8 @@ interface SavedPlantDao {
     @Query("SELECT * FROM saved_plants WHERE locationId = :locationId AND name = :name")
     fun getPlantByLocationAndName(locationId: Long, name: String): SavedPlant?
 
+
+    @Query("SELECT * FROM saved_plants")
+    fun getAllPlants(): Flow<List<SavedPlant>>
+
 }

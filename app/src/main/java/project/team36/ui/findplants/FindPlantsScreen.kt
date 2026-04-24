@@ -56,11 +56,12 @@ fun FindPlantsScreen(
     val plants by findPlantsViewModel.plants.collectAsState()
     val pendingPlant by findPlantsViewModel.pendingPlant.collectAsState()
     val savedLocations by savedPlacesViewModel.savedLocations.collectAsState()
+    val selectedLocation by savedPlacesViewModel.selectedLocation.collectAsState()
     val currentLocation = savedLocations.find { it.name == locationName }
     var showSwitchLocationDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(currentLocation) {
-        currentLocation?.let {
+    LaunchedEffect(selectedLocation) {
+        selectedLocation?.let {
             findPlantsViewModel.loadRecommendedPlants(it)
         }
     }
@@ -121,7 +122,7 @@ fun FindPlantsScreen(
                         Icon(Icons.Default.LocationOn, contentDescription = "Sted", tint = Color(0xFF2D5A27))
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = locationName.ifEmpty { "Sted: Ikke valgt" },
+                            text = selectedLocation?.name ?: locationName.ifEmpty { "Sted: Ikke valgt" },
                             color = Color(0xFF2D5A27)
                         )
                     }
@@ -164,8 +165,4 @@ fun FindPlantsScreen(
     }
 
 
-
-
-
 }
-

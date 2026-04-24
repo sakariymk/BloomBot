@@ -1,9 +1,11 @@
 package project.team36.ui.myplants
 
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -24,11 +26,18 @@ class MyPlantsViewModel(
 
     private val _precipitationPerDay = MutableStateFlow<Map<String, Double>>(emptyMap())
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     val plants = savedPlacesViewModel.selectedLocation
         .flatMapLatest { location ->
             repository.getPlantsForLocation(location?.id ?: -1)
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+
+    val allPlants: StateFlow<List<SavedPlant>> =
+        repository.getAllPlants()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
 
     //Slette plante
     fun removePlant(plant: SavedPlant) {
@@ -105,6 +114,17 @@ class MyPlantsViewModel(
     fun renameLocation(location: SavedLocation, newName: String) {
         viewModelScope.launch {
             repository.updateLocation(location.copy(name = newName))
+        }
+    }
+
+    fun getWateringText(plant: SavedPlant): String {
+        val times = plant.waterPerWeek
+
+        return when {
+            times <= 1f -> "1 gang per uke"
+            times <= 2f -> "1–2 ganger per uke"
+            times <= 4f -> "2–4 ganger per uke"
+            else -> "Flere ganger per uke"
         }
     }
 

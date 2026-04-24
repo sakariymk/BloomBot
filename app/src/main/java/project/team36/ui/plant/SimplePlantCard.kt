@@ -93,6 +93,7 @@ fun SimplePlantInfoCardPreview() {
         maxDaysWithoutWater = 12,
         imageRes = R.drawable.pelargonia,
         description = "En vakker lilje."
+
     )
 
     Team36Theme {
