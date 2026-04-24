@@ -126,6 +126,7 @@ fun LandingPageScreen(
                         Tab(
                             selected = selectedTabIndex == index,
                             onClick = { selectedTabIndex = index },
+                                      //savedPlacesViewModel.selectLocation(location)}, kan gjøre dette om vi ønsker at sist valgt location skal vises i FindPlants med en gang, og ikke ukjent sted! -Therese
 
                             modifier = Modifier
                                 .padding(end = 8.dp)

@@ -37,7 +37,7 @@ fun MyPlantsScreen(
     navController: NavController,
     savedPlacesViewModel: SavedPlacesViewModel,
     myPlantsViewModel: MyPlantsViewModel,
-    landingPageViewModel : LandingPageViewModel
+    //landingPageViewModel : LandingPageViewModel
 ) {
 
     val savedLocations by savedPlacesViewModel.savedLocations.collectAsStateWithLifecycle()
@@ -46,7 +46,7 @@ fun MyPlantsScreen(
     //hent planter for valgt sted
     val plants by myPlantsViewModel.plants.collectAsStateWithLifecycle()
 
-    val landingUiState by landingPageViewModel.uiState.collectAsStateWithLifecycle()
+    //val landingUiState by landingPageViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(selectedLocation) {
         selectedLocation?.let {
@@ -206,17 +206,20 @@ fun MyPlantsScreen(
             } else {
                 // Vi mater inn riktig liste, og tegner opp nøyaktig det elementet vi er på.
                 items(plants){ plant ->
+                    /*
                     val alertsForLocation = selectedLocation?.let {loc ->
                         landingUiState.locationAlerts[loc.id]
                     } ?: emptyList()
-
+*/
                     PlantCard(
                         plant = plant,
                         needsWater = myPlantsViewModel.needsWater(plant),
                         daysUntilWatering = myPlantsViewModel.daysUntilWatering(plant),
+                        daysSinceFertilizing = myPlantsViewModel.daysSinceFertilizing(plant),
                         onMarkAsWatered = { myPlantsViewModel.markAsWatered(plant) },
-                        alerts = alertsForLocation,
-                        navController = navController
+                        onMarkAsFertilized = { myPlantsViewModel.markAsFertilized(plant) },
+                        onNavigateToDetails = { navController.navigate("plantDetailsScreen/${plant.name}/delete") }
+                        //alerts = alertsForLocation
                     )
                 }
             }
@@ -284,19 +287,3 @@ fun EmptyPlantCard(
         }
     }
 }
-
-//For at alt skal fungere midledtidig før vi får laget nye plantsCards, eller andre løsninger
-fun SavedPlant.toPlantInfo(): PlantInfo = PlantInfo(
-    name = this.name,
-    soil = this.soil,
-    light = this.light,
-    isFrostResistant = this.isFrostResistant,
-    waterPerWeek = this.waterPerWeek,
-    plantingMonth = this.plantingMonth,
-    climateZone = this.climateZone,
-    hasBeenWatered = this.hasBeenWatered,
-    daysSinceWatered = this.daysSinceWatered,
-    maxDaysWithoutWater = this.maxDaysWithoutWater,
-    imageRes = this.imageRes,
-    description = this.description
-)

@@ -53,7 +53,6 @@ fun AppNavHost(
                 navController = navController,
                 savedPlacesViewModel = savedPlacesViewModel,
                 myPlantsViewModel = myPlantsViewModel,
-                landingPageViewModel = landingPageViewModel
             )
         }
         composable("findPlants/{locationName}") { backStackEntry ->
