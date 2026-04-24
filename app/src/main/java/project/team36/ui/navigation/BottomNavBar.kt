@@ -13,7 +13,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import project.team36.R
-import project.team36.model.location.SavedLocation
 import project.team36.ui.map.SavedPlacesViewModel
 
 @Composable
