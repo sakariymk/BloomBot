@@ -182,13 +182,13 @@ fun LandingPageScreen(
                         onClick = { landingPageViewModel.fetchAiAdvice(selectedLocation) }, // FIKSET: location -> selectedLocation
                         modifier = Modifier.fillMaxWidth().height(42.dp),
                         enabled = !uiState.isAiLoading && !uiState.isFutureAiLoading,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50), disabledContainerColor = Color(0xFF4CAF50), disabledContentColor = Color.White),
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         if (uiState.isAiLoading) {
                             CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
                         } else {
-                            Text("✨ Dagens Råd", fontSize = 13.sp)
+                            Text("✨ Dagens råd", fontSize = 13.sp)
                         }
                     }
 
@@ -198,13 +198,13 @@ fun LandingPageScreen(
                         onClick = { landingPageViewModel.fetchFutureAiAdvice(selectedLocation) }, // FIKSET: location -> selectedLocation
                         modifier = Modifier.fillMaxWidth().height(42.dp),
                         enabled = !uiState.isAiLoading && !uiState.isFutureAiLoading,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32)),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32), disabledContainerColor = Color(0xFF2E7D32), disabledContentColor = Color.White),
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         if (uiState.isFutureAiLoading) {
                             CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
                         } else {
-                            Text("🔮 Fremtids-Råd", fontSize = 13.sp)
+                            Text("🔮 Fremtids-råd", fontSize = 13.sp)
                         }
                     }
 
