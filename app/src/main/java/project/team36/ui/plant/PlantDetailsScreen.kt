@@ -3,7 +3,6 @@ package project.team36.ui.plant
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,7 +22,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DeviceThermostat
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -34,7 +32,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.RichTooltip
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -57,10 +54,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import io.modelcontextprotocol.kotlin.sdk.types.Icon
 import kotlinx.coroutines.launch
 import project.team36.model.plant.LightType
-import project.team36.model.plant.PlantInfo
 import project.team36.model.plant.SoilType
 import project.team36.ui.theme.Team36Theme
 import project.team36.R
@@ -139,7 +134,7 @@ fun PlantDetailsScreen(
                             colors = ButtonDefaults.outlinedButtonColors(
                                 containerColor = Color.White
                             ),
-                            border = BorderStroke(0.dp, Color.Transparent)
+                            border = BorderStroke(0.dp, Color.Gray)
                         ) {
                             Text("Legg til i hage", color = Color(0xFF2E7D32))
                         }
@@ -153,9 +148,9 @@ fun PlantDetailsScreen(
                             colors = ButtonDefaults.outlinedButtonColors(
                                 containerColor = Color.White
                             ),
-                            border = BorderStroke(0.dp, Color.Transparent)
+                            border = BorderStroke(0.dp, Color.Gray)
                         ) {
-                            Text("Fjern plante fra hage")
+                            Text("Fjern plante fra hage", color = Color(0xFF2E7D32))
                         }
                     }
 
@@ -182,7 +177,7 @@ fun PlantDetailsScreen(
                             fontSize = 16.sp
                         )
                     }
-                    HardinessZoneTooltip(climatezone = plant.climateZone)
+                    HardinessZoneTooltip()
                 }
                 PlantInfoCard("Solforhold") {
                     Text("Ulike planter har ulike behov for sol, noen trives best med full sollys, mens andre foretrekker mer skygge for å trives best.")
@@ -306,7 +301,7 @@ fun PlantingMonthBar(plantingMonth: Set<Int>) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HardinessZoneTooltip(climatezone: Int) {
+fun HardinessZoneTooltip() {
     val tooltipState= rememberTooltipState(isPersistent = true)
     val scope = rememberCoroutineScope()
 

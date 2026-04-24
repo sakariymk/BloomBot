@@ -33,6 +33,7 @@ class PlantDetailsViewModel (
     }
 }
 
+//Hjelpeklasser for å lettere kobinere data fra PlantInfo og SavedPlant, så vi kan bruke et skjerm til å displaye lik informasjon.
 data class PlantDetails(
     val name: String,
     val description: String,
@@ -49,7 +50,8 @@ data class PlantDetails(
     val locationId: Long? = null,
     val hasBeenWatered: Boolean? = null,
     val daysSinceWatered: Int? = null,
-    val lastWateredDate: Long? = null
+    val lastWateredDate: Long? = null,
+    val lastFertilizationDate: Long? = null
 )
 
 fun PlantInfo.toPlantDetails() = PlantDetails(

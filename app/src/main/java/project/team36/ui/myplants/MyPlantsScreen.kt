@@ -207,8 +207,10 @@ fun MyPlantsScreen(
                         plant = plant,
                         needsWater = myPlantsViewModel.needsWater(plant),
                         daysUntilWatering = myPlantsViewModel.daysUntilWatering(plant),
+                        daysSinceFertilizing = myPlantsViewModel.daysSinceFertilizing(plant),
                         onMarkAsWatered = { myPlantsViewModel.markAsWatered(plant) },
-                        navController = navController
+                        onMarkAsFertilized = { myPlantsViewModel.markAsFertilized(plant) },
+                        onNavigateToDetails = { navController.navigate("plantDetailsScreen/${plant.name}/delete") }
                     )
                 }
             }

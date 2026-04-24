@@ -79,6 +79,21 @@ class MyPlantsViewModel(
         return (plant.maxDaysWithoutWater.toLong() - daysSince).coerceAtLeast(0)
     }
 
+    fun daysSinceFertilizing(plant: SavedPlant): Long {
+        val daysSince = TimeUnit.MILLISECONDS.toDays(
+            System.currentTimeMillis() - plant.lastFertilizationDate
+        )
+        return daysSince
+    }
+
+    fun markAsFertilized(plant: SavedPlant) {
+        viewModelScope.launch {
+            repository.updatePlant(plant.copy(
+                lastFertilizationDate = System.currentTimeMillis()
+            ))
+        }
+    }
+
     //Slett location
     fun deleteLocation(location: SavedLocation) {
         viewModelScope.launch {

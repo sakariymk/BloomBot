@@ -33,5 +33,6 @@ data class SavedPlant(
     val maxDaysWithoutWater: Int,
     val imageRes: Int,
     val description: String,
-    val lastWateredDate: Long = System.currentTimeMillis() //for å tracke vanning noe bedre
+    val lastWateredDate: Long = System.currentTimeMillis(), //for å tracke vanning noe bedre
+    val lastFertilizationDate: Long = 0L //tracke når man har gjødslet planten
 )
