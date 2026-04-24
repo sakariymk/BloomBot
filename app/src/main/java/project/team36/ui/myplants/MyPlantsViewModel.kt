@@ -3,14 +3,12 @@ package project.team36.ui.myplants
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-rt kotlinx.coroutines.flow.StateFlow
 import project.team36.data.klima.frost.FrostRepository
 import project.team36.data.local.LocationRepository
 import project.team36.model.location.SavedLocation

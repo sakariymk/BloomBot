@@ -235,7 +235,7 @@ fun MapScreen(
                     viewModel.dismissPlaceInfo()
                 },
                 onDelete = {
-                    savedPlacesViewModel.deleteLocation(location)
+                    myPlantsViewModel.deleteLocation(location)
                     viewModel.dismissPlaceInfo()
                 },
                 navController = navController as NavHostController
