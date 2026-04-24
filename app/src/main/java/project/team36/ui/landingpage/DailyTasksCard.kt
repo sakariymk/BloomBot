@@ -43,15 +43,14 @@ import androidx.navigation.NavController
 import project.team36.R
 import project.team36.model.location.SavedLocation
 import project.team36.model.location.SavedPlant
-import project.team36.ui.myplants.MyPlantsViewModel
+import kotlin.collections.isNotEmpty
 
 
 @Composable
 fun DailyTasksCard (
-    plantsByLocation: Map<SavedLocation, List<SavedPlant>>,
+    plantsByLocation: Map<SavedLocation, List<Pair<SavedPlant, String>>>,
     onMarkAsWatered: (SavedPlant) -> Unit,
     navController: NavController,
-    myPlantsViewModel: MyPlantsViewModel
 ) {
     val hasAnyPlants = plantsByLocation.values.any { it.isNotEmpty() }
 
@@ -84,8 +83,8 @@ fun DailyTasksCard (
                 }
             } else {
 
-                plantsByLocation.forEach { (location, plants) ->
-                    if (plants.isNotEmpty()) {
+                plantsByLocation.forEach { (location, plantsWithText) ->
+                    if (plantsWithText.isNotEmpty()) {
                         Text(
                             text = location.name ?: "Ukjent sted",
                             style = MaterialTheme.typography.labelMedium,
@@ -101,10 +100,10 @@ fun DailyTasksCard (
                             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                         ) {
                             Column(modifier = Modifier.padding(8.dp)) {
-                                plants.forEach { plant ->
+                                plantsWithText.forEach { (plant, wateringText) ->
                                     DailyPlantRow(
                                         plant = plant,
-                                        myPlantsViewModel = myPlantsViewModel,
+                                        wateringText = wateringText,
                                         onMarkAsWatered = { onMarkAsWatered(plant) },
                                         navController = navController,
                                     )
@@ -121,7 +120,7 @@ fun DailyTasksCard (
 @Composable
 fun DailyPlantRow(
     plant: SavedPlant,
-    myPlantsViewModel: MyPlantsViewModel,
+    wateringText: String,
     onMarkAsWatered: () -> Unit,
     navController: NavController
 ) {
@@ -218,7 +217,7 @@ fun DailyPlantRow(
                         ) {
 
                             Text(
-                                text = myPlantsViewModel.getWateringText(plant),
+                                text = wateringText,
                                 fontSize = 13.sp,
                                 color = Color.DarkGray,
                                 modifier = Modifier.weight(1f)
@@ -242,8 +241,6 @@ fun DailyPlantRow(
                 ) {
                     Text("Gå til plante",color = Color.DarkGray, fontSize = 13.sp)
                 }
-
-
             }
         }
 

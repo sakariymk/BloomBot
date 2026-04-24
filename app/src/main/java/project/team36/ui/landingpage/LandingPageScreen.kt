@@ -45,13 +45,15 @@
         val locationPermission = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
         val allPlants by myPlantsViewModel.allPlants.collectAsStateWithLifecycle()
 
-
         val plantsByLocation = remember(savedLocations, allPlants) {
             savedLocations.associateWith { location ->
-                allPlants.filter { plant ->
-                    plant.locationId == location.id &&
-                            myPlantsViewModel.needsWater(plant)
-                }
+                allPlants
+                    .filter { plant ->
+                        plant.locationId == location.id && myPlantsViewModel.needsWater(plant)
+                    }
+                    .map { plant ->
+                        plant to myPlantsViewModel.getWateringText(plant)
+                    }
             }
         }
 
@@ -132,7 +134,6 @@
                     plantsByLocation = plantsByLocation,
                     onMarkAsWatered = {myPlantsViewModel.markAsWatered(it)},
                     navController = navController,
-                    myPlantsViewModel = myPlantsViewModel
                 )
             }
         }
