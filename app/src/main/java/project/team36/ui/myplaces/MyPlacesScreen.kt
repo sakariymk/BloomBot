@@ -76,8 +76,8 @@ fun MyPlacesScreen (
     if (showMaxLocationsDialog) {
         AlertDialog(
             onDismissRequest = { savedPlacesViewModel.dismissMaxLocationsDialog() },
-            title = { Text("Maks antall steder nådd") },
-            text = { Text("Du kan maksimum ha 5 steder lagret. Slett et sted for å legge til et nytt.") },
+            title = { Text("Maks antall hager nådd") },
+            text = { Text("Du kan maksimum ha 5 lagrede hager. Slett en hage for å legge til en ny.") },
             confirmButton = {
                 TextButton(onClick = { savedPlacesViewModel.dismissMaxLocationsDialog() }) {
                     Text("OK")
@@ -92,7 +92,7 @@ fun MyPlacesScreen (
             TopAppBar(
                 title = {
                     Text(
-                        text = "Mine steder",
+                        text = "Mine hager",
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Normal,
                         color = Color(0xFF2E7D32)
@@ -111,8 +111,8 @@ fun MyPlacesScreen (
                         onAddPlaceClick()
                     }
                 },
-                icon = { Icon(Icons.Default.Add, contentDescription = "Nytt sted") },
-                text = { Text("Nytt sted") },
+                icon = { Icon(Icons.Default.Add, contentDescription = "Ny hage") },
+                text = { Text("Ny hage") },
                 containerColor = Color(0xFF2D5A27),
                 contentColor = Color.White,
                 shape = RoundedCornerShape(50)
@@ -192,7 +192,7 @@ fun EmptyLocationCard(
             }
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = "Du har ingen lagrede steder enda.\nLegg til din første hage!",
+                    text = "Du har ingen lagrede hager enda.\nLegg til din første hage!",
                     fontSize = 14.sp,
                     color = Color.Black
                 )
@@ -241,12 +241,12 @@ fun LocationCard (
             )
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = location.name ?: "Ukjent sted",
+                    text = location.name ?: "Ukjent hage",
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp
                 )
                 Text(
-                    text = location.address ?: "Ingen adress funnet",
+                    text = location.address ?: "Ingen adresse funnet",
                     color = Color.Gray,
                     fontSize = 12.sp
                 )
@@ -277,7 +277,7 @@ fun MyPlacesScreenPreview() {
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             Text(
-                text = "Mine steder",
+                text = "Mine hager",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Normal,
                 color = Color(0xFF2E7D32),
@@ -292,8 +292,8 @@ fun MyPlacesScreenPreview() {
 
         ExtendedFloatingActionButton(
             onClick = {},
-            icon = { Icon(Icons.Default.Add, contentDescription = "Nytt sted") },
-            text = { Text("Nytt sted") },
+            icon = { Icon(Icons.Default.Add, contentDescription = "Ny hage") },
+            text = { Text("Nytt hage") },
             containerColor = Color(0xFF2D5A27),
             contentColor = Color.White,
             shape = RoundedCornerShape(50),

@@ -35,7 +35,7 @@ fun SavePlantDialog(
         text = {
             Column() {
                 if (savedLocations.isEmpty()) {
-                    Text("Du har ingen lagrede steder enda. Legg til et sted på kartet først")
+                    Text("Du har ingen lagrede hager enda. Legg til en hage på kartet først.")
                 }
                 else {
                     savedLocations.forEach { location ->

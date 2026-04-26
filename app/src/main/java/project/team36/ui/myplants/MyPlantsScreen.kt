@@ -88,7 +88,7 @@ fun MyPlantsScreen(
                         IconButton(onClick = {expanded = true }) {
                             Icon(
                                 imageVector = Icons.Default.Edit,
-                                contentDescription = "Rediger sted",
+                                contentDescription = "Rediger hage",
                                 tint = Color(0xFF2E7D32)
                             )
                         }
@@ -105,7 +105,7 @@ fun MyPlantsScreen(
                                 },
                             )
                             DropdownMenuItem(
-                                text = { Text("Slett sted") },
+                                text = { Text("Slett hage") },
                                 onClick = {
                                     showDeleteDialog = true
                                     expanded = false
@@ -114,8 +114,8 @@ fun MyPlantsScreen(
                         }
                         if (showDeleteDialog) {
                             AlertDialog(
-                                title = { Text("Ønsker du å slette stedet?") },
-                                text = { Text("Du vil miste alle lagrede planter på dette stedet.") },
+                                title = { Text("Ønsker du å slette hagen?") },
+                                text = { Text("Du vil miste alle lagrede planter i denne hagen.") },
                                 onDismissRequest = { showDeleteDialog = false},
                                 confirmButton = {
                                     TextButton(
@@ -129,14 +129,14 @@ fun MyPlantsScreen(
                                 },
                                 dismissButton = {
                                     TextButton(onClick = { showDeleteDialog = false} ) {
-                                        Text("Behold sted")
+                                        Text("Behold hage")
                                     }
                                 }
                             )
                         }
                         if (showRenameDialog) {
                             AlertDialog(
-                                title = { Text("Bytt navn på stedet") },
+                                title = { Text("Bytt navn på hagen") },
                                 text = {
                                     OutlinedTextField(
                                         value = newLocationName,
@@ -181,8 +181,8 @@ fun MyPlantsScreen(
         // Finn ut hvordan sende informasjon om hvor du kommer fra
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "Ukjent sted"}") },
-                icon = { Icon(Icons.Default.Add, contentDescription = "Nytt sted") },
+                onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "Ingen hage valgt"}") },
+                icon = { Icon(Icons.Default.Add, contentDescription = "Ny hage") },
                 text = { Text("Ny plante") },
                 containerColor = Color(0xFF2D5A27),
                 contentColor = Color.White,
@@ -201,7 +201,7 @@ fun MyPlantsScreen(
             if (plants.isEmpty()) {
                 item {
                     EmptyPlantCard(
-                        onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "Ukjent sted"}")}
+                        onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "Ingen hage valgt"}")}
                     )
                 }
             } else {

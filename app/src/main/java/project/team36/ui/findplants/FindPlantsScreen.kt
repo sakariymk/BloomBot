@@ -119,10 +119,10 @@ fun FindPlantsScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
                     ) {
-                        Icon(Icons.Default.LocationOn, contentDescription = "Sted", tint = Color(0xFF2D5A27))
+                        Icon(Icons.Default.LocationOn, contentDescription = "Hage", tint = Color(0xFF2D5A27))
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = selectedLocation?.name ?: locationName.ifEmpty { "Sted: Ikke valgt" },
+                            text = selectedLocation?.name ?: locationName.ifEmpty { "Ingen hage valgt" },
                             color = Color(0xFF2D5A27)
                         )
                     }
@@ -132,8 +132,8 @@ fun FindPlantsScreen(
 
                 ExtendedFloatingActionButton(
                     onClick = { showSwitchLocationDialog = true },
-                    icon = { Icon(Icons.Default.SwapHoriz, contentDescription = "Endre sted") },
-                    text = { Text("Endre sted") },
+                    icon = { Icon(Icons.Default.SwapHoriz, contentDescription = "Bytt hage") },
+                    text = { Text("Bytt hage") },
                     containerColor = Color(0xFF2D5A27),
                     contentColor = Color.White,
                     shape = RoundedCornerShape(50)

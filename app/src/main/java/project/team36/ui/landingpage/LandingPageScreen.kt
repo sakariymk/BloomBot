@@ -108,7 +108,7 @@ fun LandingPageScreen(
         ) {
             if (savedLocations.isEmpty()) {
                 Text(
-                    text = "Ingen lagrede steder ennå.",
+                    text = "Ingen lagrede hager ennå.",
                     modifier = Modifier.padding(16.dp),
                     style = MaterialTheme.typography.bodyMedium
                 )
@@ -143,7 +143,7 @@ fun LandingPageScreen(
                             text = {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
-                                        text = location.name ?: "Sted",
+                                        text = location.name ?: "Hage",
                                         color = if (isSelected) Color.White else tabButtonColor,
                                         style = MaterialTheme.typography.bodyMedium,
                                         fontWeight = FontWeight.Medium
