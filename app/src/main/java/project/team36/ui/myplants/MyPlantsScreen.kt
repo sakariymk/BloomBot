@@ -122,6 +122,7 @@ fun MyPlantsScreen(
                                         onClick = {
                                             selectedLocation?.let { myPlantsViewModel.deleteLocation(it) }
                                             navController.navigate("myPlaces")
+                                            savedPlacesViewModel.updateSelectedLocationName("Ingen hage valgt")
                                             showDeleteDialog = false
                                         }
                                     ) { Text("Slett") }
