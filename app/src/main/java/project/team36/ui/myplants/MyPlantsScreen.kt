@@ -88,7 +88,7 @@ fun MyPlantsScreen(
                         IconButton(onClick = {expanded = true }) {
                             Icon(
                                 imageVector = Icons.Default.Edit,
-                                contentDescription = "Rediger sted",
+                                contentDescription = "Rediger hage",
                                 tint = Color(0xFF2E7D32)
                             )
                         }
@@ -105,67 +105,68 @@ fun MyPlantsScreen(
                                 },
                             )
                             DropdownMenuItem(
-                                text = { Text("Slett sted") },
+                                text = { Text("Slett hage") },
                                 onClick = {
                                     showDeleteDialog = true
                                     expanded = false
                                 }
                             )
-                            if (showDeleteDialog) {
-                                AlertDialog(
-                                    title = { Text("Ønsker du å slette stedet?") },
-                                    text = { Text("Du vil miste alle lagrede planter på dette stedet.") },
-                                    onDismissRequest = { showDeleteDialog = false},
-                                    confirmButton = {
-                                        TextButton(
-                                            onClick = {
-                                                selectedLocation?.let { myPlantsViewModel.deleteLocation(it) }
-                                                navController.navigate("myPlaces")
-                                                showDeleteDialog = false
+                        }
+                        if (showDeleteDialog) {
+                            AlertDialog(
+                                title = { Text("Ønsker du å slette hagen?") },
+                                text = { Text("Du vil miste alle lagrede planter i denne hagen.") },
+                                onDismissRequest = { showDeleteDialog = false},
+                                confirmButton = {
+                                    TextButton(
+                                        onClick = {
+                                            selectedLocation?.let { myPlantsViewModel.deleteLocation(it) }
+                                            navController.navigate("myPlaces")
+                                            savedPlacesViewModel.updateSelectedLocationName("Ingen hage valgt")
+                                            showDeleteDialog = false
+                                        }
+                                    ) { Text("Slett") }
+                                },
+                                dismissButton = {
+                                    TextButton(onClick = { showDeleteDialog = false} ) {
+                                        Text("Behold hage")
+                                    }
+                                }
+                            )
+                        }
+                        if (showRenameDialog) {
+                            AlertDialog(
+                                title = { Text("Bytt navn på hagen") },
+                                text = {
+                                    OutlinedTextField(
+                                        value = newLocationName,
+                                        onValueChange = { newLocationName = it },
+                                        label = { Text("Nytt navn") },
+                                        singleLine = true
+                                    )
+                                },
+                                onDismissRequest = { showRenameDialog = false },
+                                confirmButton = {
+                                    TextButton(
+                                        onClick = {
+                                            selectedLocation?.let {
+                                                myPlantsViewModel.renameLocation(it, newLocationName)
                                             }
-                                        ) { Text("Slett") }
-                                    },
-                                    dismissButton = {
-                                        TextButton(onClick = { showDeleteDialog = false} ) {
-                                            Text("Behold sted")
-                                        }
+                                            savedPlacesViewModel.updateSelectedLocationName(newLocationName)
+                                            showRenameDialog = false
+                                            navController.navigate("myPlants") {
+                                                popUpTo("myPlaces") { inclusive = false }
+                                            }
+                                        },
+                                        enabled = newLocationName.isNotBlank()
+                                    ) { Text("Lagre") }
+                                },
+                                dismissButton = {
+                                    TextButton(onClick =  { showRenameDialog = false }) {
+                                        Text("Avbryt")
                                     }
-                                )
-                            }
-                            if (showRenameDialog) {
-                                AlertDialog(
-                                    title = { Text("Bytt navn på stedet") },
-                                    text = {
-                                        OutlinedTextField(
-                                            value = newLocationName,
-                                            onValueChange = { newLocationName = it },
-                                            label = { Text("Nytt navn") },
-                                            singleLine = true
-                                        )
-                                    },
-                                    onDismissRequest = { showRenameDialog = false },
-                                    confirmButton = {
-                                        TextButton(
-                                            onClick = {
-                                                selectedLocation?.let {
-                                                    myPlantsViewModel.renameLocation(it, newLocationName)
-                                                }
-                                                savedPlacesViewModel.updateSelectedLocationName(newLocationName)
-                                                showRenameDialog = false
-                                                navController.navigate("myPlants") {
-                                                    popUpTo("myPlaces") { inclusive = false }
-                                                }
-                                            },
-                                            enabled = newLocationName.isNotBlank()
-                                        ) { Text("Lagre") }
-                                    },
-                                    dismissButton = {
-                                        TextButton(onClick =  { showRenameDialog = false }) {
-                                            Text("Avbryt")
-                                        }
-                                    }
-                                )
-                            }
+                                }
+                            )
                         }
                     }
                 },
@@ -180,8 +181,8 @@ fun MyPlantsScreen(
         // Finn ut hvordan sende informasjon om hvor du kommer fra
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "Ukjent sted"}") },
-                icon = { Icon(Icons.Default.Add, contentDescription = "Nytt sted") },
+                onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "Ingen hage valgt"}") },
+                icon = { Icon(Icons.Default.Add, contentDescription = "Ny hage") },
                 text = { Text("Ny plante") },
                 containerColor = Color(0xFF2D5A27),
                 contentColor = Color.White,
@@ -200,7 +201,7 @@ fun MyPlantsScreen(
             if (plants.isEmpty()) {
                 item {
                     EmptyPlantCard(
-                        onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "Ukjent sted"}")}
+                        onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "Ingen hage valgt"}")}
                     )
                 }
             } else {

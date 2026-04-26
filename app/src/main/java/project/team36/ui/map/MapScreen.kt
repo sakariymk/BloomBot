@@ -90,7 +90,7 @@ fun MapScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Legg til sted",
+                        text = "Legg til hage",
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Normal,
                         color = Color(0xFF2E7D32)
@@ -199,7 +199,7 @@ fun MapScreen(
             if (uiState.showSaveDialog) {
                 AlertDialog(
                     onDismissRequest = { viewModel.dismissSaveDialog() },
-                    title = { Text("Lagre sted?") },
+                    title = { Text("Lagre hage?") },
                     confirmButton = {
                         TextButton(
                             onClick = {

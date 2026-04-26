@@ -62,11 +62,11 @@ fun BottomNavBar(navController: NavController, savedPlacesViewModel : SavedPlace
                         id = if (activeRoute == "myPlaces") R.drawable.plant_icon_thick
                         else R.drawable.plant_icon
                     ),
-                    contentDescription = "Mine steder"
+                    contentDescription = "Mine hager"
 
                 )
             },
-            label = {Text("Mine steder")}
+            label = {Text("Mine hager")}
         )
 
         NavigationBarItem(

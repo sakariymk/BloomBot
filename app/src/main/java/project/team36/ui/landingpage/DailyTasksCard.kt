@@ -86,7 +86,7 @@ fun DailyTasksCard (
                 plantsByLocation.forEach { (location, plantsWithText) ->
                     if (plantsWithText.isNotEmpty()) {
                         Text(
-                            text = location.name ?: "Ukjent sted",
+                            text = location.name ?: "Ukjent hage",
                             style = MaterialTheme.typography.labelMedium,
                             color = Color.White,
                             modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 4.dp)
