@@ -111,61 +111,61 @@ fun MyPlantsScreen(
                                     expanded = false
                                 }
                             )
-                            if (showDeleteDialog) {
-                                AlertDialog(
-                                    title = { Text("Ønsker du å slette stedet?") },
-                                    text = { Text("Du vil miste alle lagrede planter på dette stedet.") },
-                                    onDismissRequest = { showDeleteDialog = false},
-                                    confirmButton = {
-                                        TextButton(
-                                            onClick = {
-                                                selectedLocation?.let { myPlantsViewModel.deleteLocation(it) }
-                                                navController.navigate("myPlaces")
-                                                showDeleteDialog = false
+                        }
+                        if (showDeleteDialog) {
+                            AlertDialog(
+                                title = { Text("Ønsker du å slette stedet?") },
+                                text = { Text("Du vil miste alle lagrede planter på dette stedet.") },
+                                onDismissRequest = { showDeleteDialog = false},
+                                confirmButton = {
+                                    TextButton(
+                                        onClick = {
+                                            selectedLocation?.let { myPlantsViewModel.deleteLocation(it) }
+                                            navController.navigate("myPlaces")
+                                            showDeleteDialog = false
+                                        }
+                                    ) { Text("Slett") }
+                                },
+                                dismissButton = {
+                                    TextButton(onClick = { showDeleteDialog = false} ) {
+                                        Text("Behold sted")
+                                    }
+                                }
+                            )
+                        }
+                        if (showRenameDialog) {
+                            AlertDialog(
+                                title = { Text("Bytt navn på stedet") },
+                                text = {
+                                    OutlinedTextField(
+                                        value = newLocationName,
+                                        onValueChange = { newLocationName = it },
+                                        label = { Text("Nytt navn") },
+                                        singleLine = true
+                                    )
+                                },
+                                onDismissRequest = { showRenameDialog = false },
+                                confirmButton = {
+                                    TextButton(
+                                        onClick = {
+                                            selectedLocation?.let {
+                                                myPlantsViewModel.renameLocation(it, newLocationName)
                                             }
-                                        ) { Text("Slett") }
-                                    },
-                                    dismissButton = {
-                                        TextButton(onClick = { showDeleteDialog = false} ) {
-                                            Text("Behold sted")
-                                        }
+                                            savedPlacesViewModel.updateSelectedLocationName(newLocationName)
+                                            showRenameDialog = false
+                                            navController.navigate("myPlants") {
+                                                popUpTo("myPlaces") { inclusive = false }
+                                            }
+                                        },
+                                        enabled = newLocationName.isNotBlank()
+                                    ) { Text("Lagre") }
+                                },
+                                dismissButton = {
+                                    TextButton(onClick =  { showRenameDialog = false }) {
+                                        Text("Avbryt")
                                     }
-                                )
-                            }
-                            if (showRenameDialog) {
-                                AlertDialog(
-                                    title = { Text("Bytt navn på stedet") },
-                                    text = {
-                                        OutlinedTextField(
-                                            value = newLocationName,
-                                            onValueChange = { newLocationName = it },
-                                            label = { Text("Nytt navn") },
-                                            singleLine = true
-                                        )
-                                    },
-                                    onDismissRequest = { showRenameDialog = false },
-                                    confirmButton = {
-                                        TextButton(
-                                            onClick = {
-                                                selectedLocation?.let {
-                                                    myPlantsViewModel.renameLocation(it, newLocationName)
-                                                }
-                                                savedPlacesViewModel.updateSelectedLocationName(newLocationName)
-                                                showRenameDialog = false
-                                                navController.navigate("myPlants") {
-                                                    popUpTo("myPlaces") { inclusive = false }
-                                                }
-                                            },
-                                            enabled = newLocationName.isNotBlank()
-                                        ) { Text("Lagre") }
-                                    },
-                                    dismissButton = {
-                                        TextButton(onClick =  { showRenameDialog = false }) {
-                                            Text("Avbryt")
-                                        }
-                                    }
-                                )
-                            }
+                                }
+                            )
                         }
                     }
                 },
