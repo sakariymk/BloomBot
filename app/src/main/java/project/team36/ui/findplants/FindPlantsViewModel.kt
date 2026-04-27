@@ -25,6 +25,10 @@ class FindPlantsViewModel (
     private val _plants = MutableStateFlow<List<PlantDetails>>(emptyList())
     val plants: StateFlow<List<PlantDetails>> = _plants.asStateFlow()
 
+    //TODO: få disse til å hente ikke-anbefalte planter
+    private val _notRecommendedPlants = MutableStateFlow<List<PlantDetails>>(emptyList())
+    val notRecommendedPlants: StateFlow<List<PlantDetails>> = _notRecommendedPlants.asStateFlow()
+
     private val _pendingPlant = MutableStateFlow<PlantDetails?>(null)
     val pendingPlant: StateFlow<PlantDetails?> = _pendingPlant.asStateFlow()
 
