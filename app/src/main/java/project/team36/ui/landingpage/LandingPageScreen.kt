@@ -121,13 +121,13 @@ fun LandingPageScreen(
                     indicator = {}
                 ) {
                     savedLocations.forEachIndexed { index, location ->
-                        val hasAlert = (uiState.locationAlerts[location.id] ?: emptyList()).isNotEmpty()
+                        val alerts = uiState.locationAlerts[location.id] ?: emptyList()
+                        val hasAlert = alerts.isNotEmpty()
+                        val alertColor = alerts.firstOrNull()?.color ?: Color.Red // får å hente ut selve fargen til alerte og display samme farge på weather-kortet
                         val isSelected = selectedTabIndex == index
                         Tab(
                             selected = selectedTabIndex == index,
-                            onClick = { selectedTabIndex = index },
-                                      //savedPlacesViewModel.selectLocation(location)}, kan gjøre dette om vi ønsker at sist valgt location skal vises i FindPlants med en gang, og ikke ukjent sted! -Therese
-
+                            onClick = { selectedTabIndex = index; savedPlacesViewModel.selectLocation(location) },
                             modifier = Modifier
                                 .padding(end = 8.dp)
                                 .height(40.dp)
@@ -153,7 +153,7 @@ fun LandingPageScreen(
                                         Icon(
                                             Icons.Default.Warning,
                                             contentDescription = null,
-                                            tint = Color.Red,
+                                            tint = alertColor,
                                             modifier = Modifier.size(14.dp)
                                         )
                                     }
@@ -169,6 +169,17 @@ fun LandingPageScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    if (alertsForSelectedLocation.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Column {
+                            alertsForSelectedLocation.forEach { alert ->
+                                LocationAlertBanner(alert)
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+
                     Text(text = "Værvarsel", style = MaterialTheme.typography.labelLarge)
 
                     WeatherCard(
@@ -208,15 +219,6 @@ fun LandingPageScreen(
                         }
                     }
 
-                    if (alertsForSelectedLocation.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Column {
-                            alertsForSelectedLocation.forEach { alert ->
-                                LocationAlertBanner(alert)
-                                Spacer(modifier = Modifier.height(8.dp))
-                            }
-                        }
-                    }
                 }
 
 
