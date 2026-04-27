@@ -2,8 +2,7 @@ package project.team36.data.network
 
 import android.content.Context
 import android.net.NetworkCapabilities
-import android.view.View
-import androidx.compose.material3.Snackbar
+import android.net.ConnectivityManager
 
 object NetworkUtility {
     fun isNetworkAvailable(context: Context): Boolean {

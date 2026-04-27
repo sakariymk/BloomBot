@@ -193,7 +193,7 @@ class MainActivity : ComponentActivity() {
 
                 AppNavHost(
                     navController = navController,
-                    snackbarHostState: SnackbarHostState,
+                    snackbarHostState = snackbarHostState,
                     mapViewModel = mapViewModel,
                     findPlantsViewModel = findPlantsViewModel,
                     myPlantsViewModel = myPlantsViewModel,
