@@ -17,15 +17,8 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,9 +36,6 @@ import androidx.navigation.NavHostController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import com.mapbox.geojson.Feature
-import com.mapbox.geojson.FeatureCollection
-import com.mapbox.geojson.Polygon
 import com.mapbox.maps.extension.compose.MapEffect
 import com.mapbox.maps.extension.compose.annotation.generated.PointAnnotation
 import com.mapbox.maps.extension.compose.annotation.rememberIconImage
@@ -56,10 +46,7 @@ import com.mapbox.maps.extension.style.layers.addLayer
 import com.mapbox.maps.extension.style.layers.generated.fillLayer
 import com.mapbox.maps.extension.style.sources.addSource
 import com.mapbox.maps.extension.style.sources.generated.vectorSource
-import com.mapbox.maps.extension.style.sources.getSourceAs
-import com.mapbox.maps.extension.style.sources.generated.GeoJsonSource
 import project.team36.R
-import project.team36.data.mcp.WeatherAlert
 import project.team36.ui.myplants.MyPlantsViewModel
 import project.team36.ui.navigation.BottomNavBar
 
@@ -225,9 +212,6 @@ fun MapScreen(
                 aiResponse = uiState.aiResponse,
                 isAiLoading = uiState.isAiLoading,
                 isFutureAiLoading = uiState.isFutureAiLoading,
-                onGetRawApiData = { loc -> viewModel.fetchRawApiData(loc) },
-                rawApiData = uiState.rawApiData,
-                onDismissRawApi = { viewModel.dismissRawApiData() },
                 onDismissAi = { viewModel.dismissAiAdvice() },
                 onDismiss = { viewModel.dismissPlaceInfo() },
                 onEdit = { newName ->

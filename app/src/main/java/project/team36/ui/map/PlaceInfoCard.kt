@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
+import project.team36.model.ai.AiRecommendationResponse
 import project.team36.model.location.SavedLocation
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,7 +45,7 @@ fun PlaceInfoCard(
     // <------ ENDRING: Fikset at onGetAiAdvice krever SavedLocation, og la til onGetFutureAiAdvice parameter!
     onGetAiAdvice: (SavedLocation) -> Unit,
     onGetFutureAiAdvice: (SavedLocation) -> Unit,
-    aiResponse: project.team36.model.ai.AiRecommendationResponse?,
+    aiResponse: AiRecommendationResponse?,
     isAiLoading: Boolean,
     isFutureAiLoading: Boolean,
     onDismissAi: () -> Unit,
@@ -54,10 +55,6 @@ fun PlaceInfoCard(
     navController: NavHostController,
 
 
-    // <------ ENDRING: Nye parametere for test-knappen
-    onGetRawApiData: (SavedLocation) -> Unit,
-    rawApiData: String?,
-    onDismissRawApi: () -> Unit
 ) {
     var showEditDialog by rememberSaveable { mutableStateOf((false)) }
     var editedName by rememberSaveable { mutableStateOf(location.name ?: "")}
@@ -131,17 +128,6 @@ fun PlaceInfoCard(
         )
     }
 
-    // <------ ENDRING: Popup for RAW API data
-    if (rawApiData != null) {
-        AlertDialog(
-            onDismissRequest = onDismissRawApi,
-            title = { Text("RAW API Data 🛠") },
-            text = { Text(rawApiData, modifier = Modifier.verticalScroll(rememberScrollState())) },
-            confirmButton = {
-                TextButton(onClick = onDismissRawApi) { Text("Lukk") }
-            }
-        )
-    }
 
     Dialog(onDismissRequest = onDismiss) {
         Column(
@@ -246,39 +232,6 @@ fun PlaceInfoCard(
                     } else {
                         Text(
                             text = "✨ Få AI-Råd",
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight(400)
-                        )
-                    }
-                }
-
-                // <------ ENDRING: NY TEST-KNAPP FOR RAW API
-                Button(
-                    onClick = {
-                        onGetRawApiData(location)
-                    },
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(4.dp)
-                        .shadow(
-                            elevation = 4.dp,
-                            spotColor = Color(0x40000000),
-                            ambientColor = Color(0x40000000)
-                        )
-                        .width(193.dp)
-                        .height(42.dp),
-                    enabled = !isAiLoading,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.DarkGray, // Mørk grå for å vise at det er en dev-knapp
-                        contentColor = Color.White
-                    ),
-                    shape = RoundedCornerShape(23.5.dp)
-                ) {
-                    if (isAiLoading) {
-                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
-                    } else {
-                        Text(
-                            text = "🛠 Test RAW API",
                             fontSize = 15.sp,
                             fontWeight = FontWeight(400)
                         )

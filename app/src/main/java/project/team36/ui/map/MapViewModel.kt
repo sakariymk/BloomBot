@@ -113,14 +113,6 @@ class MapViewModel(
         }
     }
 
-    // <------ ENDRING: Funksjoner for RAW API testing
-    fun fetchRawApiData(location: SavedLocation) {
-        _uiState.value = _uiState.value.copy(isAiLoading = true, rawApiData = null)
-        viewModelScope.launch {
-            val rawData = repository.getRawApiTest(location)
-            _uiState.value = _uiState.value.copy(isAiLoading = false, rawApiData = rawData)
-        }
-    }
 
     fun dismissRawApiData() {
         _uiState.value = _uiState.value.copy(rawApiData = null)
