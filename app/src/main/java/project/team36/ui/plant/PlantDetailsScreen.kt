@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -216,7 +217,7 @@ fun PlantDetailsScreen(
                 }
                 PlantInfoCard(title = "Jordtype") {
                     Text("Jorden planten trives aller best i når det gjelder struktur, sammensetning, næringsinnhold og surhetsgrad. Valg av jordtype avhenger av plantens behov, men generelt trives de fleste planter i en luftig, næringsrik jord med god drenering ")
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         plant.soil.forEach { soilType ->
                             OutlinedButton(
                                 onClick = {},
@@ -348,147 +349,5 @@ fun HardinessZoneTooltip() {
             }
 
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PlantDetailsScreenPreview() {
-    val fakePlant = PlantDetails(
-        name = "Lilje",
-        soil = setOf(SoilType.SAND, SoilType.CHALK),
-        light = setOf(LightType.FULL),
-        isFrostResistant = false,
-        waterPerWeek = 2f,
-        plantingMonth = setOf(6, 7, 8),
-        climateZone = 2,
-        hasBeenWatered = false,
-        daysSinceWatered = 3,
-        maxDaysWithoutWater = 12,
-        imageRes = R.drawable.pelargonia,
-        description = "En vakker lilje."
-    )
-
-    Team36Theme() {
-        PlantDetailsScreenPreview_Content(fakePlant)
-    }
-}
-
-@Composable
-fun PlantDetailsScreenPreview_Content(plant: PlantDetails) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFDFEAC0))
-            .verticalScroll(rememberScrollState())
-    ) {
-        Box(
-            modifier = Modifier
-                .padding(16.dp)
-                .size(48.dp)
-                .clip(CircleShape)
-                .background(Color.White),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Tilbake")
-        }
-
-        Image(
-            painter = painterResource(plant.imageRes),
-            contentDescription = plant.name,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(220.dp)
-                .padding(horizontal = 16.dp)
-                .clip(RoundedCornerShape(16.dp))
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(text = plant.name, fontSize = 36.sp, fontWeight = FontWeight.Normal)
-            OutlinedButton(
-                onClick = {},
-                shape = RoundedCornerShape(50),
-                colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.White),
-                border = BorderStroke(0.dp, Color.Transparent)
-            ) {
-                Text("Legg til", color = Color.Black)
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Plantingsmåned
-        PlantInfoCard(title = "Plantingsmåned") {
-            Text("Dette er de ideelle månedene å plante denne planten.")
-            PlantingMonthBar(plantingMonth = plant.plantingMonth)
-        }
-
-        PlantInfoCard(title = "Herdighet") {
-            Text("Den høyeste herdighetssonen planten tåler.")
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.DeviceThermostat,
-                    contentDescription = null,
-                    tint = Color(0xFF5A7A3A)
-                )
-                Text(
-                    "H${plant.climateZone}",
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 16.sp
-                )
-            }
-        }
-
-        PlantInfoCard(title = "Vanning") {
-            Text("Vi registrerer om det har regnet, slik at du kan få påminnelse om vanning dersom det ikke har regnet tilstrekkelig.")
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.WaterDrop,
-                    contentDescription = null,
-                    tint = Color(0xFF5A7A3A)
-                )
-                Text(
-                    "Hver ${plant.maxDaysWithoutWater}. dag",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                )
-            }
-        }
-
-        PlantInfoCard(title = "Jordtype") {
-            Text("Jordtypen påvirker hvor mye vann røttene får tilgang til, hvor god luftsirkulasjonen er, og hvor lett det er for røttene å vokse seg dypt.")
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                plant.soil.forEach { soilType ->
-                    OutlinedButton(
-                        onClick = {},
-                        shape = RoundedCornerShape(50),
-                        border = BorderStroke(1.dp, Color.LightGray)
-                    ) {
-                        Text(
-                            text = soilType.name.lowercase()
-                                .replaceFirstChar { it.uppercase() },
-                            color = Color.Black
-                        )
-                    }
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
     }
 }
