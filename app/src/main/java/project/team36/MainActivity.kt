@@ -108,10 +108,6 @@ class MainActivity : ComponentActivity() {
             .build()
         val claudeApi = claudeRetrofit.create(ClaudeApi::class.java)
 
-        val metRetrofit = Retrofit.Builder()
-            .baseUrl("https://api.met.no/")
-            .build()
-
         val claudeKey = "***FJERNET***"
         val frostClientId = "08b40da1-9456-4846-988a-e5283cf731cb"
 
@@ -168,16 +164,16 @@ class MainActivity : ComponentActivity() {
                     }
                 )
 
-                AppNavHost(
-                    navController = navController,
-                    mapViewModel = mapViewModel,
-                    findPlantsViewModel = findPlantsViewModel,
-                    myPlantsViewModel = myPlantsViewModel,
-                    savedPlacesViewModel = savedPlacesViewModel,
-                    plantDetailsViewModel = plantDetailsViewModel,
-                    landingPageViewModel = landingPageViewModel
-                )
+                    AppNavHost(
+                        navController = navController,
+                        mapViewModel = mapViewModel,
+                        findPlantsViewModel = findPlantsViewModel,
+                        myPlantsViewModel = myPlantsViewModel,
+                        savedPlacesViewModel = savedPlacesViewModel,
+                        plantDetailsViewModel = plantDetailsViewModel,
+                        landingPageViewModel = landingPageViewModel
+                    )
+                }
             }
         }
     }
-}

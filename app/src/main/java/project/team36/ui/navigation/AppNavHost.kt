@@ -21,7 +21,6 @@ import project.team36.ui.myplaces.MyPlacesScreen
 import project.team36.ui.landingpage.LandingPageScreen
 import project.team36.ui.landingpage.LandingPageViewModel
 
-//import project.team36.ui.plant.PlantSwipeViewModel
 
 @Composable
 fun AppNavHost(
@@ -36,7 +35,7 @@ fun AppNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = "landingpage", //HER ENDRER JEG BARE TIL LANDINGPAGE FOR Å SE DEN PÅ APPEN
+        startDestination = "landingpage",
         modifier = modifier
     ){
         composable("map") {
@@ -48,6 +47,7 @@ fun AppNavHost(
                 myPlantsViewModel = myPlantsViewModel
             )
         }
+
         composable ("myPlants"){
             MyPlantsScreen(
                 navController = navController,
