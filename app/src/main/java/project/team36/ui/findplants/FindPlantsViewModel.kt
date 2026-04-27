@@ -2,6 +2,7 @@ package project.team36.ui.findplants
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -109,4 +110,19 @@ class FindPlantsViewModel (
         }
     }
 
+}
+
+
+class FindPlantsViewModelFactory(
+    private val plantRepository: PlantRepository,
+    private val locationRepository: LocationRepository,
+    private val savedPlacesViewModel: SavedPlacesViewModel
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(FindPlantsViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return FindPlantsViewModel(plantRepository, locationRepository, savedPlacesViewModel) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
 }

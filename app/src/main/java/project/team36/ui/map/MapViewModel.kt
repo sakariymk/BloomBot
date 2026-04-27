@@ -62,20 +62,6 @@ data class MapUiState(
     val isAlertLoading: Boolean = false
 )
 
-class MapViewModelFactory(
-    private val repository: HybridAiRepository,
-    private val weatherRepository: MetWeatherRepository
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(MapViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return MapViewModel(repository, weatherRepository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}
-
-
 
 class MapViewModel(
     private val repository: HybridAiRepository,
@@ -309,5 +295,20 @@ class MapViewModel(
     // En liten funksjon for å lukke AI-svaret igjen:
     fun dismissAiAdvice() {
         _uiState.value = _uiState.value.copy(aiResponse = null)
+    }
+}
+
+
+
+class MapViewModelFactory(
+    private val repository: HybridAiRepository,
+    private val weatherRepository: MetWeatherRepository
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(MapViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return MapViewModel(repository, weatherRepository) as T
+        }
+        throw IllegalArgumentException("Ukjent ViewModel klasse")
     }
 }

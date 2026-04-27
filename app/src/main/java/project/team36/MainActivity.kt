@@ -5,8 +5,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -26,56 +24,19 @@ import project.team36.data.mcp.MetMcpClient
 import project.team36.data.mcp.MetWeatherRepository
 import project.team36.data.plant.PlantDataSource
 import project.team36.data.plant.PlantRepository
+import project.team36.ui.findplants.FindPlantsViewModelFactory
 import project.team36.ui.landingpage.LandingPageViewModel
 import project.team36.ui.landingpage.LandingPageViewModelFactory
 import project.team36.ui.map.MapViewModel
+import project.team36.ui.map.MapViewModelFactory
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.map.SavedPlacesViewModelFactory
 import project.team36.ui.myplants.MyPlantsViewModel
+import project.team36.ui.myplants.MyPlantsViewModelFactory
 import project.team36.ui.plant.PlantDetailsViewModel
+import project.team36.ui.plant.PlantDetailsViewModelFactory
 import project.team36.ui.theme.Team36Theme
 
-
-class MapViewModelFactory(
-    private val repository: HybridAiRepository,
-    private val weatherRepository: MetWeatherRepository
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(MapViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return MapViewModel(repository, weatherRepository) as T
-        }
-        throw IllegalArgumentException("Ukjent ViewModel klasse")
-    }
-}
-
-class FindPlantsViewModelFactory(
-    private val plantRepository: PlantRepository,
-    private val locationRepository: LocationRepository,
-    private val savedPlacesViewModel: SavedPlacesViewModel
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(FindPlantsViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return FindPlantsViewModel(plantRepository, locationRepository, savedPlacesViewModel) as T
-        }
-        throw IllegalArgumentException("Ukjent ViewModel klasse")
-    }
-}
-
-class MyPlantsViewModelFactory(
-    private val repository: LocationRepository,
-    private val savedPlacesViewModel: SavedPlacesViewModel,
-    private val frostRepository: FrostRepository
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(MyPlantsViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return MyPlantsViewModel(repository, savedPlacesViewModel, frostRepository) as T
-        }
-        throw IllegalArgumentException("Ukjent ViewModel klasse")
-    }
-}
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -108,12 +69,7 @@ class MainActivity : ComponentActivity() {
             .build()
         val claudeApi = claudeRetrofit.create(ClaudeApi::class.java)
 
-        val metRetrofit = Retrofit.Builder()
-            .baseUrl("https://api.met.no/")
-            .build()
-
         val claudeKey = "***FJERNET***"
-        val frostClientId = "08b40da1-9456-4846-988a-e5283cf731cb"
 
         val mcpClient = MetMcpClient()
 
@@ -142,30 +98,28 @@ class MainActivity : ComponentActivity() {
                 val landingPageViewModel: LandingPageViewModel = viewModel(
                     factory = LandingPageViewModelFactory(metWeatherRepository, hybridAiRepository)
                 )
-
                 val savedPlacesViewModel: SavedPlacesViewModel = viewModel(
                     factory = SavedPlacesViewModelFactory(locationRepository)
                 )
                 val findPlantsViewModel: FindPlantsViewModel = viewModel(
-                    factory = FindPlantsViewModelFactory(plantRepository, locationRepository, savedPlacesViewModel)
+                    factory = FindPlantsViewModelFactory(
+                        plantRepository,
+                        locationRepository,
+                        savedPlacesViewModel
+                    )
                 )
-
                 val myPlantsViewModel: MyPlantsViewModel = viewModel(
-                    factory = MyPlantsViewModelFactory(locationRepository, savedPlacesViewModel, frostRepository)
+                    factory = MyPlantsViewModelFactory(
+                        locationRepository,
+                        savedPlacesViewModel,
+                        frostRepository
+                    )
                 )
-
                 val mapViewModel: MapViewModel = viewModel(
                     factory = MapViewModelFactory(hybridAiRepository, metWeatherRepository)
                 )
-
-                // plantDetailsScreen ViewModel --> sjekk om den skal ligge her
                 val plantDetailsViewModel: PlantDetailsViewModel = viewModel(
-                    factory = object : ViewModelProvider.Factory {
-                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                            @Suppress("UNCHECKED_CAST")
-                            return PlantDetailsViewModel(plantRepository, locationRepository) as T
-                        }
-                    }
+                    factory = PlantDetailsViewModelFactory(plantRepository, locationRepository)
                 )
 
                 AppNavHost(
