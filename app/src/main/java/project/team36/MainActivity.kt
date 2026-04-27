@@ -41,6 +41,7 @@ import project.team36.ui.map.SavedPlacesViewModelFactory
 import project.team36.ui.myplants.MyPlantsViewModel
 import project.team36.ui.plant.PlantDetailsViewModel
 import project.team36.ui.theme.Team36Theme
+import androidx.compose.runtime.DisposableEffect
 
 
 class MapViewModelFactory(
@@ -147,13 +148,19 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
 
                 val connectivityObserver = remember { ConnectivityObserver(applicationContext) }
+
+                DisposableEffect(Unit) {
+                    connectivityObserver.register()
+                    onDispose { connectivityObserver.unregister() }
+                }
+
                 val isConnected by connectivityObserver.isConnected.collectAsState(initial = true)
 
                 val snackbarHostState = remember { SnackbarHostState() }
                 LaunchedEffect(isConnected) {
                     if (!isConnected) {
                         snackbarHostState.showSnackbar(
-                            message = "No internet connection",
+                            message = "Ingen internettforbindelse",
                             duration = SnackbarDuration.Indefinite
                         )
                     }

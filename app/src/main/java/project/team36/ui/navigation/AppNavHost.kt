@@ -24,6 +24,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Snackbar
+import androidx.compose.foundation.layout.height
+import androidx.compose.ui.unit.dp
 
 //import project.team36.ui.plant.PlantSwipeViewModel
 
@@ -39,8 +42,18 @@ fun AppNavHost(
     plantDetailsViewModel: PlantDetailsViewModel,
     landingPageViewModel: LandingPageViewModel,
 ) {
-    Scaffold(                                                    // ✅ Add Scaffold
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { snackbarData ->
+                Snackbar(
+                    snackbarData = snackbarData,
+                    modifier = Modifier
+                        .padding(bottom = 105.dp)
+                        .height(70.dp)
+
+                )
+            }
+        }
     ) { innerPadding ->
     NavHost(
         navController = navController,
