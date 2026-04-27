@@ -57,7 +57,7 @@ fun AppNavHost(
     ) { innerPadding ->
     NavHost(
         navController = navController,
-        startDestination = "landingpage", //HER ENDRER JEG BARE TIL LANDINGPAGE FOR Å SE DEN PÅ APPEN
+        startDestination = "landingpage",
         modifier = modifier.padding(innerPadding)
     ){
         composable("map") {
