@@ -20,9 +20,7 @@ import project.team36.ui.findplants.SavePlantDialog
 import project.team36.ui.myplaces.MyPlacesScreen
 import project.team36.ui.landingpage.LandingPageScreen
 import project.team36.ui.landingpage.LandingPageViewModel
-import project.team36.ui.navigation.SplashScreen
 
-//import project.team36.ui.plant.PlantSwipeViewModel
 
 @Composable
 fun AppNavHost(
@@ -37,7 +35,7 @@ fun AppNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = "splash",
+        startDestination = "landingpage",
         modifier = modifier
     ){
         composable("map") {
@@ -49,19 +47,7 @@ fun AppNavHost(
                 myPlantsViewModel = myPlantsViewModel
             )
         }
-        composable("splash") {
-            SplashScreen(
-                onSplashFinished = {
-                    // Når videoen er ferdig, navigerer vi til landingpage
-                    navController.navigate("landingpage") {
-                        // popUpTo sørger for at vi "kaster" splash-skjermen ut av minnet.
-                        // Da lukkes appen hvis brukeren trykker på tilbake-knappen fra landingpage,
-                        // i stedet for å spille av videoen på nytt.
-                        popUpTo("splash") { inclusive = true }
-                    }
-                }
-            )
-        }
+
         composable ("myPlants"){
             MyPlantsScreen(
                 navController = navController,
