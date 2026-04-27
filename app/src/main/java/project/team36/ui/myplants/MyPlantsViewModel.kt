@@ -1,6 +1,7 @@
 package project.team36.ui.myplants
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -146,3 +147,19 @@ class MyPlantsViewModel(
 
 //For å få riktig tidsformat fra siste vanningsdato lagret for hver plante
 fun Long.toIso8601(): String = Instant.ofEpochMilli(this).toString()
+
+
+
+class MyPlantsViewModelFactory(
+    private val repository: LocationRepository,
+    private val savedPlacesViewModel: SavedPlacesViewModel,
+    private val frostRepository: FrostRepository
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(MyPlantsViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return MyPlantsViewModel(repository, savedPlacesViewModel, frostRepository) as T
+        }
+        throw IllegalArgumentException("Ukjent ViewModel klasse")
+    }
+}

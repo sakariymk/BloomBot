@@ -1,6 +1,7 @@
 package project.team36.ui.plant
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.room.PrimaryKey
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -81,3 +82,15 @@ fun SavedPlant.toPlantDetails() = PlantDetails(
     lastWateredDate = lastWateredDate,
     locationId = locationId
 )
+class PlantDetailsViewModelFactory(
+    private val plantRepository: PlantRepository,
+    private val locationRepository: LocationRepository
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(PlantDetailsViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return PlantDetailsViewModel(plantRepository, locationRepository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
