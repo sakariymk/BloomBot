@@ -33,7 +33,7 @@ import project.team36.ui.theme.Team36Theme
 
 @Composable
 fun SimplePlantCard (
-    plant : PlantInfo,
+    plant : PlantDetails,
     onNavigateToPlantDetails : (() -> Unit)? = null
 ) {
     val imageId = if (plant.imageRes != 0) plant.imageRes else R.drawable.defaultplant
@@ -80,7 +80,7 @@ fun SimplePlantCard (
 @Preview(showBackground = true)
 @Composable
 fun SimplePlantInfoCardPreview() {
-    val fakePlant = PlantInfo(
+    val fakePlant = PlantDetails(
         name = "Lilje",
         soil = setOf(SoilType.SAND),
         light = setOf(LightType.FULL),

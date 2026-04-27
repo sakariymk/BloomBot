@@ -17,7 +17,7 @@ import project.team36.model.location.SavedPlant
         SavedLocation::class,
         SavedPlant::class
     ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 
@@ -36,6 +36,14 @@ abstract class AppDatabase : RoomDatabase() {
                 )
             }
         }
+
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "ALTER TABLE saved_plants ADD COLUMN lastFertilizationDate INTEGER NOT NULL DEFAULT 0"
+                )
+            }
+        }
         @Volatile
         private var INSTANCE: AppDatabase? = null
         fun getDatabase(context: Context): AppDatabase {
@@ -45,8 +53,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "app_database"
                 )
-                    .addMigrations(MIGRATION_2_3)
-                    .fallbackToDestructiveMigration()
+                    .addMigrations(MIGRATION_2_3, MIGRATION_3_4)
                     .build()
                 INSTANCE = instance
                 instance

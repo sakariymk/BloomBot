@@ -25,7 +25,6 @@ import java.util.concurrent.TimeUnit
 import project.team36.ui.findplants.FindPlantsViewModel
 import project.team36.data.ai.ClaudeApi
 import project.team36.data.ai.HybridAiRepository
-import project.team36.data.klima.MetWeatherApi
 import project.team36.data.klima.frost.FrostRepository
 import project.team36.data.local.AppDatabase
 import project.team36.data.local.LocationRepository
@@ -119,7 +118,6 @@ class MainActivity : ComponentActivity() {
         val metRetrofit = Retrofit.Builder()
             .baseUrl("https://api.met.no/")
             .build()
-        val metWeatherApi = metRetrofit.create(MetWeatherApi::class.java) //TODO: se om dette trengs?
 
         val claudeKey = "***FJERNET***"
         val frostClientId = "08b40da1-9456-4846-988a-e5283cf731cb"
@@ -141,7 +139,6 @@ class MainActivity : ComponentActivity() {
             mcpClient = mcpClient,
             // <------ ENDRING: Vi sender inn locationRepository (lokal database) i stedet for dataSource (CSV)
             plantDataSource = locationRepository,
-            frostClientId = frostClientId,
             claudeApiKey = claudeKey
         )
 
@@ -186,7 +183,7 @@ class MainActivity : ComponentActivity() {
                     factory = object : ViewModelProvider.Factory {
                         override fun <T : ViewModel> create(modelClass: Class<T>): T {
                             @Suppress("UNCHECKED_CAST")
-                            return PlantDetailsViewModel(plantRepository) as T
+                            return PlantDetailsViewModel(plantRepository, locationRepository) as T
                         }
                     }
                 )

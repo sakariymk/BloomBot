@@ -8,11 +8,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import project.team36.data.mcp.MetWeatherRepository
+import project.team36.data.mcp.WeatherAlert
 import project.team36.data.mcp.WeatherForecast
 import project.team36.model.location.SavedLocation
 import kotlin.jvm.java
 import project.team36.data.ai.HybridAiRepository
 import project.team36.model.ai.AiRecommendationResponse
+
 
 
 
@@ -26,6 +28,8 @@ data class WeatherUiState(
 data class LandingPageUiState(
     val locationForecasts: Map<Long, WeatherUiState?> = emptyMap(),
     val isWeatherLoading: Boolean = false,
+    val locationAlerts : Map <Long, List<WeatherAlert>> = emptyMap(),
+    val isAlertsLoading : Boolean = false,
     val aiResponse: AiRecommendationResponse? = null,
     val isAiLoading: Boolean = false,
     val isFutureAiLoading: Boolean = false
@@ -90,21 +94,41 @@ class LandingPageViewModel(
     fun dismissAiAdvice() {
         _uiState.value = _uiState.value.copy(aiResponse = null)
     }
-    fun loadWeatherForLocations(locations: List<SavedLocation>) {
+
+    fun loadDataForLocations(locations: List<SavedLocation>) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isWeatherLoading = true)
-            val forecasts = locations.associate { location ->
+            _uiState.value = _uiState.value.copy(isWeatherLoading = true, isAlertsLoading = true)
+
+            // Henter alle varsler
+            val allAlerts = runCatching { weatherRepository.getAllAlerts() }.getOrDefault(emptyList())
+
+            val alertsMap = mutableMapOf<Long, List<WeatherAlert>>()
+            val forecastsMap = mutableMapOf<Long, WeatherUiState?>()
+
+            locations.forEach { location ->
+                val lat = location.lat ?: 0.0
+                val lon = location.lon ?: 0.0
+
+                // Filtrer varsler som treffer akkurat denne lokasjonen
+                val relevantAlerts = allAlerts.filter { alert ->
+                    alert.polygons.any { polygon ->
+                        weatherRepository.isPointInPolygon(lat, lon, polygon)
+                    }
+                }
+                alertsMap[location.id] = relevantAlerts
+
+                // Hent værvarsel
                 val forecast = runCatching {
-                    weatherRepository.getParsedForecast(
-                        location.lat ?: 0.0,
-                        location.lon ?: 0.0
-                    )
+                    weatherRepository.getParsedForecast(lat, lon)
                 }.getOrNull()
-                location.id to forecast?.toUiState()
+                forecastsMap[location.id] = forecast?.toUiState()
             }
+
             _uiState.value = _uiState.value.copy(
-                locationForecasts = forecasts,
-                isWeatherLoading = false
+                locationForecasts = forecastsMap,
+                locationAlerts = alertsMap,
+                isWeatherLoading = false,
+                isAlertsLoading = false
             )
         }
     }

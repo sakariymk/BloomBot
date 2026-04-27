@@ -29,11 +29,11 @@ fun SwitchLocationDialog (
 
     AlertDialog (
         onDismissRequest = onDismiss,
-        title = { Text("Endre sted") },
+        title = { Text("Endre hage") },
         text = {
             Column {
                 if (savedLocations.isEmpty()) {
-                    Text("Du har ingen lagrede steder enda. Legg til et nytt sted.") // kanskje ordne CTA til kartet her?
+                    Text("Du har ingen lagrede hager enda. Legg til en ny hage.") // kanskje ordne CTA til kartet her?
                 } else {
                     savedLocations.forEach { location ->
                         Row(

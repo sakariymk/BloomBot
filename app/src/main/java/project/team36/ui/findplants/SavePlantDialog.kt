@@ -18,10 +18,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import project.team36.model.location.SavedLocation
 import project.team36.model.plant.PlantInfo
+import project.team36.ui.plant.PlantDetails
 
 @Composable
 fun SavePlantDialog(
-    plant: PlantInfo,
+    plant: PlantDetails,
     savedLocations: List<SavedLocation>,
     onConfirm: (SavedLocation) -> Unit,
     onDismiss: () -> Unit
@@ -34,7 +35,7 @@ fun SavePlantDialog(
         text = {
             Column() {
                 if (savedLocations.isEmpty()) {
-                    Text("Du har ingen lagrede steder enda. Legg til et sted på kartet først")
+                    Text("Du har ingen lagrede hager enda. Legg til en hage på kartet først.")
                 }
                 else {
                     savedLocations.forEach { location ->
