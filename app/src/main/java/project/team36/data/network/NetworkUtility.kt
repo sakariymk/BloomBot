@@ -1,0 +1,18 @@
+package project.team36.data.network
+
+import android.content.Context
+import android.net.NetworkCapabilities
+import android.view.View
+import androidx.compose.material3.Snackbar
+
+object NetworkUtility {
+    fun isNetworkAvailable(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        val network = connectivityManager.activeNetwork ?: return false
+        val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
+
+        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    }
+}

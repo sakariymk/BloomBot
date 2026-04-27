@@ -5,6 +5,12 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -25,6 +31,7 @@ import project.team36.data.local.AppDatabase
 import project.team36.data.local.LocationRepository
 import project.team36.data.mcp.MetMcpClient
 import project.team36.data.mcp.MetWeatherRepository
+import project.team36.data.network.ConnectivityObserver
 import project.team36.data.plant.PlantDataSource
 import project.team36.data.plant.PlantRepository
 import project.team36.ui.landingpage.LandingPageViewModel
@@ -142,6 +149,19 @@ class MainActivity : ComponentActivity() {
             Team36Theme {
                 val navController = rememberNavController()
 
+                val connectivityObserver = remember { ConnectivityObserver(applicationContext) }
+                val isConnected by connectivityObserver.isConnected.collectAsState(initial = true)
+
+                val snackbarHostState = remember { SnackbarHostState() }
+                LaunchedEffect(isConnected) {
+                    if (!isConnected) {
+                        snackbarHostState.showSnackbar(
+                            message = "No internet connection",
+                            duration = SnackbarDuration.Indefinite
+                        )
+                    }
+                }
+
                 val landingPageViewModel: LandingPageViewModel = viewModel(
                     factory = LandingPageViewModelFactory(metWeatherRepository, hybridAiRepository)
                 )
@@ -173,6 +193,7 @@ class MainActivity : ComponentActivity() {
 
                 AppNavHost(
                     navController = navController,
+                    snackbarHostState: SnackbarHostState,
                     mapViewModel = mapViewModel,
                     findPlantsViewModel = findPlantsViewModel,
                     myPlantsViewModel = myPlantsViewModel,
