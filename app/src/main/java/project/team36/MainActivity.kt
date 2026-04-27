@@ -5,6 +5,14 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -22,6 +30,7 @@ import project.team36.data.local.AppDatabase
 import project.team36.data.local.LocationRepository
 import project.team36.data.mcp.MetMcpClient
 import project.team36.data.mcp.MetWeatherRepository
+import project.team36.data.network.ConnectivityObserver
 import project.team36.data.plant.PlantDataSource
 import project.team36.data.plant.PlantRepository
 import project.team36.ui.findplants.FindPlantsViewModelFactory
@@ -36,6 +45,7 @@ import project.team36.ui.myplants.MyPlantsViewModelFactory
 import project.team36.ui.plant.PlantDetailsViewModel
 import project.team36.ui.plant.PlantDetailsViewModelFactory
 import project.team36.ui.theme.Team36Theme
+import androidx.compose.runtime.DisposableEffect
 
 
 class MainActivity : ComponentActivity() {
@@ -95,6 +105,25 @@ class MainActivity : ComponentActivity() {
             Team36Theme {
                 val navController = rememberNavController()
 
+                val connectivityObserver = remember { ConnectivityObserver(applicationContext) }
+
+                DisposableEffect(Unit) {
+                    connectivityObserver.register()
+                    onDispose { connectivityObserver.unregister() }
+                }
+
+                val isConnected by connectivityObserver.isConnected.collectAsState(initial = true)
+
+                val snackbarHostState = remember { SnackbarHostState() }
+                LaunchedEffect(isConnected) {
+                    if (!isConnected) {
+                        snackbarHostState.showSnackbar(
+                            message = "Ingen internettforbindelse",
+                            duration = SnackbarDuration.Indefinite
+                        )
+                    }
+                }
+
                 val landingPageViewModel: LandingPageViewModel = viewModel(
                     factory = LandingPageViewModelFactory(metWeatherRepository, hybridAiRepository)
                 )
@@ -124,6 +153,7 @@ class MainActivity : ComponentActivity() {
 
                 AppNavHost(
                     navController = navController,
+                    snackbarHostState = snackbarHostState,
                     mapViewModel = mapViewModel,
                     findPlantsViewModel = findPlantsViewModel,
                     myPlantsViewModel = myPlantsViewModel,
