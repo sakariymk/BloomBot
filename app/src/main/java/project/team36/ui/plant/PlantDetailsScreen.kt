@@ -155,6 +155,10 @@ fun PlantDetailsScreen(
                     }
 
                 }
+                PlantInfoCard(title = "Om planten") {
+                    Text("${plant.description}")
+                }
+                Spacer(modifier = Modifier.height(8.dp))
                 PlantInfoCard(title = "Plantingsmåned") {
                     Text("Dette er de ideelle månedene å plante denne planten.")
                     PlantingMonthBar(plantingMonth = plant.plantingMonth)
