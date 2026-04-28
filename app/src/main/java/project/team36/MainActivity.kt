@@ -154,7 +154,7 @@ class MainActivity : ComponentActivity() {
                     onDispose { connectivityObserver.unregister() }
                 }
 
-                val isConnected by connectivityObserver.isConnected.collectAsState(initial = true)
+                val isConnected by connectivityObserver.isConnected.collectAsState()
 
                 val snackbarHostState = remember { SnackbarHostState() }
                 LaunchedEffect(isConnected) {
