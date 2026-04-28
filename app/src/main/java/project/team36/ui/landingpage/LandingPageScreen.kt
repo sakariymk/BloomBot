@@ -66,6 +66,7 @@ fun LandingPageScreen(
     val locationPermission = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
     val allPlants by myPlantsViewModel.allPlants.collectAsStateWithLifecycle()
 
+    //TODO: logikken i denne bør flyttes til ViewModel, for kompleks for screen -T
     val plantsByLocation = remember(savedLocations, allPlants) {
         savedLocations.associateWith { location ->
             allPlants
