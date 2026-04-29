@@ -65,8 +65,7 @@ fun AppNavHost(
                 modifier = modifier,
                 viewModel = mapViewModel,
                 navController = navController,
-                savedPlacesViewModel = savedPlacesViewModel,
-                myPlantsViewModel = myPlantsViewModel
+                savedPlacesViewModel = savedPlacesViewModel
             )
         }
         composable ("myPlants"){

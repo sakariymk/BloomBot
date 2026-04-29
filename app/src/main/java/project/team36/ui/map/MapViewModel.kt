@@ -35,14 +35,6 @@ import project.team36.ui.map.ClimateZoneConfig.LAYER_ID
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-data class SavedPlace(
-    val result: SearchResult,
-    val customName: String,
-    val plants: List<PlantInfo> = emptyList(),
-    val id: String = UUID.randomUUID().toString()
-
-)
-
 data class MapUiState(
     val centerLng: Double = 9.30,
     val centerLat: Double = 63.59,
@@ -86,6 +78,11 @@ class MapViewModel(
         ApiType.SEARCH_BOX,
         SearchEngineSettings()
     )
+
+    fun resetState() {
+        _uiState.value = MapUiState()
+        hasLoadedAlerts = false
+    }
 
     fun updateUserPosition(lat: Double, lon: Double) {
         if (!hasLoadedAlerts) {
