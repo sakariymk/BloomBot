@@ -158,8 +158,9 @@ class MainActivity : ComponentActivity() {
                     )
                 )
                 val mapViewModel: MapViewModel = viewModel(
-                    factory = MapViewModelFactory(hybridAiRepository, metWeatherRepository)
+                    factory = MapViewModelFactory(metWeatherRepository, locationRepository)
                 )
+
                 val plantDetailsViewModel: PlantDetailsViewModel = viewModel(
                     factory = PlantDetailsViewModelFactory(plantRepository, locationRepository)
                 )

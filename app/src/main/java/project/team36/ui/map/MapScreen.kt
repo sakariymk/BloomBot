@@ -21,6 +21,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -48,7 +50,8 @@ import com.mapbox.maps.extension.style.layers.generated.fillLayer
 import com.mapbox.maps.extension.style.sources.addSource
 import com.mapbox.maps.extension.style.sources.generated.vectorSource
 import project.team36.R
-import project.team36.ui.myplants.MyPlantsViewModel
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import project.team36.ui.navigation.BottomNavBar
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
@@ -62,17 +65,27 @@ fun MapScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val savedLocations by savedPlacesViewModel.savedLocations.collectAsStateWithLifecycle()
     val mapViewportState = viewModel.mapViewportState
+    val context = LocalContext.current
 
     val locationPermissionState = rememberPermissionState(
         Manifest.permission.ACCESS_FINE_LOCATION
     )
+    var showLocationChoiceDialog by remember(savedLocations.isEmpty()) {
+        mutableStateOf(savedLocations.isEmpty())
+    }
+    var permissionRequested by remember { mutableStateOf(false) }
 
     LaunchedEffect(navController.currentBackStackEntry) {
         viewModel.resetState()
     }
-
     LaunchedEffect(Unit) {
         locationPermissionState.launchPermissionRequest()
+    }
+    LaunchedEffect(locationPermissionState.status.isGranted) {
+        if (permissionRequested && locationPermissionState.status.isGranted) {
+            viewModel.requestLiveLocationSave()
+            showLocationChoiceDialog = false
+        }
     }
 
     Scaffold(
@@ -188,6 +201,45 @@ fun MapScreen(
                 )
             }
 
+            if(showLocationChoiceDialog) {
+                AlertDialog(
+                    onDismissRequest = {showLocationChoiceDialog = false},
+                    title = {Text("Hvor vil du dyrke?")},
+                    confirmButton = {
+                        TextButton(onClick = {
+                            if (locationPermissionState.status.isGranted) {
+                                viewModel.requestLiveLocationSave()
+                                showLocationChoiceDialog = false
+                            } else {
+                                permissionRequested = true
+                                locationPermissionState.launchPermissionRequest()
+                            }
+                        }) {Text("Bruk min posisjon")}
+                    },
+                    dismissButton = {
+                        TextButton(onClick = {showLocationChoiceDialog = false}) {
+                            Text("Søk opp adresse")
+                        }
+                    }
+                )
+            }
+
+            if (uiState.showLiveLocationConfirm) {
+                AlertDialog(
+                    onDismissRequest = { viewModel.dismissLiveLocationConfirm() },
+                    title = { Text("Lagre sted?") },
+                    text = { Text("Vil du lagre din nåværende posisjon?") },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            viewModel.confirmSaveLiveLocation(context) { navController.navigate("myPlaces") }
+                        }) { Text("Ja") }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { viewModel.dismissLiveLocationConfirm() }) { Text("Nei") }
+                    }
+                )
+            }
+
             if (uiState.showSaveDialog) {
                 AlertDialog(
                     onDismissRequest = { viewModel.dismissSaveDialog() },
@@ -195,9 +247,7 @@ fun MapScreen(
                     confirmButton = {
                         TextButton(
                             onClick = {
-                                viewModel.confirmSavePlace(savedPlacesViewModel) {
-                                    navController.navigate("myPlaces")
-                                }
+                                viewModel.confirmSavePlace { navController.navigate("myPlaces") }
                                 viewModel.dismissSaveDialog()
                             }) { Text("Ja") }
                     },
