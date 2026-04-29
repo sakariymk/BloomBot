@@ -1,5 +1,6 @@
 package project.team36.ui.navigation
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -33,7 +34,8 @@ fun BottomNavBar(navController: NavController, savedPlacesViewModel : SavedPlace
     )
 
     NavigationBar(
-        containerColor = Color(0xFF243B37)
+        containerColor = Color(0xFF243B37),
+        windowInsets = WindowInsets(0) //gjør at navigasjonsbaren ikke legger til ekstra padding under
     ) {
         NavigationBarItem(
             selected = activeRoute == "landingpage",

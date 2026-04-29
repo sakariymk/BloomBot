@@ -172,7 +172,8 @@ fun MyPlantsScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFFE8F5E2)
-                )
+                ),
+                windowInsets = WindowInsets(0) //gjør at appen ikke legger til mye mellomrom på toppen av skjermen
             )
         },
 
