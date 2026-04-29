@@ -79,6 +79,11 @@ class MapViewModel(
         SearchEngineSettings()
     )
 
+    fun resetState() {
+        _uiState.value = MapUiState()
+        hasLoadedAlerts = false
+    }
+
     fun updateUserPosition(lat: Double, lon: Double) {
         if (!hasLoadedAlerts) {
             hasLoadedAlerts = true

@@ -67,6 +67,10 @@ fun MapScreen(
         Manifest.permission.ACCESS_FINE_LOCATION
     )
 
+    LaunchedEffect(navController.currentBackStackEntry) {
+        viewModel.resetState()
+    }
+
     LaunchedEffect(Unit) {
         locationPermissionState.launchPermissionRequest()
     }
