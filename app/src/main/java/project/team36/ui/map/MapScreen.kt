@@ -3,11 +3,15 @@ package project.team36.ui.map
 import android.Manifest
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -52,7 +56,18 @@ import com.mapbox.maps.extension.style.sources.generated.vectorSource
 import project.team36.R
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import project.team36.ui.navigation.BottomNavBar
+import androidx.compose.ui.window.Dialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.height
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -201,27 +216,76 @@ fun MapScreen(
                 )
             }
 
-            if(showLocationChoiceDialog) {
-                AlertDialog(
-                    onDismissRequest = {showLocationChoiceDialog = false},
-                    title = {Text("Hvor vil du dyrke?")},
-                    confirmButton = {
-                        TextButton(onClick = {
-                            if (locationPermissionState.status.isGranted) {
-                                viewModel.requestLiveLocationSave()
-                                showLocationChoiceDialog = false
-                            } else {
-                                permissionRequested = true
-                                locationPermissionState.launchPermissionRequest()
+            if (showLocationChoiceDialog) {
+                Dialog(onDismissRequest = { showLocationChoiceDialog = false }) {
+                    Card(
+                        shape = RoundedCornerShape(24.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFEDF7E6)),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(24.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text("🌱", fontSize = 48.sp)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                "Hvor vil du dyrke?",
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                "Vi bruker posisjonen din til å finne planter som passer der du er",
+                                fontSize = 14.sp,
+                                textAlign = TextAlign.Center,
+                                color = Color.DarkGray
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            Text(
+                                "🪴  Anbefalte planter for stedet",
+                                fontSize = 14.sp,
+                                textAlign = TextAlign.Center
+                                )
+
+                            Text("🌡  Lokal temperatur og klima",
+                                fontSize = 14.sp,
+                                textAlign = TextAlign.Center
+                            )
+
+                            Spacer(modifier = Modifier.height(24.dp))
+
+                            Button(
+                                onClick = {
+                                    if (locationPermissionState.status.isGranted) {
+                                        viewModel.requestLiveLocationSave()
+                                        showLocationChoiceDialog = false
+                                    } else {
+                                        permissionRequested = true
+                                        locationPermissionState.launchPermissionRequest()
+                                    }
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(50.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3))
+                            ) {
+                                Text("Bruk min posisjon nå", color = Color.White, modifier = Modifier.padding(vertical = 4.dp))
                             }
-                        }) {Text("Bruk min posisjon")}
-                    },
-                    dismissButton = {
-                        TextButton(onClick = {showLocationChoiceDialog = false}) {
-                            Text("Søk opp adresse")
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            OutlinedButton(
+                                onClick = { showLocationChoiceDialog = false },
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(50.dp)
+                            ) {
+                                Text("Søk etter en adresse", color = Color.DarkGray, modifier = Modifier.padding(vertical = 4.dp))
+                            }
                         }
                     }
-                )
+                }
             }
 
             if (uiState.showLiveLocationConfirm) {
