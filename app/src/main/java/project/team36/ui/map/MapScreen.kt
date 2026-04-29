@@ -57,7 +57,6 @@ fun MapScreen(
     modifier: Modifier = Modifier,
     viewModel: MapViewModel = viewModel(),
     savedPlacesViewModel: SavedPlacesViewModel,
-    myPlantsViewModel: MyPlantsViewModel,
     navController: NavController,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -209,21 +208,7 @@ fun MapScreen(
         uiState.selectedSavedLocation?.let { location ->
             PlaceInfoCard(
                 location = location,
-                onGetAiAdvice = { loc -> viewModel.fetchAiAdvice(loc) },
-                onGetFutureAiAdvice = { loc -> viewModel.fetchFutureAiAdvice(loc) },
-                aiResponse = uiState.aiResponse,
-                isAiLoading = uiState.isAiLoading,
-                isFutureAiLoading = uiState.isFutureAiLoading,
-                onDismissAi = { viewModel.dismissAiAdvice() },
                 onDismiss = { viewModel.dismissPlaceInfo() },
-                onEdit = { newName ->
-                    savedPlacesViewModel.updateLocation(location.copy(name = newName))
-                    viewModel.dismissPlaceInfo()
-                },
-                onDelete = {
-                    myPlantsViewModel.deleteLocation(location)
-                    viewModel.dismissPlaceInfo()
-                },
                 navController = navController as NavHostController
             )
         }
