@@ -95,7 +95,8 @@ fun LandingPageScreen(
                         color = Color(0xFF2E7D32)
                     )
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFE8F5E2))
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFE8F5E2)),
+                windowInsets = WindowInsets(0) //gjør at appen ikke legger til mye mellomrom på toppen av skjermen
             )
         },
         bottomBar = { BottomNavBar(navController = navController, savedPlacesViewModel) }
