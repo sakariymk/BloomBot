@@ -46,12 +46,25 @@ import project.team36.ui.plant.PlantDetailsViewModel
 import project.team36.ui.plant.PlantDetailsViewModelFactory
 import project.team36.ui.theme.Team36Theme
 import androidx.compose.runtime.DisposableEffect
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.SystemBarStyle
+import androidx.core.view.WindowCompat
 
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        //gjør statusbaren gjennomsiktig i appen
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.light(
+                scrim = android.graphics.Color.TRANSPARENT,
+                darkScrim = android.graphics.Color.TRANSPARENT
+            ),
+            //setter fargen til telefonens navigasjonsknapper
+            navigationBarStyle = SystemBarStyle.dark(
+                scrim = 0xFF243B37.toInt()
+            )
+        )
         val dataSource = PlantDataSource(this)
         val db = AppDatabase.getDatabase(this)
         val locationRepository = LocationRepository(db.savedLocationDao(), db.savedPlantDao())
