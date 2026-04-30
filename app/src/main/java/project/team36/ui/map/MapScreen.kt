@@ -93,9 +93,6 @@ fun MapScreen(
     LaunchedEffect(navController.currentBackStackEntry) {
         viewModel.resetState()
     }
-    LaunchedEffect(Unit) {
-        locationPermissionState.launchPermissionRequest()
-    }
     LaunchedEffect(locationPermissionState.status.isGranted) {
         if (permissionRequested && locationPermissionState.status.isGranted) {
             viewModel.requestLiveLocationSave()
