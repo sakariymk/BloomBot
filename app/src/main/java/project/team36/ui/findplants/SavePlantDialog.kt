@@ -11,6 +11,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -27,7 +28,7 @@ fun SavePlantDialog(
     onConfirm: (SavedLocation) -> Unit,
     onDismiss: () -> Unit
 ) {
-    var selectedLocation by rememberSaveable() { mutableStateOf<SavedLocation?>(null) }
+    var selectedLocation by remember() { mutableStateOf<SavedLocation?>(null) } //endret fra rememberSaveable, grunnen til kræsj av app ved testing
 
     AlertDialog(
         onDismiss,

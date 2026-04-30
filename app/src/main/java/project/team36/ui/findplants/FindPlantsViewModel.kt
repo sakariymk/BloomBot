@@ -25,6 +25,8 @@ class FindPlantsViewModel (
 ) : ViewModel() {
     private val _plants = MutableStateFlow<List<PlantDetails>>(emptyList())
     val plants: StateFlow<List<PlantDetails>> = _plants.asStateFlow()
+    private val _notRecommendedPlants = MutableStateFlow<List<PlantDetails>>(emptyList())
+    val notRecommendedPlants: StateFlow<List<PlantDetails>> = _notRecommendedPlants.asStateFlow()
 
     private val _pendingPlant = MutableStateFlow<PlantDetails?>(null)
     val pendingPlant: StateFlow<PlantDetails?> = _pendingPlant.asStateFlow()
@@ -101,11 +103,13 @@ class FindPlantsViewModel (
             locationRepository.getPlantsForLocation(location.id)
                 .first()
                 .let { savedPlants ->
-                    Log.d("FindPlants", "Location zone: ${location.zone}, savedPlants: ${savedPlants.size}")
-                    val result = plantRepository.recommendPlants(location, savedPlants)
+                    val recommended = plantRepository.recommendPlants(location, savedPlants)
                         .map { it.toPlantDetails() }
-                    Log.d("FindPlants", "Recommended plants: ${result.size}")
-                    _plants.value = result
+                    _plants.value = recommended
+
+                    val notRecommended = plantRepository.notRecommendedPlants(location, savedPlants)
+                        .map { it.toPlantDetails() }
+                    _notRecommendedPlants.value = notRecommended
                 }
         }
     }
