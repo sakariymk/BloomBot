@@ -148,7 +148,8 @@ fun PlantDetailsScreen(
                             shape = RoundedCornerShape(50),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.secondary
-                            )
+                            ),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                         ) {
                             Text("Fjern plante fra hage", color = MaterialTheme.colorScheme.onSecondary)
                         }

@@ -15,10 +15,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,20 +28,12 @@ import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import project.team36.R
 import project.team36.data.mcp.WeatherAlert
 import project.team36.model.location.SavedPlant
-import project.team36.model.plant.LightType
-import project.team36.model.plant.SoilType
-import project.team36.ui.theme.errorLight
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -150,13 +141,13 @@ fun PlantCard(
                     //Teller ned på vanningsdager siden sist vanning, eller siden det sist regnet 5 mm
                     InfoSection(
                         title = "Vanningsbehov",
-                        subtitle = when {
-                            daysUntilWatering == 0L -> "Må vannes nå!"
-                            daysUntilWatering == 1L -> "$daysUntilWatering dag til neste vanning"
+                        subtitle = when (daysUntilWatering) {
+                            0L -> "Må vannes nå!"
+                            1L -> "$daysUntilWatering dag til neste vanning"
                             else -> "$daysUntilWatering dager til neste vanning"
                         },
                         buttonText = "Jeg har vannet",
-                        buttonColor = MaterialTheme.colorScheme.primary,
+                        buttonColor = MaterialTheme.colorScheme.onPrimary,
                         onButtonClick = onMarkAsWatered
                     )
 
@@ -173,7 +164,7 @@ fun PlantCard(
                             "$daysSinceFertilizing dager siden sist gjødsling (${plant.lastFertilizationDate.toDisplayDate()})"
                         },
                         buttonText = "Jeg har gjødslet",
-                        buttonColor = MaterialTheme.colorScheme.primary,
+                        buttonColor = MaterialTheme.colorScheme.onPrimary,
                         onButtonClick = onMarkAsFertilized
                     )
                     // Knapp for å navigere til detaljskjerm for plante med en slett-knapp
@@ -194,7 +185,7 @@ fun PlantCard(
                                 color = MaterialTheme.colorScheme.onSecondary
                             )
                             Icon(
-                                imageVector = Icons.Default.ArrowForward,
+                                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onSecondary,
                                 modifier = Modifier.size(14.dp)
@@ -276,14 +267,14 @@ private fun InfoSection(
         Spacer(modifier = Modifier.width(8.dp))
         Button(
             onClick = onButtonClick,
-            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
+            colors = ButtonDefaults.buttonColors(buttonColor),
             shape = RoundedCornerShape(50),
             contentPadding = PaddingValues(horizontal = 14.dp, vertical = 7.dp),
         ) {
             Text(
                 text = buttonText,
                 fontSize = 13.sp,
-                color = MaterialTheme.colorScheme.onBackground
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
     }
@@ -291,7 +282,7 @@ private fun InfoSection(
 //Hjelpefunksjon for å definere displayformatet på dato fra database
 fun Long.toDisplayDate(): String {
     if (this == 0L) return "Ikke gjødslet enda"
-    val sdf = SimpleDateFormat("dd.MMMM yyyy", Locale("no"))
+    val sdf = SimpleDateFormat("dd.MMMM yyyy", Locale.forLanguageTag("no"))
     return sdf.format(Date(this))
 }
 
