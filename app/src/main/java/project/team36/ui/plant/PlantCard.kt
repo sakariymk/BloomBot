@@ -42,14 +42,13 @@ import project.team36.data.mcp.WeatherAlert
 import project.team36.model.location.SavedPlant
 import project.team36.model.plant.LightType
 import project.team36.model.plant.SoilType
+import project.team36.ui.theme.errorLight
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 // Farger for kortet - se om de kan lagres i Theme
-private val ColorAlert = Color(0xFFFF9EA0) //varslingstag
-private val ColorButtons = Color(0xFFB5DBFF) //knapper
-private val ColorBackground = Color(0xFFE8F8E3) //bakgrunn på seksjoner
+
 
 @Composable
 fun PlantCard(
@@ -78,7 +77,7 @@ fun PlantCard(
             )
             .clickable { expanded = !expanded },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
@@ -106,7 +105,7 @@ fun PlantCard(
                         text = plant.name,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color.Black
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
 
@@ -118,7 +117,7 @@ fun PlantCard(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .background(
-                                color = ColorAlert ,
+                                color = MaterialTheme.colorScheme.error,
                                 RoundedCornerShape(50)
                             )
                             .padding(horizontal = 12.dp, vertical = 6.dp)
@@ -126,7 +125,7 @@ fun PlantCard(
                         Icon(
                             painter = painterResource(id = R.drawable.wateringcan),
                             contentDescription = null,
-                            tint = Color.White,
+                            tint = MaterialTheme.colorScheme.onError,
                             modifier = Modifier.size(14.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
@@ -134,7 +133,7 @@ fun PlantCard(
                             text = "Må vannes",
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Medium,
-                            color = Color.White
+                            color = MaterialTheme.colorScheme.onError
                         )
                     }
                 }
@@ -157,7 +156,7 @@ fun PlantCard(
                             else -> "$daysUntilWatering dager til neste vanning"
                         },
                         buttonText = "Jeg har vannet",
-                        buttonColor = ColorButtons,
+                        buttonColor = MaterialTheme.colorScheme.primary,
                         onButtonClick = onMarkAsWatered
                     )
 
@@ -174,7 +173,7 @@ fun PlantCard(
                             "$daysSinceFertilizing dager siden sist gjødsling (${plant.lastFertilizationDate.toDisplayDate()})"
                         },
                         buttonText = "Jeg har gjødslet",
-                        buttonColor = ColorButtons,
+                        buttonColor = MaterialTheme.colorScheme.primary,
                         onButtonClick = onMarkAsFertilized
                     )
                     // Knapp for å navigere til detaljskjerm for plante med en slett-knapp
@@ -183,7 +182,7 @@ fun PlantCard(
                         modifier = Modifier
                             .align(Alignment.Start)
                             .padding(top = 8.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = ColorBackground)
+                        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary)
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -192,12 +191,12 @@ fun PlantCard(
                             Text(
                                 text = "Se detaljer",
                                 fontSize = 13.sp,
-                                color = Color.Black
+                                color = MaterialTheme.colorScheme.onSecondary
                             )
                             Icon(
                                 imageVector = Icons.Default.ArrowForward,
                                 contentDescription = null,
-                                tint = Color.Black,
+                                tint = MaterialTheme.colorScheme.onSecondary,
                                 modifier = Modifier.size(14.dp)
                             )
                         }
@@ -232,7 +231,7 @@ private fun StatusChip(text: String, color: Color) {
         Icon(
             painter = painterResource(id = R.drawable.wateringcan),
             contentDescription = null,
-            tint = Color.White,
+            tint = MaterialTheme.colorScheme.onError,
             modifier = Modifier.size(14.dp)
         )
         Spacer(modifier = Modifier.width(4.dp))
@@ -256,7 +255,7 @@ private fun InfoSection(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(ColorBackground, RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.background, RoundedCornerShape(12.dp))
             .padding(horizontal = 14.dp, vertical = 10.dp),
         verticalAlignment = Alignment.Top
     ) {
@@ -265,26 +264,26 @@ private fun InfoSection(
                 text = title,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = Color.Black
+                color = MaterialTheme.colorScheme.onBackground
             )
             Text(
                 text = subtitle,
                 fontSize = 13.sp,
-                color = Color.Gray,
+                color = MaterialTheme.colorScheme.onBackground,
 
             )
         }
         Spacer(modifier = Modifier.width(8.dp))
         Button(
             onClick = onButtonClick,
-            colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
+            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
             shape = RoundedCornerShape(50),
             contentPadding = PaddingValues(horizontal = 14.dp, vertical = 7.dp),
         ) {
             Text(
                 text = buttonText,
                 fontSize = 13.sp,
-                color = Color.Black
+                color = MaterialTheme.colorScheme.onBackground
             )
         }
     }
@@ -304,7 +303,7 @@ private fun WeatherSection(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(ColorBackground, RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.background, RoundedCornerShape(12.dp))
             .padding(12.dp)
     ) {
         Text(

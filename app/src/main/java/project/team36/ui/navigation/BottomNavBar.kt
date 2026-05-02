@@ -1,6 +1,7 @@
 package project.team36.ui.navigation
 
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
@@ -25,15 +26,15 @@ fun BottomNavBar(navController: NavController, savedPlacesViewModel : SavedPlace
 
 
     val navItemColors = NavigationBarItemDefaults.colors(
-        selectedIconColor = Color.White,
-        unselectedIconColor = Color.White,
-        selectedTextColor = Color.White,
-        unselectedTextColor = Color.White,
-        indicatorColor = Color(0xFF3A5A54)
+        selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        unselectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        selectedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        unselectedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        indicatorColor = MaterialTheme.colorScheme.primary
     )
 
     NavigationBar(
-        containerColor = Color(0xFF243B37)
+        containerColor = MaterialTheme.colorScheme.primaryContainer
     ) {
         NavigationBarItem(
             selected = activeRoute == "landingpage",
