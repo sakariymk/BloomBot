@@ -29,6 +29,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.RichTooltip
@@ -75,7 +76,7 @@ fun PlantDetailsScreen(
     val plants by plantDetailsViewModel.plant.collectAsStateWithLifecycle()
 
     Scaffold(
-        containerColor = Color(0xFFE8F5E2),
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = { },
@@ -84,7 +85,7 @@ fun PlantDetailsScreen(
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Tilbake",
-                            tint = Color(0xFF2E7D32)
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                 },
@@ -125,18 +126,18 @@ fun PlantDetailsScreen(
                         text = plant.name,
                         fontSize = 36.sp,
                         fontWeight = FontWeight.Normal,
-                        color = Color(0xFF2E7D32)
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                     if (onAddPlant != null) {
                         OutlinedButton(
                             onClick = { onAddPlant() },
                             shape = RoundedCornerShape(50),
                             colors = ButtonDefaults.outlinedButtonColors(
-                                containerColor = Color.White
+                                containerColor = MaterialTheme.colorScheme.primary
                             ),
                             border = BorderStroke(0.dp, Color.Gray)
                         ) {
-                            Text("Legg til i hage", color = Color(0xFF2E7D32))
+                            Text("Legg til i hage", color = MaterialTheme.colorScheme.onPrimary)
                         }
                     } else if (onDeletePlant != null) {
                         OutlinedButton(
@@ -150,7 +151,7 @@ fun PlantDetailsScreen(
                             ),
                             border = BorderStroke(0.dp, Color.Gray)
                         ) {
-                            Text("Fjern plante fra hage", color = Color(0xFF2E7D32))
+                            Text("Fjern plante fra hage", color = MaterialTheme.colorScheme.onPrimary)
                         }
                     }
 
@@ -169,7 +170,7 @@ fun PlantDetailsScreen(
                         Icon(
                             imageVector = Icons.Default.DeviceThermostat,
                             contentDescription = null,
-                            tint = Color(0xFF5A7A3A)
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
                             "H${plant.climateZone}",
@@ -190,7 +191,7 @@ fun PlantDetailsScreen(
                             ) {
                                 Text(
                                     text = lightType.displayName,
-                                    color = Color.Black
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         }
@@ -205,7 +206,7 @@ fun PlantDetailsScreen(
                         Icon(
                             imageVector = Icons.Default.WaterDrop,
                             contentDescription = null,
-                            tint = Color(0xFF5A7A3A)
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
                             "Vannes ca. hver ${plant.maxDaysWithoutWater}. dag",
@@ -225,7 +226,7 @@ fun PlantDetailsScreen(
                             ) {
                                 Text(
                                     text = soilType.displayName,
-                                    color = Color.Black
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         }
@@ -242,7 +243,7 @@ fun PlantInfoCard(title: String, content: @Composable ColumnScope.() -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(0.dp)
     ) {
@@ -282,7 +283,7 @@ fun PlantingMonthBar(plantingMonth: Set<Int>) {
                 .fillMaxWidth()
                 .height(20.dp)
                 .clip(RoundedCornerShape(50))
-                .background(Color(0xFFB0C080))
+                .background(MaterialTheme.colorScheme.background)
         ) {
             Spacer(modifier = Modifier.fillMaxWidth(startFraction))
             Box(
@@ -290,7 +291,7 @@ fun PlantingMonthBar(plantingMonth: Set<Int>) {
                     .fillMaxHeight()
                     .fillMaxWidth(widthFraction / (1f - startFraction))
                     .clip(RoundedCornerShape(50))
-                    .background(Color(0xFF5A7A3A)),
+                    .background(MaterialTheme.colorScheme.onBackground),
                 contentAlignment = Alignment.Center
             ) {
                 Text(label, fontSize = 11.sp, color = Color.White)
@@ -320,8 +321,8 @@ fun HardinessZoneTooltip() {
                         }
                     },
                     colors = TooltipDefaults.richTooltipColors(
-                        containerColor = Color(0xFFE8F8E3),
-                        titleContentColor = Color(0xFF2D5A27),
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
                         contentColor = Color.Black,
                         actionContentColor = Color(0xFF2D5A27)
                     )
