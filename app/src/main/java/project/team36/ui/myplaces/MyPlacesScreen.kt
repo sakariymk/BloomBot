@@ -35,6 +35,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -87,7 +88,7 @@ fun MyPlacesScreen (
     }
 
     Scaffold(
-        containerColor = Color.Transparent,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = {
@@ -95,11 +96,11 @@ fun MyPlacesScreen (
                         text = "Mine hager",
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Normal,
-                        color = Color(0xFF2E7D32)
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFFE8F5E2)
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         },
@@ -113,8 +114,8 @@ fun MyPlacesScreen (
                 },
                 icon = { Icon(Icons.Default.Add, contentDescription = "Ny hage") },
                 text = { Text("Ny hage") },
-                containerColor = Color(0xFF2D5A27),
-                contentColor = Color.White,
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
                 shape = RoundedCornerShape(50)
             )
         },
@@ -124,7 +125,7 @@ fun MyPlacesScreen (
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFE8F5E2))
+                .background(MaterialTheme.colorScheme.background)
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp)
         ) {
@@ -163,7 +164,7 @@ fun EmptyLocationCard(
             .fillMaxWidth()
             .border(
                 width = 2.dp,
-                color = Color(0xFF2E7D32),
+                color = MaterialTheme.colorScheme.primary,
                 shape = RoundedCornerShape(16.dp)
             ),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent)
@@ -180,13 +181,13 @@ fun EmptyLocationCard(
                     .fillMaxHeight()
                     .width(80.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFF2E7D32)),
+                    .background(MaterialTheme.colorScheme.primary),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.House,
                     contentDescription = "Ikon av hus",
-                    tint = Color(0xFFE8F5E2),
+                    tint = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(40.dp)
                 )
             }
@@ -194,12 +195,12 @@ fun EmptyLocationCard(
                 Text(
                     text = "Du har ingen lagrede hager enda.\nLegg til din første hage!",
                     fontSize = 14.sp,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onBackground
                 )
                 Button(
                     onClick = onAddPlaceClick,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF2E7D32)
+                        containerColor = MaterialTheme.colorScheme.primary
                     ),
                     shape = RoundedCornerShape(50),
                     modifier = Modifier.fillMaxWidth(),
@@ -225,7 +226,7 @@ fun LocationCard (
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
@@ -254,7 +255,7 @@ fun LocationCard (
             Icon(
                 imageVector = Icons.Default.ArrowForwardIos,
                 contentDescription = "Gå til $location.name",
-                tint = Color(0xFF2E7D32)
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
     }
@@ -280,7 +281,7 @@ fun MyPlacesScreenPreview() {
                 text = "Mine hager",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Normal,
-                color = Color(0xFF2E7D32),
+                color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.padding(vertical = 16.dp)
             )
             LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {

@@ -114,7 +114,7 @@ fun FindPlantsScreen(
                 Surface(
                     shape = RoundedCornerShape(50),
                     color = MaterialTheme.colorScheme.surface,
-                    border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
+                    border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline)
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,

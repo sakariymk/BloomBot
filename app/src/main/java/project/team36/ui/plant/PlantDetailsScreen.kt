@@ -221,7 +221,7 @@ fun PlantDetailsScreen(
                             OutlinedButton(
                                 onClick = {},
                                 shape = RoundedCornerShape(50),
-                                border = BorderStroke(1.dp, Color.LightGray)
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                             ) {
                                 Text(
                                     text = soilType.displayName,
@@ -338,7 +338,7 @@ fun HardinessZoneTooltip() {
                 Button(
                     onClick = { scope.launch { tooltipState.show() } },
                     shape = RoundedCornerShape(50),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
                     colors = ButtonDefaults.outlinedButtonColors(
                         MaterialTheme.colorScheme.secondary
                     ),
