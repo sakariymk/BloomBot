@@ -26,7 +26,7 @@ fun WeatherCard(
         modifier = modifier
             .padding(horizontal = 6.dp, vertical = 6.dp)
             .height(100.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         when {
