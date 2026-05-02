@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DeviceThermostat
 import androidx.compose.material.icons.filled.WaterDrop
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -129,29 +130,27 @@ fun PlantDetailsScreen(
                         color = MaterialTheme.colorScheme.onBackground
                     )
                     if (onAddPlant != null) {
-                        OutlinedButton(
+                        Button(
                             onClick = { onAddPlant() },
                             shape = RoundedCornerShape(50),
-                            colors = ButtonDefaults.outlinedButtonColors(
+                            colors = ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.primary
-                            ),
-                            border = BorderStroke(0.dp, Color.Gray)
+                            )
                         ) {
                             Text("Legg til i hage", color = MaterialTheme.colorScheme.onPrimary)
                         }
                     } else if (onDeletePlant != null) {
-                        OutlinedButton(
+                        Button(
                             onClick = {
                                 onDeletePlant()
                                 onBackClick()
                             },
                             shape = RoundedCornerShape(50),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                containerColor = Color.White
-                            ),
-                            border = BorderStroke(0.dp, Color.Gray)
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.secondary
+                            )
                         ) {
-                            Text("Fjern plante fra hage", color = MaterialTheme.colorScheme.onPrimary)
+                            Text("Fjern plante fra hage", color = MaterialTheme.colorScheme.onSecondary)
                         }
                     }
 
@@ -336,15 +335,15 @@ fun HardinessZoneTooltip() {
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                OutlinedButton(
+                Button(
                     onClick = { scope.launch { tooltipState.show() } },
                     shape = RoundedCornerShape(50),
-                    border = BorderStroke(1.dp, Color.LightGray),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = Color(0xFFE8F8E3)
+                        Color.Transparent
                     ),
                 ) {
-                    Text("Herdighetssone forklart", color = Color.Black)
+                    Text("Herdighetssone forklart", color = MaterialTheme.colorScheme.onSurface)
                 }
             }
 
