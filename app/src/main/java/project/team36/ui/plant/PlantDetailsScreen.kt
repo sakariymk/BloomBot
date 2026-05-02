@@ -320,9 +320,9 @@ fun HardinessZoneTooltip() {
                         }
                     },
                     colors = TooltipDefaults.richTooltipColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                        contentColor = Color.Black,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        contentColor = MaterialTheme.colorScheme.onSurface,
                         actionContentColor = Color(0xFF2D5A27)
                     )
                 ) {
@@ -338,9 +338,9 @@ fun HardinessZoneTooltip() {
                 Button(
                     onClick = { scope.launch { tooltipState.show() } },
                     shape = RoundedCornerShape(50),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        Color.Transparent
+                        MaterialTheme.colorScheme.secondary
                     ),
                 ) {
                     Text("Herdighetssone forklart", color = MaterialTheme.colorScheme.onSurface)
