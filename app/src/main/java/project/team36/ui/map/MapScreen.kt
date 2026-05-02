@@ -85,7 +85,7 @@ fun MapScreen(
     }
 
     Scaffold(
-        containerColor = Color.Transparent,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = {
@@ -93,7 +93,7 @@ fun MapScreen(
                         text = "Legg til hage",
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Normal,
-                        color = Color(0xFF2E7D32)
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 },
                 navigationIcon = {
@@ -101,12 +101,12 @@ fun MapScreen(
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Lukk skjermen",
-                            tint = Color(0xFF2E7D32)
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFFE8F5E2)
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         },

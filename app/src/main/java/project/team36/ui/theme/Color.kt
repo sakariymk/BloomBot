@@ -26,7 +26,7 @@ val onBackgroundLight = Color(0xFF316322)
 val surfaceLight = Color(0xFFFFFFFF)
 val onSurfaceLight = Color(0xFF316322)
 val outlineLight = Color(0xFF316322)
-val primaryContainerLight = Color(0xFF354E16)
+val primaryContainerLight = Color(0xFF316322)
 val onPrimaryContainerLight = Color(0xFFFFFFFF)
 
 val primaryDark = Color(0xFFB1D18A)

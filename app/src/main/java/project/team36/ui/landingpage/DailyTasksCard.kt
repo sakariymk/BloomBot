@@ -1,7 +1,9 @@
 package project.team36.ui.landingpage
 
+import android.R.attr.bottom
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +22,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -59,26 +62,26 @@ fun DailyTasksCard (
             text = "Dagens oppgaver",
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(start = 16.dp, bottom = 6.dp),
-            color = Color(0xFF316322)
+            color = MaterialTheme.colorScheme.onBackground
         )
 
 
         Card(
             modifier = Modifier
                 .padding(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF316322))
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
         ) {
 
             if (!hasAnyPlants) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface),
                     shape = RoundedCornerShape(16.dp)
                 ) {
                     Text(
                         text = "Ingen planter trenger vann i dag!",
                         modifier = Modifier.padding(16.dp),
-                        color = Color(0xFF316322)
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             } else {
@@ -88,14 +91,14 @@ fun DailyTasksCard (
                         Text(
                             text = location.name ?: "Ukjent hage",
                             style = MaterialTheme.typography.labelMedium,
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
                             modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 4.dp)
                         )
 
                         Card(
                             modifier = Modifier
                                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color.White),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                             shape = RoundedCornerShape(16.dp),
                             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                         ) {
@@ -157,7 +160,8 @@ fun DailyPlantRow(
                 Text(
                     text = plant.name,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -165,13 +169,13 @@ fun DailyPlantRow(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .background(Color(0xFFD32F2F), RoundedCornerShape(50))
+                    .background(MaterialTheme.colorScheme.error, RoundedCornerShape(50))
                     .padding(horizontal = 12.dp, vertical = 6.dp)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.wateringcan),
                     contentDescription = null,
-                    tint = Color.White,
+                    tint = MaterialTheme.colorScheme.onError,
                     modifier = Modifier.size(14.dp)
                 )
 
@@ -181,11 +185,18 @@ fun DailyPlantRow(
                     text = "Må vannes",
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.onError
                 )
             }
 
 
+        }
+
+        if (expanded) {
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 12.dp),
+                color = MaterialTheme.colorScheme.outline
+            )
         }
 
         //innhold når kortet er expanded
@@ -198,38 +209,36 @@ fun DailyPlantRow(
             ) {
 
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F8E3))
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
 
-                    Column(
-                        modifier = Modifier.padding(8.dp)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = "Vanningsbehov",
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color.DarkGray,
-                            fontSize = 13.sp
-                        )
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(2.dp)
                         ) {
-
+                            Text(
+                                text = "Vanningsbehov",
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontSize = 13.sp
+                            )
                             Text(
                                 text = wateringText,
                                 fontSize = 13.sp,
-                                color = Color.DarkGray,
-                                modifier = Modifier.weight(1f)
+                                color = MaterialTheme.colorScheme.onSurface,
                             )
+                        }
 
-                            Button(
-                                onClick = onMarkAsWatered,
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB5DBFF)),
-                                shape = RoundedCornerShape(50)
-                            ) {
-                                Text("Jeg har vannet", color = Color.Black, fontSize = 12.sp)
-                            }
+                        Button(
+                            onClick = onMarkAsWatered,
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                            shape = RoundedCornerShape(50)
+                        ) {
+                            Text("Jeg har vannet", color = MaterialTheme.colorScheme.onPrimary, fontSize = 12.sp)
                         }
                     }
                 }
@@ -237,9 +246,10 @@ fun DailyPlantRow(
                 OutlinedButton(
                     onClick = { navController.navigate("plantDetailsScreen/${plant.name}/view") },
                     shape = RoundedCornerShape(50),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE8F8E3))
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+                    border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.outline)
                 ) {
-                    Text("Gå til plante",color = Color.DarkGray, fontSize = 13.sp)
+                    Text("Gå til plante",color = MaterialTheme.colorScheme.onSecondary, fontSize = 13.sp)
                 }
             }
         }
