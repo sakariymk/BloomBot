@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -66,7 +67,7 @@ fun FindPlantsScreen(
         }
     }
     Scaffold(
-        containerColor = Color.Transparent,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = {
@@ -74,11 +75,11 @@ fun FindPlantsScreen(
                         text = "Finn nye planter",
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Normal,
-                        color = Color(0xFF2E7D32)
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFFE8F5E2)
+                    containerColor = MaterialTheme.colorScheme.background
                 )
             )
         },
@@ -88,7 +89,7 @@ fun FindPlantsScreen(
     ) { innerPadding ->
         Box(modifier = Modifier
                 .padding(innerPadding)
-                .background(Color(0xFFE8F5E2))
+                .background(MaterialTheme.colorScheme.background)
         ) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
@@ -112,18 +113,18 @@ fun FindPlantsScreen(
             ) {
                 Surface(
                     shape = RoundedCornerShape(50),
-                    color = Color.White,
-                    border = BorderStroke(2.dp, Color(0xFF2D5A27))
+                    color = MaterialTheme.colorScheme.surface,
+                    border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
                     ) {
-                        Icon(Icons.Default.LocationOn, contentDescription = "Hage", tint = Color(0xFF2D5A27))
+                        Icon(Icons.Default.LocationOn, contentDescription = "Hage", tint = MaterialTheme.colorScheme.onSurface)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = selectedLocation?.name ?: locationName.ifEmpty { "Ingen hage valgt" },
-                            color = Color(0xFF2D5A27)
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }
@@ -134,8 +135,8 @@ fun FindPlantsScreen(
                     onClick = { showSwitchLocationDialog = true },
                     icon = { Icon(Icons.Default.SwapHoriz, contentDescription = "Bytt hage") },
                     text = { Text("Bytt hage") },
-                    containerColor = Color(0xFF2D5A27),
-                    contentColor = Color.White,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
                     shape = RoundedCornerShape(50)
                 )
             }
