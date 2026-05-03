@@ -39,7 +39,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import project.team36.R
 import project.team36.model.location.SavedLocation
 import project.team36.model.location.SavedPlant
@@ -50,7 +49,7 @@ import kotlin.collections.isNotEmpty
 fun DailyTasksCard (
     plantsByLocation: Map<SavedLocation, List<Pair<SavedPlant, String>>>,
     onMarkAsWatered: (SavedPlant) -> Unit,
-    navController: NavController,
+    onNavigateToPlant: (SavedPlant) -> Unit,
 ) {
     val hasAnyPlants = plantsByLocation.values.any { it.isNotEmpty() }
 
@@ -101,11 +100,11 @@ fun DailyTasksCard (
                         ) {
                             Column(modifier = Modifier.padding(8.dp)) {
                                 plantsWithText.forEach { (plant, wateringText) ->
-                                    DailyPlantRow(
+                                    WateringPlantCard(
                                         plant = plant,
                                         wateringText = wateringText,
                                         onMarkAsWatered = { onMarkAsWatered(plant) },
-                                        navController = navController,
+                                        onNavigateToPlant = { onNavigateToPlant(plant) },
                                     )
                                 }
                             }
@@ -118,11 +117,11 @@ fun DailyTasksCard (
 }
 
 @Composable
-fun DailyPlantRow(
+fun WateringPlantCard(
     plant: SavedPlant,
     wateringText: String,
     onMarkAsWatered: () -> Unit,
-    navController: NavController
+    onNavigateToPlant: () -> Unit,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     val imageId = if (plant.imageRes != 0) plant.imageRes else R.drawable.defaultplant
@@ -149,8 +148,6 @@ fun DailyPlantRow(
 
             Spacer(modifier = Modifier.width(12.dp))
 
-
-
             Column(
                 modifier = Modifier.weight(1f)
             ) {
@@ -165,7 +162,7 @@ fun DailyPlantRow(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .background(Color(0xFFD32F2F), RoundedCornerShape(50))
+                    .background(Color(0xFFD32F2F), RoundedCornerShape(50)) //TODO; ENDRE TILBAKE TIL ColorAlert
                     .padding(horizontal = 12.dp, vertical = 6.dp)
             ) {
                 Icon(
@@ -235,9 +232,9 @@ fun DailyPlantRow(
                 }
 
                 OutlinedButton(
-                    onClick = { navController.navigate("plantDetailsScreen/${plant.name}/view") },
+                    onClick = onNavigateToPlant,
                     shape = RoundedCornerShape(50),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE8F8E3))
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE8F8E3)) //TODO; ENDRE TILBAKE TIL ColorBackground
                 ) {
                     Text("Gå til plante",color = Color.DarkGray, fontSize = 13.sp)
                 }

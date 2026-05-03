@@ -41,7 +41,6 @@ import project.team36.ui.map.MapViewModelFactory
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.map.SavedPlacesViewModelFactory
 import project.team36.ui.myplants.MyPlantsViewModel
-import project.team36.ui.myplants.MyPlantsViewModelFactory
 import project.team36.ui.plant.PlantDetailsViewModel
 import project.team36.ui.plant.PlantDetailsViewModelFactory
 import project.team36.ui.theme.Team36Theme
@@ -49,6 +48,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.SystemBarStyle
 import androidx.core.view.WindowCompat
+import project.team36.ui.myplants.MyPlantsViewModelFactory
 
 
 class MainActivity : ComponentActivity() {
