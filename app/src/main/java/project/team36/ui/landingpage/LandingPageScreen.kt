@@ -42,10 +42,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.navigation.BottomNavBar
-import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.unit.sp
 import project.team36.ui.myplants.MyPlantsViewModel
 import project.team36.data.mcp.WeatherAlert
 
@@ -64,18 +61,9 @@ fun LandingPageScreen(
     val savedLocations by savedPlacesViewModel.savedLocations.collectAsStateWithLifecycle()
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val locationPermission = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
-    val allPlants by myPlantsViewModel.allPlants.collectAsStateWithLifecycle()
 
-    //TODO: logikken i denne bør flyttes til ViewModel, for kompleks for screen -T
-    val plantsByLocation = remember(savedLocations, allPlants) {
-        savedLocations.associateWith { location ->
-            allPlants
-                .filter { plant ->
-                    plant.locationId == location.id && myPlantsViewModel.needsWater(plant)
-                }
-                .map { plant -> plant to myPlantsViewModel.getWateringText(plant) }
-        }
-    }
+    val plantsByLocation by remember(savedLocations) {
+        myPlantsViewModel.getPlantsNeedingWaterByLocation(savedLocations) }.collectAsStateWithLifecycle(initialValue = emptyMap())
 
     LaunchedEffect(Unit) { locationPermission.launchPermissionRequest() }
 
@@ -272,7 +260,9 @@ fun LandingPageScreen(
                 DailyTasksCard(
                     plantsByLocation = plantsByLocation,
                     onMarkAsWatered = { myPlantsViewModel.markAsWatered(it) },
-                    navController = navController,
+                    onNavigateToPlant = { plant ->
+                        navController.navigate("plantDetailsScreen/${plant.name}/view")
+                    }
                 )
             }
         }
