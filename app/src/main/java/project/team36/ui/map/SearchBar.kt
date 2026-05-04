@@ -49,17 +49,17 @@ fun SearchBar(
             .fillMaxWidth()
             .padding(8.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor = Color.White,
-            unfocusedContainerColor = Color.White,
-            focusedBorderColor = Color.Gray,
-            unfocusedBorderColor = Color.LightGray
+            focusedContainerColor = MaterialTheme.colorScheme.surface,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.outline
         ),
         shape = RoundedCornerShape(8.dp)
     )
 
     if (suggestions.isNotEmpty()) {
         Surface(
-            color = Color.White,
+            color = MaterialTheme.colorScheme.surface,
             shadowElevation = 4.dp,
             shape = RoundedCornerShape(8.dp),
             modifier = Modifier
@@ -110,13 +110,13 @@ fun SearchBar(
                             Text(
                                 text = addressText,
                                 fontSize = 14.sp,
-                                color = Color.Black,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 modifier = Modifier.padding(top = 4.dp)
                             )
                         }
                     }
                     if (index < filteredSuggestions.lastIndex) {
-                        HorizontalDivider(color = Color.LightGray)
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outline)
                     }
                 }
             }

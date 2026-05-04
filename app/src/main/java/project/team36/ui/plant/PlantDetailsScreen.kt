@@ -25,12 +25,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DeviceThermostat
 import androidx.compose.material.icons.filled.WaterDrop
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.RichTooltip
@@ -77,7 +79,7 @@ fun PlantDetailsScreen(
     val plants by plantDetailsViewModel.plant.collectAsStateWithLifecycle()
 
     Scaffold(
-        containerColor = Color(0xFFE8F5E2),
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = { },
@@ -86,7 +88,7 @@ fun PlantDetailsScreen(
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Tilbake",
-                            tint = Color(0xFF2E7D32)
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                 },
@@ -128,32 +130,31 @@ fun PlantDetailsScreen(
                         text = plant.name,
                         fontSize = 36.sp,
                         fontWeight = FontWeight.Normal,
-                        color = Color(0xFF2E7D32)
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                     if (onAddPlant != null) {
-                        OutlinedButton(
+                        Button(
                             onClick = { onAddPlant() },
                             shape = RoundedCornerShape(50),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                containerColor = Color.White
-                            ),
-                            border = BorderStroke(0.dp, Color.Gray)
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary
+                            )
                         ) {
-                            Text("Legg til i hage", color = Color(0xFF2E7D32))
+                            Text("Legg til i hage", color = MaterialTheme.colorScheme.onPrimary)
                         }
                     } else if (onDeletePlant != null) {
-                        OutlinedButton(
+                        Button(
                             onClick = {
                                 onDeletePlant()
                                 onBackClick()
                             },
                             shape = RoundedCornerShape(50),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                containerColor = Color.White
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.secondary
                             ),
-                            border = BorderStroke(0.dp, Color.Gray)
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                         ) {
-                            Text("Fjern plante fra hage", color = Color(0xFF2E7D32))
+                            Text("Fjern plante fra hage", color = MaterialTheme.colorScheme.onSecondary)
                         }
                     }
 
@@ -176,7 +177,7 @@ fun PlantDetailsScreen(
                         Icon(
                             imageVector = Icons.Default.DeviceThermostat,
                             contentDescription = null,
-                            tint = Color(0xFF5A7A3A)
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
                             "H${plant.climateZone}",
@@ -197,7 +198,7 @@ fun PlantDetailsScreen(
                             ) {
                                 Text(
                                     text = lightType.displayName,
-                                    color = Color.Black
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         }
@@ -212,7 +213,7 @@ fun PlantDetailsScreen(
                         Icon(
                             imageVector = Icons.Default.WaterDrop,
                             contentDescription = null,
-                            tint = Color(0xFF5A7A3A)
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
                             "Vannes ca. hver ${plant.maxDaysWithoutWater}. dag",
@@ -228,11 +229,11 @@ fun PlantDetailsScreen(
                             OutlinedButton(
                                 onClick = {},
                                 shape = RoundedCornerShape(50),
-                                border = BorderStroke(1.dp, Color.LightGray)
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                             ) {
                                 Text(
                                     text = soilType.displayName,
-                                    color = Color.Black
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         }
@@ -249,7 +250,7 @@ fun PlantInfoCard(title: String, content: @Composable ColumnScope.() -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(0.dp)
     ) {
@@ -289,7 +290,7 @@ fun PlantingMonthBar(plantingMonth: Set<Int>) {
                 .fillMaxWidth()
                 .height(20.dp)
                 .clip(RoundedCornerShape(50))
-                .background(Color(0xFFB0C080))
+                .background(MaterialTheme.colorScheme.background)
         ) {
             Spacer(modifier = Modifier.fillMaxWidth(startFraction))
             Box(
@@ -297,7 +298,7 @@ fun PlantingMonthBar(plantingMonth: Set<Int>) {
                     .fillMaxHeight()
                     .fillMaxWidth(widthFraction / (1f - startFraction))
                     .clip(RoundedCornerShape(50))
-                    .background(Color(0xFF5A7A3A)),
+                    .background(MaterialTheme.colorScheme.onBackground),
                 contentAlignment = Alignment.Center
             ) {
                 Text(label, fontSize = 11.sp, color = Color.White)
@@ -327,9 +328,9 @@ fun HardinessZoneTooltip() {
                         }
                     },
                     colors = TooltipDefaults.richTooltipColors(
-                        containerColor = Color(0xFFE8F8E3),
-                        titleContentColor = Color(0xFF2D5A27),
-                        contentColor = Color.Black,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        contentColor = MaterialTheme.colorScheme.onSurface,
                         actionContentColor = Color(0xFF2D5A27)
                     )
                 ) {
@@ -342,15 +343,15 @@ fun HardinessZoneTooltip() {
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                OutlinedButton(
+                Button(
                     onClick = { scope.launch { tooltipState.show() } },
                     shape = RoundedCornerShape(50),
-                    border = BorderStroke(1.dp, Color.LightGray),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = Color(0xFFE8F8E3)
+                        MaterialTheme.colorScheme.secondary
                     ),
                 ) {
-                    Text("Herdighetssone forklart", color = Color.Black)
+                    Text("Herdighetssone forklart", color = MaterialTheme.colorScheme.onSurface)
                 }
             }
 

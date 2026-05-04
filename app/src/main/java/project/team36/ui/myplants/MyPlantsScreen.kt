@@ -57,15 +57,14 @@ fun MyPlantsScreen(
     }
 
     Scaffold(
-        containerColor = Color.Transparent,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = {
                     Text(
                         text = selectedLocation?.name ?: "Mine planter",
                         fontSize = 28.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = Color(0xFF2E7D32)
+                        fontWeight = FontWeight.Normal
                     )
                 },
                 navigationIcon = {
@@ -73,7 +72,7 @@ fun MyPlantsScreen(
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Tilbake",
-                            tint = Color(0xFF2E7D32)
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 },
@@ -89,7 +88,7 @@ fun MyPlantsScreen(
                             Icon(
                                 imageVector = Icons.Default.Edit,
                                 contentDescription = "Rediger hage",
-                                tint = Color(0xFF2E7D32)
+                                tint = MaterialTheme.colorScheme.onBackground
                             )
                         }
                         DropdownMenu(
@@ -128,7 +127,7 @@ fun MyPlantsScreen(
                                     ) { Text("Slett") }
                                 },
                                 dismissButton = {
-                                    TextButton(onClick = { showDeleteDialog = false} ) {
+                                    TextButton(onClick = { showDeleteDialog = false } ) {
                                         Text("Behold hage")
                                     }
                                 }
@@ -171,7 +170,7 @@ fun MyPlantsScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFFE8F5E2)
+                    containerColor = MaterialTheme.colorScheme.background
                 ),
                 windowInsets = WindowInsets(0) //gjør at appen ikke legger til mye mellomrom på toppen av skjermen
             )
@@ -185,8 +184,8 @@ fun MyPlantsScreen(
                 onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "Ingen hage valgt"}") },
                 icon = { Icon(Icons.Default.Add, contentDescription = "Ny hage") },
                 text = { Text("Ny plante") },
-                containerColor = Color(0xFF2D5A27),
-                contentColor = Color.White,
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
                 shape = RoundedCornerShape(50)
             )
         }
@@ -195,8 +194,8 @@ fun MyPlantsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .background(Color(0xFFE8F5E2))
-                .padding(16.dp),
+                .background(MaterialTheme.colorScheme.background)
+                .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             if (plants.isEmpty()) {
@@ -238,7 +237,7 @@ fun EmptyPlantCard(
             .fillMaxWidth()
             .border(
                 width = 2.dp,
-                color = Color(0xFF2E7D32),
+                color = MaterialTheme.colorScheme.outline,
                 shape = RoundedCornerShape(16.dp)
             ),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent)

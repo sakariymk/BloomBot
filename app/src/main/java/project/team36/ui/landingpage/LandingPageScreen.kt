@@ -43,6 +43,9 @@ import com.google.accompanist.permissions.rememberPermissionState
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.navigation.BottomNavBar
 import androidx.compose.material3.*
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.unit.sp
+import com.mapbox.maps.extension.style.expressions.dsl.generated.color
 import project.team36.ui.myplants.MyPlantsViewModel
 import project.team36.data.mcp.WeatherAlert
 
@@ -54,8 +57,8 @@ fun LandingPageScreen(
     landingPageViewModel: LandingPageViewModel,
     myPlantsViewModel: MyPlantsViewModel
 ) {
-    val backgroundColor = Color(0xFFE8F5E9)
-    val tabButtonColor = Color(0xFF386633)
+    val backgroundColor = MaterialTheme.colorScheme.background
+    val tabButtonColor = MaterialTheme.colorScheme.primary
 
     val uiState by landingPageViewModel.uiState.collectAsStateWithLifecycle()
     val savedLocations by savedPlacesViewModel.savedLocations.collectAsStateWithLifecycle()
@@ -74,17 +77,17 @@ fun LandingPageScreen(
     }
 
     Scaffold(
-        containerColor = backgroundColor,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = {
                     Text(
                         text = "Hjem",
                         style = MaterialTheme.typography.headlineMedium,
-                        color = Color(0xFF2E7D32)
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFFE8F5E2)),
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
                 windowInsets = WindowInsets(0) //gjør at appen ikke legger til mye mellomrom på toppen av skjermen
             )
         },
@@ -100,13 +103,14 @@ fun LandingPageScreen(
                 Text(
                     text = "Ingen lagrede hager ennå.",
                     modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             } else {
                 ScrollableTabRow(
                     selectedTabIndex = selectedTabIndex,
                     edgePadding = 16.dp,
-                    containerColor = Color.Transparent,
+                    containerColor = MaterialTheme.colorScheme.background,
                     divider = {},
                     indicator = {}
                 ) {
@@ -122,7 +126,7 @@ fun LandingPageScreen(
                                 .padding(end = 8.dp)
                                 .height(40.dp)
                                 .background(
-                                    color = if (isSelected) tabButtonColor else Color.White,
+                                    color = if (isSelected) tabButtonColor else MaterialTheme.colorScheme.secondary,
                                     shape = CircleShape
                                 )
                                 .border(
@@ -134,7 +138,7 @@ fun LandingPageScreen(
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
                                         text = location.name ?: "Hage",
-                                        color = if (isSelected) Color.White else tabButtonColor,
+                                        color = if (isSelected) MaterialTheme.colorScheme.secondary else tabButtonColor,
                                         style = MaterialTheme.typography.bodyMedium,
                                         fontWeight = FontWeight.Medium
                                     )
@@ -183,13 +187,13 @@ fun LandingPageScreen(
                         onClick = { landingPageViewModel.fetchAiAdvice(selectedLocation) }, // FIKSET: location -> selectedLocation
                         modifier = Modifier.fillMaxWidth().height(42.dp),
                         enabled = !uiState.isAiLoading && !uiState.isFutureAiLoading,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50), disabledContainerColor = Color(0xFF4CAF50), disabledContentColor = Color.White),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, disabledContainerColor = Color(0xFF4CAF50), disabledContentColor = Color.White),
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         if (uiState.isAiLoading) {
                             CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
                         } else {
-                            Text("✨ Dagens råd", fontSize = 13.sp)
+                            Text("✨ Dagens råd", fontSize = 13.sp, color = MaterialTheme.colorScheme.onPrimary)
                         }
                     }
 
@@ -199,13 +203,13 @@ fun LandingPageScreen(
                         onClick = { landingPageViewModel.fetchFutureAiAdvice(selectedLocation) }, // FIKSET: location -> selectedLocation
                         modifier = Modifier.fillMaxWidth().height(42.dp),
                         enabled = !uiState.isAiLoading && !uiState.isFutureAiLoading,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32), disabledContainerColor = Color(0xFF2E7D32), disabledContentColor = Color.White),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, disabledContainerColor = Color(0xFF2E7D32), disabledContentColor = Color.White),
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         if (uiState.isFutureAiLoading) {
                             CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
                         } else {
-                            Text("🔮 Fremtids-råd", fontSize = 13.sp)
+                            Text("🔮 Fremtids-råd", fontSize = 13.sp, color = MaterialTheme.colorScheme.onPrimary)
                         }
                     }
 
@@ -215,6 +219,7 @@ fun LandingPageScreen(
                 if (uiState.aiResponse != null) {
                     AlertDialog(
                         onDismissRequest = { landingPageViewModel.dismissAiAdvice() },
+                        containerColor = MaterialTheme.colorScheme.surface,
                         title = { Text("Hageråd fra Claude 🌱", fontWeight = FontWeight.Bold) },
                         text = {
                             Column(
@@ -222,24 +227,24 @@ fun LandingPageScreen(
                                 verticalArrangement = Arrangement.spacedBy(12.dp)
                             ) {
                                 Column {
-                                    Text("Været:", fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
+                                    Text("Været:", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                                     Text(uiState.aiResponse!!.weatherSummary)
                                 }
 
                                 if (uiState.aiResponse!!.plantAdvice.isNotEmpty()) {
                                     Column {
-                                        Text("Dine planter:", fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
+                                        Text("Dine planter:", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                                         uiState.aiResponse!!.plantAdvice.forEach { advice ->
                                             Spacer(modifier = Modifier.height(4.dp))
                                             Text("• ${advice.plantName}", fontWeight = FontWeight.SemiBold)
-                                            Text(advice.advice, modifier = Modifier.padding(start = 12.dp), color = Color.DarkGray)
+                                            Text(advice.advice, modifier = Modifier.padding(start = 12.dp), color = MaterialTheme.colorScheme.onSurface)
                                         }
                                     }
                                 }
 
                                 if (uiState.aiResponse!!.generalTasks.isNotEmpty()) {
                                     Column {
-                                        Text("Hageoppgaver:", fontWeight = FontWeight.Bold, color = Color(0xFF2E7D32))
+                                        Text("Hageoppgaver:", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                                         uiState.aiResponse!!.generalTasks.forEach { task ->
                                             Text("- $task", modifier = Modifier.padding(start = 4.dp))
                                         }
@@ -249,7 +254,7 @@ fun LandingPageScreen(
                         },
                         confirmButton = {
                             TextButton(onClick = { landingPageViewModel.dismissAiAdvice() }) {
-                                Text("Lukk", color = Color(0xFF2E7D32))
+                                Text("Lukk", color = MaterialTheme.colorScheme.onSurface)
                             }
                         }
                     )
@@ -291,13 +296,13 @@ fun LocationAlertBanner(alert: WeatherAlert) {
                 text = alert.event.uppercase(),
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 13.sp,
-                color = Color.Black,
+                color = MaterialTheme.colorScheme.onBackground,
                 letterSpacing = 0.5.sp
             )
             Text(
                 text = alert.description,
                 fontSize = 13.sp,
-                color = Color.DarkGray,
+                color = MaterialTheme.colorScheme.onBackground,
                 lineHeight = 18.sp
             )
         }
