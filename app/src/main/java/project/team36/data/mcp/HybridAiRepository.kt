@@ -7,7 +7,12 @@ import project.team36.data.local.LocationRepository
 import project.team36.model.location.SavedLocation
 import project.team36.model.ai.*
 import kotlinx.serialization.json.Json
+import kotlinx.coroutines.*
 import android.util.Log
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.toList
+import project.team36.model.location.SavedPlant
+
 
 
 /**
@@ -59,23 +64,43 @@ class HybridAiRepository(
 
     // Fleksibel JSON-parser som forhindrer krasj dersom Claude returnerer uventede felt
     private val jsonParser = Json { ignoreUnknownKeys = true; isLenient = true }
-
-    // Henter inn vær og planter for lokasjonen, og ber Claude generere et strukturert JSON-svar med dagens råd
-    suspend fun getPlantRecommendations(location: SavedLocation): AiRecommendationResponse? {
+    private class AiParameters (location: SavedLocation, plantDataSource: LocationRepository) {
         val lat = location.lat ?: 0.0
         val lon = location.lon ?: 0.0
 
         // Henter brukerens lagrede planter for denne spesifikke hagen fra den lokale databasen
-        val plants = try { plantDataSource.getPlantsForLocation(location.id).first() } catch (e: Exception) { emptyList() }
+        suspend fun getPlantData(
+            location: SavedLocation,
+            plantDataSource: LocationRepository
+        ): List<SavedPlant> {
+            val plants = try {
+                plantDataSource.getPlantsForLocation(location.id).first()
+            } catch (e: Exception) {
+                emptyList()
+            }
+            return plants
+        }
 
         // Formaterer plantelisten til en lesbar streng for Claude, eller gir en standardmelding hvis listen er tom
-        val plantsText = if (plants.isEmpty()) {
-            "Brukeren har foreløpig ingen planter på denne lokasjonen. Gi generelle hageråd for dette området."
-        } else {
-            plants.take(15).joinToString("\n") {
-                "- ${it.name}: Sone: ${it.climateZone}, Lysbehov: ${it.light}, Vann Per Uke: ${it.waterPerWeek}, Frostsikker: ${it.isFrostResistant}"
+        suspend fun getPlantTxt(location: SavedLocation, plantDataSource: LocationRepository): String {
+            val plantsText = if (getPlantData(location, plantDataSource).isEmpty()) {
+                "Brukeren har foreløpig ingen planter på denne lokasjonen. Gi generelle hageråd for dette området."
+            } else {
+                getPlantData(location, plantDataSource).take(15).joinToString("\n") {
+                    "- ${it.name}: Sone: ${it.climateZone}, Lysbehov: ${it.light}, Vann Per Uke: ${it.waterPerWeek}, Frostsikker: ${it.isFrostResistant}"
+                }
             }
+            return plantsText
         }
+    }
+
+    // Henter inn vær og planter for lokasjonen, og ber Claude generere et strukturert JSON-svar med dagens råd
+    suspend fun getPlantRecommendations(location: SavedLocation): AiRecommendationResponse? {
+        val aiParams = AiParameters(location, plantDataSource)
+        val lat = aiParams.lat
+        val lon = aiParams.lon
+
+        val plantsText = aiParams.getPlantTxt(location, plantDataSource)
 
         // Setter opp systemprompten som gir Claude rollen sin og strenge instruksjoner for JSON-strukturen vi forventer
         val systemPrompt = """
@@ -137,11 +162,11 @@ class HybridAiRepository(
                     val inputJson = block.input?.jsonObject
                     val rLat = inputJson?.get("latitude")?.jsonPrimitive?.double ?: lat
                     val rLon = inputJson?.get("longitude")?.jsonPrimitive?.double ?: lon
+                    val weatherRepo = project.team36.data.mcp.MetWeatherRepository(mcpClient) // MANUELL REAKTORERING: FLYTTET UTENFOR WHEN LØKKEN
 
                     // Kjører funksjonen som korresponderer med verktøyet Claude ba om
                     val resultText = when (toolName) {
                         "weatherforecast" -> {
-                            val weatherRepo = project.team36.data.mcp.MetWeatherRepository(mcpClient)
                             val forecast = weatherRepo.getParsedForecast(rLat, rLon)
                             "Værvarsel: ${forecast?.temperature}°C, ${forecast?.weatherSymbol}, Vind: ${forecast?.windSpeed} m/s, Nedbør: ${forecast?.precipitation} mm."
                         }
@@ -186,20 +211,10 @@ class HybridAiRepository(
 
     // Identisk logikk som getPlantRecommendations, men med en prompt skreddersydd for fremtidsvarsler
     suspend fun getFuturePlantRecommendations(location: SavedLocation): AiRecommendationResponse? {
-        val lat = location.lat ?: 0.0
-        val lon = location.lon ?: 0.0
-
-        // Henter planter fra database
-        val plants = try { plantDataSource.getPlantsForLocation(location.id).first() } catch (e: Exception) { emptyList() }
-
-        // Formaterer plantelisten
-        val plantsText = if (plants.isEmpty()) {
-            "Brukeren har foreløpig ingen planter på denne lokasjonen. Gi generelle hageråd for dette området."
-        } else {
-            plants.take(15).joinToString("\n") {
-                "- ${it.name}: Sone ${it.climateZone}, Frostsikker: ${it.isFrostResistant}, VannperUke: ${it.waterPerWeek}"
-            }
-        }
+        val aiParams = AiParameters(location, plantDataSource)
+        val lat = aiParams.lat
+        val lon = aiParams.lon
+        val plantsText = aiParams.getPlantTxt(location, plantDataSource)
 
         // Systemprompt spesifikt for fremtidsråd, krever også her streng JSON-retur
         val systemPrompt = """
@@ -261,11 +276,11 @@ class HybridAiRepository(
                     val inputJson = block.input?.jsonObject
                     val rLat = inputJson?.get("latitude")?.jsonPrimitive?.double ?: lat
                     val rLon = inputJson?.get("longitude")?.jsonPrimitive?.double ?: lon
+                    val weatherRepo = project.team36.data.mcp.MetWeatherRepository(mcpClient) // MANUELL REFAKTORERING: FLYTTET UTENFOR WHEN LØKKEN
 
                     // Kjører vær-verktøyet
                     val resultText = when (toolName) {
                         "weatherforecast" -> {
-                            val weatherRepo = project.team36.data.mcp.MetWeatherRepository(mcpClient)
                             val forecast = weatherRepo.getParsedForecast(rLat, rLon)
                             "Værvarsel: ${forecast?.temperature}°C, ${forecast?.weatherSymbol}, Vind: ${forecast?.windSpeed} m/s, Nedbør: ${forecast?.precipitation} mm."
                         }

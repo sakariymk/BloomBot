@@ -1,6 +1,7 @@
 package project.team36.data.local
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.toList
 import project.team36.data.local.dao.SavedLocationDao
 import project.team36.data.local.dao.SavedPlantDao
 import project.team36.model.location.SavedLocation
