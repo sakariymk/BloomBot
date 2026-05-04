@@ -125,10 +125,10 @@ fun FindPlantsScreen(
                                 modifier = Modifier
                                     .padding(horizontal = 8.dp, vertical = 8.dp)
                                     .background(
-                                        color = if (isSelected) tabButtonColor else Color.White,
+                                        color = if (isSelected) tabButtonColor else MaterialTheme.colorScheme.secondary,
                                         shape = CircleShape
                                     )
-                                    .border(1.dp, tabButtonColor, CircleShape),
+                                    .border(1.dp, MaterialTheme.colorScheme.outline, CircleShape),
                                 text = {
                                     Text(
                                         text = title,
@@ -151,13 +151,13 @@ fun FindPlantsScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp, vertical = 8.dp)
-                            .background(Color.White, RoundedCornerShape(12.dp))
+                            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp))
                             .padding(12.dp)
                     ) {
                         Text(
                             text = infoText,
                             style = MaterialTheme.typography.bodySmall,
-                            color = Color(0xFF2D5A27)
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
 
