@@ -63,6 +63,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.MaterialTheme
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
@@ -211,7 +212,7 @@ fun MapScreen(
                 Dialog(onDismissRequest = { showLocationChoiceDialog = false }) {
                     Card(
                         shape = RoundedCornerShape(24.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFFEDF7E6)),
+                        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.background),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Column(
