@@ -1,6 +1,9 @@
 package project.team36.ui.landingpage
 
 import android.Manifest
+import android.content.Context
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -43,11 +46,15 @@ import com.google.accompanist.permissions.rememberPermissionState
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.navigation.BottomNavBar
 import androidx.compose.material3.*
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.unit.sp
-import com.mapbox.maps.extension.style.expressions.dsl.generated.color
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.window.Dialog
 import project.team36.ui.myplants.MyPlantsViewModel
 import project.team36.data.mcp.WeatherAlert
+import project.team36.R
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
@@ -63,6 +70,21 @@ fun LandingPageScreen(
     val uiState by landingPageViewModel.uiState.collectAsStateWithLifecycle()
     val savedLocations by savedPlacesViewModel.savedLocations.collectAsStateWithLifecycle()
     var selectedTabIndex by remember { mutableIntStateOf(0) }
+
+    // for onboarding
+    val context = LocalContext.current
+    val prefs = remember {
+        context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+    }
+
+    // Vis automatisk første gang
+    LaunchedEffect(Unit) {
+        if (!prefs.getBoolean("has_seen_intro", false)) {
+            landingPageViewModel.showInfoDialog()
+            prefs.edit().putBoolean("has_seen_intro", true).apply()
+        }
+    }
+
     val locationPermission = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
 
     val plantsByLocation by remember(savedLocations) {
@@ -86,6 +108,15 @@ fun LandingPageScreen(
                         style = MaterialTheme.typography.headlineMedium,
                         color = MaterialTheme.colorScheme.onBackground
                     )
+                },
+                actions = {
+                    IconButton(onClick = { landingPageViewModel.showInfoDialog() }) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = "Info",
+                            tint = MaterialTheme.colorScheme.onBackground
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
                 windowInsets = WindowInsets(0) //gjør at appen ikke legger til mye mellomrom på toppen av skjermen
@@ -185,7 +216,9 @@ fun LandingPageScreen(
 
                     Button(
                         onClick = { landingPageViewModel.fetchAiAdvice(selectedLocation) }, // FIKSET: location -> selectedLocation
-                        modifier = Modifier.fillMaxWidth().height(42.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(42.dp),
                         enabled = !uiState.isAiLoading && !uiState.isFutureAiLoading,
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, disabledContainerColor = Color(0xFF4CAF50), disabledContentColor = Color.White),
                         shape = RoundedCornerShape(12.dp)
@@ -201,7 +234,9 @@ fun LandingPageScreen(
 
                     Button(
                         onClick = { landingPageViewModel.fetchFutureAiAdvice(selectedLocation) }, // FIKSET: location -> selectedLocation
-                        modifier = Modifier.fillMaxWidth().height(42.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(42.dp),
                         enabled = !uiState.isAiLoading && !uiState.isFutureAiLoading,
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, disabledContainerColor = Color(0xFF2E7D32), disabledContentColor = Color.White),
                         shape = RoundedCornerShape(12.dp)
@@ -272,7 +307,17 @@ fun LandingPageScreen(
             }
         }
     }
+    if (uiState.showInfoDialog) {
+        OnboardingDialog(
+            onDismiss = { landingPageViewModel.dismissInfoDialog() },
+            onFinish = {
+                landingPageViewModel.dismissInfoDialog()
+                navController.navigate("myPlaces")
+            }
+        )
+    }
 }
+
 
 @Composable
 fun LocationAlertBanner(alert: WeatherAlert) {

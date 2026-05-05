@@ -33,7 +33,8 @@ data class LandingPageUiState(
     val isAlertsLoading : Boolean = false,
     val aiResponse: AiRecommendationResponse? = null,
     val isAiLoading: Boolean = false,
-    val isFutureAiLoading: Boolean = false
+    val isFutureAiLoading: Boolean = false,
+    val showInfoDialog: Boolean = false
 )
 
 private fun weatherSymbolToDescription(symbol: String): String {
@@ -101,6 +102,14 @@ class LandingPageViewModel(
 
     fun dismissAiAdvice() {
         _uiState.value = _uiState.value.copy(aiResponse = null)
+    }
+
+    fun showInfoDialog() {
+        _uiState.value = _uiState.value.copy(showInfoDialog = true)
+    }
+
+    fun dismissInfoDialog() {
+        _uiState.value = _uiState.value.copy(showInfoDialog = false)
     }
 
     fun loadDataForLocations(locations: List<SavedLocation>) {

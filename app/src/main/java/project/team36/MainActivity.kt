@@ -61,10 +61,12 @@ class MainActivity : ComponentActivity() {
                 darkScrim = android.graphics.Color.TRANSPARENT
             ),
             //setter fargen til telefonens navigasjonsknapper
-            navigationBarStyle = SystemBarStyle.dark(
-                scrim = 0xFF243B37.toInt()
+            navigationBarStyle = SystemBarStyle.light(
+                scrim = android.graphics.Color.TRANSPARENT,
+                darkScrim = android.graphics.Color.TRANSPARENT
             )
         )
+
         val dataSource = PlantDataSource(this)
         val db = AppDatabase.getDatabase(this)
         val locationRepository = LocationRepository(db.savedLocationDao(), db.savedPlantDao())
