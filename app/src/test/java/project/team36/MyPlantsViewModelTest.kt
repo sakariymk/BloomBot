@@ -26,7 +26,6 @@ class MyPlantsViewModelTest {
     @Test
     fun testDaysUntilWatering () {
 
-        every { fakeSavedPlacesViewModel.selectedLocation } returns MutableStateFlow(null)
         val viewModel = MyPlantsViewModel(fakeLocationRepo, fakeSavedPlacesViewModel,fakeFrostRepo)
 
         val now = System.currentTimeMillis()
@@ -48,8 +47,9 @@ class MyPlantsViewModelTest {
 
         val plant = opprettTestPlante()
 
-        every { fakeSavedPlacesViewModel.selectedLocation } returns MutableStateFlow(null)
-        every { fakeLocationRepo.getPlantsForLocation(any()) } returns flowOf(listOf(plant))
+        // every-lambdaene sørger for at man ikke får feil i kall til LocationRepository
+        every { fakeSavedPlacesViewModel.selectedLocation } returns MutableStateFlow(null) // returnerer alltid null
+        every { fakeLocationRepo.getPlantsForLocation(any()) } returns flowOf(listOf(plant)) // mocker at SavedPlants-objektet ligger i databasen for en hvilken som helst locationId
 
         val myPlantsViewModel = MyPlantsViewModel(fakeLocationRepo, fakeSavedPlacesViewModel,fakeFrostRepo)
 
@@ -57,7 +57,7 @@ class MyPlantsViewModelTest {
 
         println("----Test result----")
         println("deletePlantByName ble kalt med parameter: ${plant.name}")
-        coVerify { fakeLocationRepo.deletePlant(plant) }
+        coVerify { fakeLocationRepo.deletePlant(plant) } // sjekker at deletePlant-metode kalles under testen, med riktig SavedPlant objekt
     }
 
     private fun opprettTestPlante() = SavedPlant(
