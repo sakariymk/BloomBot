@@ -1,8 +1,7 @@
 package project.team36
 
-import io.mockk.MockKAnnotations
+import io.mockk.coVerify
 import io.mockk.mockk
-import org.junit.Before
 import org.junit.Test
 import project.team36.data.klima.frost.FrostRepository
 import project.team36.data.local.LocationRepository
@@ -11,8 +10,11 @@ import project.team36.model.plant.LightType
 import project.team36.model.plant.SoilType
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.myplants.MyPlantsViewModel
-import io.mockk.coVerify
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import io.mockk.every
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runTest
+import java.util.concurrent.TimeUnit
 
 
 class MyPlantsViewModelTest {
@@ -20,14 +22,41 @@ class MyPlantsViewModelTest {
     val fakeLocationRepo : LocationRepository = mockk<LocationRepository>(relaxed = true)
     val fakeSavedPlacesViewModel = mockk<SavedPlacesViewModel>(relaxed = true)
     val fakeFrostRepo : FrostRepository = mockk<FrostRepository>(relaxed = true)
-    val viewModel = MyPlantsViewModel(fakeLocationRepo, fakeSavedPlacesViewModel,fakeFrostRepo)
 
     @Test
-    fun deletingPlantWithRemovePlant() {
+    fun testDaysUntilWatering () {
+
+        every { fakeSavedPlacesViewModel.selectedLocation } returns MutableStateFlow(null)
+        val viewModel = MyPlantsViewModel(fakeLocationRepo, fakeSavedPlacesViewModel,fakeFrostRepo)
+
+        val now = System.currentTimeMillis()
+        val daysAgo = 2L
+        val plant = opprettTestPlante().copy(
+            lastWateredDate = now - TimeUnit.DAYS.toMillis(daysAgo),
+            maxDaysWithoutWater = 3
+        )
+
+        val result = viewModel.daysUntilWatering(plant)
+
+        println("----Test result----")
+        println("Dager til vannig: $result")
+        assert(result == 1L) {"Forventet 1 dag til vanning, testresultat: $result"}
+    }
+
+    @Test
+    fun deletingPlantWithRemovePlantByName() = runTest {
+
         val plant = opprettTestPlante()
 
-        viewModel.removePlant(plant)
+        every { fakeSavedPlacesViewModel.selectedLocation } returns MutableStateFlow(null)
+        every { fakeLocationRepo.getPlantsForLocation(any()) } returns flowOf(listOf(plant))
 
+        val myPlantsViewModel = MyPlantsViewModel(fakeLocationRepo, fakeSavedPlacesViewModel,fakeFrostRepo)
+
+        myPlantsViewModel.removePlantByName("Pelargonia")
+
+        println("----Test result----")
+        println("deletePlantByName ble kalt med parameter: ${plant.name}")
         coVerify { fakeLocationRepo.deletePlant(plant) }
     }
 

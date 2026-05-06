@@ -18,6 +18,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 
+
 class MyPlantsViewModel(
     private val repository: LocationRepository,
     private val savedPlacesViewModel: SavedPlacesViewModel,
@@ -39,7 +40,7 @@ class MyPlantsViewModel(
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
 
-    //Slette plante
+    // SLETTES?
     fun removePlant(plant: SavedPlant) {
         viewModelScope.launch {
             repository.deletePlant(plant)

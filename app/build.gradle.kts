@@ -82,8 +82,8 @@ dependencies {
     implementation(libs.androidx.foundation)
     implementation(libs.androidx.junit.ktx)
     testImplementation(libs.junit)
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3") // kanskje fjerne
-    testImplementation("io.mockk:mockk:1.13.10") // kanskje fjerne
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    testImplementation("io.mockk:mockk:1.13.12")
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
