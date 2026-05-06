@@ -1,28 +1,38 @@
 package project.team36.data.ai
 
 import kotlinx.serialization.json.*
-// <------ ENDRING: Importerte '.first()' for å kunne lese plantene fra databasen
 import kotlinx.coroutines.flow.first
-import java.text.SimpleDateFormat
-import java.util.*
 import project.team36.data.mcp.MetMcpClient
-// <------ ENDRING: Endret fra PlantDataSource til LocationRepository og SavedLocation
 import project.team36.data.local.LocationRepository
 import project.team36.model.location.SavedLocation
 import project.team36.model.ai.*
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import android.util.Log
-import retrofit2.HttpException
 
+
+/**
+ * Formål og funksjon:
+ * Dette er hjernen i AI-integrasjonen vår. Filen styrer hele dialogen mellom appen og Claude.
+ * Den henter ut brukerens lagrede planter, bygger strenge prompts for å tvinge AI-en til å svare i JSON,
+ * og gir Claude tilgang til verktøy for å sjekke været. Til slutt oversetter den Claudes
+ * tekstsvar til strukturerte Kotlin-objekter som UI-et kan bruke.
+ *
+ * Relevante filer:
+ * - ClaudeApi: Retrofit-grensesnittet som sender selve HTTP-forespørslene.
+ * - AiRecommendationModels: Dataklassene (AiRecommendationResponse) som vi parser JSON-svaret over til.
+ * - MetWeatherRepository / MetMcpClient: Verktøyene Claude bruker for å hente faktisk værdata.
+ * - LocationRepository: Databasen hvor vi henter brukerens planter fra.
+ */
+
+// Repository som initialiserer samtalen med Claude og forsyner den med verktøy for vær og planter
 class HybridAiRepository(
     private val claudeApi: ClaudeApi,
     private val mcpClient: MetMcpClient,
-    // <------ ENDRING: Denne heter nå LocationRepository, fordi vi bruker Room Database
     private val plantDataSource: LocationRepository,
     private val claudeApiKey: String
 ) {
 
+    // Definerer væroverktøyet slik at Claude vet hvilke parametere (lat/lon) som kreves for å bruke det
     private val weatherTool = ClaudeTool(
         name = "weatherforecast",
         description = "Henter værinformasjon for i dag de kommende dagene.",
@@ -36,7 +46,7 @@ class HybridAiRepository(
         )
     )
 
-    // Nytt: alert-verktøy uten påkrevde parametere
+    // Definerer verktøy for ekstremvær. Dette krever ingen input-parametere fra Claude
     private val alertTool = ClaudeTool(
         name = "get_weather_alerts",
         description = "Henter aktive ekstremværvarsler fra Meteorologisk institutt for Norge. Bruk dette for å advare brukeren om farlige værforhold.",
@@ -47,33 +57,18 @@ class HybridAiRepository(
         )
     )
 
+    // Fleksibel JSON-parser som forhindrer krasj dersom Claude returnerer uventede felt
     private val jsonParser = Json { ignoreUnknownKeys = true; isLenient = true }
 
-    // <------ ENDRING: Ny funksjon for å hente RAW data for testing
-    suspend fun getRawApiTest(location: SavedLocation): String {
-        val lat = location.lat ?: 0.0
-        val lon = location.lon ?: 0.0
-        val builder = java.lang.StringBuilder()
-
-        builder.append("\n=== MET WEATHER API (Via MCP) ===\n")
-        try {
-            // Her henter vi selve råteksten fra MCP-serveren (før Claude ser den)
-            val rawMet = mcpClient.getForecast(lat, lon)
-            builder.append(rawMet)
-        } catch (e: Exception) {
-            builder.append("Feil ved MET API: ${e.message}\n")
-        }
-
-        return builder.toString()
-    }
-
-    // <------ ENDRING: Endret funksjonen til å ta imot hele SavedLocation i stedet for to Double-verdier
+    // Henter inn vær og planter for lokasjonen, og ber Claude generere et strukturert JSON-svar med dagens råd
     suspend fun getPlantRecommendations(location: SavedLocation): AiRecommendationResponse? {
         val lat = location.lat ?: 0.0
         val lon = location.lon ?: 0.0
 
+        // Henter brukerens lagrede planter for denne spesifikke hagen fra den lokale databasen
         val plants = try { plantDataSource.getPlantsForLocation(location.id).first() } catch (e: Exception) { emptyList() }
 
+        // Formaterer plantelisten til en lesbar streng for Claude, eller gir en standardmelding hvis listen er tom
         val plantsText = if (plants.isEmpty()) {
             "Brukeren har foreløpig ingen planter på denne lokasjonen. Gi generelle hageråd for dette området."
         } else {
@@ -82,7 +77,7 @@ class HybridAiRepository(
             }
         }
 
-        // <------ ENDRING: Ledeteksten tvinger Claude til å svare i JSON
+        // Setter opp systemprompten som gir Claude rollen sin og strenge instruksjoner for JSON-strukturen vi forventer
         val systemPrompt = """
             Du er en profesjonell og velformulert hageekspert i Norge som skal gi råd til en hobbygartner/bruker.
             Du får dagens værinformasjon fra en API som heter MetWeather, du får følgende koordinater Lat: $lat, Lon: $lon.
@@ -105,11 +100,13 @@ class HybridAiRepository(
             }
         """.trimIndent()
 
+        // Starter samtaleloggen med brukerens initiell prompt
         val conversation = mutableListOf(
             ClaudeMessage("user", listOf(ContentBlock(type = "text", text = "Hva bør jeg gjøre i hagen nå? Svar KUN med JSON.")))
         )
 
         return try {
+            // Sender den første forespørselen til Claude med tilgang til verktøyene våre
             var response = claudeApi.sendMessage(
                 apiKey = claudeApiKey,
                 request = ClaudeRequest(
@@ -121,20 +118,27 @@ class HybridAiRepository(
             )
 
             var toolLoops = 0
+            // Løkke som lar Claude bruke verktøy. Vi setter en maksgrense på 3 iterasjoner for å unngå uendelige looper
             while (response.stop_reason == "tool_use" && toolLoops < 3) {
                 toolLoops++
+
+                // Legger Claudes verktøyforespørsel til i loggen slik at den husker konteksten
                 conversation.add(ClaudeMessage("assistant", response.content))
 
                 val toolUseBlocks = response.content.filter { it.type == "tool_use" }
                 val toolResultBlocks = mutableListOf<ContentBlock>()
 
+                // Går gjennom hvert verktøy Claude ba om å kjøre i denne runden
                 for (block in toolUseBlocks) {
                     val toolId = block.id ?: continue
                     val toolName = block.name ?: ""
+
+                    // Henter ut koordinatene Claude sender med. Hvis de mangler, bruker vi hagens koordinater
                     val inputJson = block.input?.jsonObject
                     val rLat = inputJson?.get("latitude")?.jsonPrimitive?.double ?: lat
                     val rLon = inputJson?.get("longitude")?.jsonPrimitive?.double ?: lon
 
+                    // Kjører funksjonen som korresponderer med verktøyet Claude ba om
                     val resultText = when (toolName) {
                         "weatherforecast" -> {
                             val weatherRepo = project.team36.data.mcp.MetWeatherRepository(mcpClient)
@@ -144,13 +148,16 @@ class HybridAiRepository(
                         else -> "Ukjent verktøy."
                     }
 
+                    // Pakker resultatet inn i et format Claude forstår, og legger det i listen
                     toolResultBlocks.add(
                         ContentBlock(type = "tool_result", tool_use_id = toolId, content = resultText)
                     )
                 }
 
+                // Legger alle verktøyresultatene inn i samtalen som en ny melding fra brukeren
                 conversation.add(ClaudeMessage("user", toolResultBlocks))
 
+                // Sender samtalen tilbake til Claude med de nye værdataene, slik at den kan generere endelig svar
                 response = claudeApi.sendMessage(
                     apiKey = claudeApiKey,
                     request = ClaudeRequest(
@@ -162,10 +169,13 @@ class HybridAiRepository(
                 )
             }
 
-            // <------ ENDRING: Ekstraher teksten, rens bort evt. markdown (```json ... ```) og parse til objekt
+            // Finner selve tekstblokken i det endelige svaret fra Claude
             val rawText = response.content.firstOrNull { it.type == "text" }?.text ?: return null
+
+            // Fjerner eventuelle markdown-tagger (som ```json) Claude noen ganger legger til
             val cleanJson = rawText.replace(Regex("```json|```"), "").trim()
 
+            // Konverterer den rene JSON-strengen over til dataklassen vår
             jsonParser.decodeFromString<AiRecommendationResponse>(cleanJson)
 
         } catch (e: Exception) {
@@ -174,13 +184,15 @@ class HybridAiRepository(
         }
     }
 
-    // <------ ENDRING: Returtypen er AiRecommendationResponse?
+    // Identisk logikk som getPlantRecommendations, men med en prompt skreddersydd for fremtidsvarsler
     suspend fun getFuturePlantRecommendations(location: SavedLocation): AiRecommendationResponse? {
         val lat = location.lat ?: 0.0
         val lon = location.lon ?: 0.0
 
+        // Henter planter fra database
         val plants = try { plantDataSource.getPlantsForLocation(location.id).first() } catch (e: Exception) { emptyList() }
 
+        // Formaterer plantelisten
         val plantsText = if (plants.isEmpty()) {
             "Brukeren har foreløpig ingen planter på denne lokasjonen. Gi generelle hageråd for dette området."
         } else {
@@ -189,7 +201,7 @@ class HybridAiRepository(
             }
         }
 
-        // <------ ENDRING: Stram JSON-prompt også for fremtidsvarsler
+        // Systemprompt spesifikt for fremtidsråd, krever også her streng JSON-retur
         val systemPrompt = """
             Du er en profesjonell og velformulert hageekspert i Norge som skal gi råd til en hobbygartner/bruker.
             Du får dagens og kommende dagenes værinformasjon fra en API som heter MetWeather, du får følgende koordinater Lat: $lat, Lon: $lon.
@@ -223,6 +235,7 @@ class HybridAiRepository(
         )
 
         return try {
+            // Første API-kall for fremtidsdata
             var response = claudeApi.sendMessage(
                 apiKey = claudeApiKey,
                 request = ClaudeRequest(
@@ -234,6 +247,7 @@ class HybridAiRepository(
             )
 
             var toolLoops = 0
+            // Håndterer verktøybruk (hente fremtidsvær)
             while (response.stop_reason == "tool_use" && toolLoops < 3) {
                 toolLoops++
                 conversation.add(ClaudeMessage("assistant", response.content))
@@ -248,6 +262,7 @@ class HybridAiRepository(
                     val rLat = inputJson?.get("latitude")?.jsonPrimitive?.double ?: lat
                     val rLon = inputJson?.get("longitude")?.jsonPrimitive?.double ?: lon
 
+                    // Kjører vær-verktøyet
                     val resultText = when (toolName) {
                         "weatherforecast" -> {
                             val weatherRepo = project.team36.data.mcp.MetWeatherRepository(mcpClient)
@@ -264,6 +279,7 @@ class HybridAiRepository(
 
                 conversation.add(ClaudeMessage("user", toolResultBlocks))
 
+                // Sender værdata tilbake til Claude for endelig analyse
                 response = claudeApi.sendMessage(
                     apiKey = claudeApiKey,
                     request = ClaudeRequest(
@@ -275,7 +291,7 @@ class HybridAiRepository(
                 )
             }
 
-            // <------ ENDRING: Ekstraher og parse JSON for fremtidsvarsel
+            // Henter tekstsvaret, renser bort markdown og parser til JSON-objekt
             val rawText = response.content.firstOrNull { it.type == "text" }?.text ?: return null
             val cleanJson = rawText.replace(Regex("```json|```"), "").trim()
 

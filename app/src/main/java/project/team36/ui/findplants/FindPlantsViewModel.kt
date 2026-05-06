@@ -2,6 +2,7 @@ package project.team36.ui.findplants
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -24,6 +25,8 @@ class FindPlantsViewModel (
 ) : ViewModel() {
     private val _plants = MutableStateFlow<List<PlantDetails>>(emptyList())
     val plants: StateFlow<List<PlantDetails>> = _plants.asStateFlow()
+    private val _notRecommendedPlants = MutableStateFlow<List<PlantDetails>>(emptyList())
+    val notRecommendedPlants: StateFlow<List<PlantDetails>> = _notRecommendedPlants.asStateFlow()
 
     private val _pendingPlant = MutableStateFlow<PlantDetails?>(null)
     val pendingPlant: StateFlow<PlantDetails?> = _pendingPlant.asStateFlow()
@@ -100,13 +103,30 @@ class FindPlantsViewModel (
             locationRepository.getPlantsForLocation(location.id)
                 .first()
                 .let { savedPlants ->
-                    Log.d("FindPlants", "Location zone: ${location.zone}, savedPlants: ${savedPlants.size}")
-                    val result = plantRepository.recommendPlants(location, savedPlants)
+                    val recommended = plantRepository.recommendPlants(location, savedPlants)
                         .map { it.toPlantDetails() }
-                    Log.d("FindPlants", "Recommended plants: ${result.size}")
-                    _plants.value = result
+                    _plants.value = recommended
+
+                    val notRecommended = plantRepository.notRecommendedPlants(location, savedPlants)
+                        .map { it.toPlantDetails() }
+                    _notRecommendedPlants.value = notRecommended
                 }
         }
     }
 
+}
+
+
+class FindPlantsViewModelFactory(
+    private val plantRepository: PlantRepository,
+    private val locationRepository: LocationRepository,
+    private val savedPlacesViewModel: SavedPlacesViewModel
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(FindPlantsViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return FindPlantsViewModel(plantRepository, locationRepository, savedPlacesViewModel) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
 }

@@ -9,38 +9,44 @@ import retrofit2.http.POST
 
 /**
  * Formål og funksjon:
- * Her har jeg definert kjernenettet vårt for kommunikasjon med Anthropics servere (Claude).
- * Dette er nettverkskontrakten som setter reglene for hvordan appen min skal koble seg til AI-en
+ * Her har vi definert kjernenettet vårt for kommunikasjon med Anthropics servere (Claude).
+ * Dette er nettverkskontrakten som setter reglene for hvordan appen vårskal koble seg til AI-en
  * og sende over våre system-prompter, bruker-spørsmål og verktøy.
  *
  * Relevante filer:
- * - MainActivity: Hvor jeg bygger opp Retrofit-motoren med riktige timeouts.
- * - HybridAiRepository: Hvor jeg orkestrerer selve samtalen med Claude.
- * - ClaudeModels: Hvor jeg har definert datastrukturen jeg sender og mottar.
+ * - MainActivity: Hvor vi bygger opp Retrofit-motoren med riktige timeouts.
+ * - HybridAiRepository: Hvor vi orkestrerer selve samtalen med Claude.
+ * - ClaudeModels: Hvor vi har definert datastrukturen vi sender og mottar.
  */
 
-// Igjen lar jeg Retrofit ta seg av det tunge løftet ved å definere et interface.
+// vi bruker et interface her fordi Retrofit krever det for å automatisk generere den underliggende nettverkskoden for oss.
 interface ClaudeApi {
 
-    // Jeg må sende med disse tre faste headerne på hvert eneste anrop, ellers avviser Anthropic forespørselen.
+    // Anthropic API-et er veldig strengt på hvilke headers som sendes inn.
+    // vi må spesifisere versjon og at all kommunikasjon skjer vi a JSON, ellers vi l serveren avvise forespørselen vår.
     @Headers(
-        "Accept: application/json",           // Jeg forventer JSON-svar tilbake.
-        "Content-Type: application/json",     // Jeg sender dataene mine i JSON-format.
-        "anthropic-version: 2023-06-01"       // Jeg spesifiserer API-protokollen deres (dette er et strengt Anthropic-krav).
+        "Accept: application/json",           // Forteller serveren at vi forventer å få svaret tilbake i JSON-format.
+        "Content-Type: application/json",     // Forteller serveren at dataene vi sender oppover også er formatert som JSON.
+        "anthropic-version: 2023-06-01"       // Dette er et strengt krav fra Anthropic for å definere hvilken API-protokoll vi bruker.
     )
 
-    // Jeg bruker et POST-kall fordi jeg aktivt sender en pakke med data (meldinger) opp til AI-serveren.
+    // Siden vi sender opp en relativt stor datapakke (prompt, logg og verktøy), må vi bruke et HTTP POST-kall.
+    // "v1/messages" er det spesifikke endepunktet hos Claude for å generere tekstbaserte svar.
     @POST("v1/messages")
 
-    // Kjøres i bakgrunnen (suspend) for å holde appen min responsiv mens Claude "tenker".
+    // Funksjonen er 'suspend' slik at nettverkskallet kjører asynkront i bakgrunnen (i en coroutine).
+    // På den måten unngår vi at selve appen og brukergrensesnittet fryser mens Claude "tenker".
     suspend fun sendMessage(
 
-        // Jeg injiserer den hemmelige API-nøkkelen vår dynamisk i headeren for dette spesifikke kallet.
+        // API-nøkkelen vår injiseres dynamisk i headeren for dette spesifikke kallet.
+        // Dette gjøres vi a @Header-annotasjonen slik at den blir gjemt i HTTP-forespørselen som "x-api-key".
         @Header("x-api-key") apiKey: String,
 
-        // Her legger jeg hele datamodellen min (requesten) i kroppen på POST-meldingen.
+        // Her legger vi hele datamodellen vår (requesten med system prompt og samtalelogg) i selve "kroppen" av POST-meldingen.
+        // Retrofit vi l automatisk gjøre om Kotlin-objektet ClaudeRequest til en JSON-streng før det sendes.
         @Body request: ClaudeRequest
 
-        // Jeg har strukturert koden slik at den automatisk oversetter JSON-svaret tilbake til et ClaudeResponse-objekt jeg kan jobbe med.
+        // Når API-kallet er ferdig, sørger Retrofit og Kotlin Serialization for å automatisk
+        // oversette JSON-svaret fra Claude tilbake til et ClaudeResponse-objekt som vi enkelt kan hente data fra.
     ): ClaudeResponse
 }

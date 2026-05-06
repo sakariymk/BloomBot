@@ -20,12 +20,20 @@ import project.team36.ui.findplants.SavePlantDialog
 import project.team36.ui.myplaces.MyPlacesScreen
 import project.team36.ui.landingpage.LandingPageScreen
 import project.team36.ui.landingpage.LandingPageViewModel
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Snackbar
+import androidx.compose.foundation.layout.height
+import androidx.compose.ui.unit.dp
 
 //import project.team36.ui.plant.PlantSwipeViewModel
 
 @Composable
 fun AppNavHost(
     modifier: Modifier = Modifier,
+    snackbarHostState: SnackbarHostState,
     navController: NavHostController,
     mapViewModel: MapViewModel,
     findPlantsViewModel: FindPlantsViewModel,
@@ -34,18 +42,30 @@ fun AppNavHost(
     plantDetailsViewModel: PlantDetailsViewModel,
     landingPageViewModel: LandingPageViewModel,
 ) {
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { snackbarData ->
+                Snackbar(
+                    snackbarData = snackbarData,
+                    modifier = Modifier
+                        .padding(bottom = 105.dp)
+                        .height(70.dp)
+
+                )
+            }
+        }
+    ) { innerPadding ->
     NavHost(
         navController = navController,
-        startDestination = "landingpage", //HER ENDRER JEG BARE TIL LANDINGPAGE FOR Å SE DEN PÅ APPEN
-        modifier = modifier
+        startDestination = "landingpage",
+        modifier = modifier.padding(innerPadding)
     ){
         composable("map") {
             MapScreen(
                 modifier = modifier,
                 viewModel = mapViewModel,
                 navController = navController,
-                savedPlacesViewModel = savedPlacesViewModel,
-                myPlantsViewModel = myPlantsViewModel
+                savedPlacesViewModel = savedPlacesViewModel
             )
         }
         composable ("myPlants"){
@@ -121,5 +141,6 @@ fun AppNavHost(
                 onAddPlaceClick = { navController.navigate("map") },
             )
         }
+    }
     }
 }

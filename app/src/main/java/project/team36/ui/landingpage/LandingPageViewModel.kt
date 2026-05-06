@@ -1,5 +1,6 @@
 package project.team36.ui.landingpage
 
+import android.R.attr.src
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -37,24 +38,31 @@ data class LandingPageUiState(
 
 private fun weatherSymbolToDescription(symbol: String): String {
     return when (symbol) {
-        "clearsky"         -> "Klarvær"
-        "clearsky_day"     -> "Klarvær"
-        "clearsky_night"   -> "Klarvær"
-        "fair"             -> "Lettskyet"
-        "fair_day"         -> "Lettskyet"
-        "fair_night"       -> "Lettskyet"
-        "partlycloudy"     -> "Delvis skyet"
-        "partlycloudy_day" -> "Delvis skyet"
-        "partlycloudy_night" -> "Delvis skyet"
-        "cloudy"           -> "Overskyet"
-        "fog"              -> "Tåke"
-        "rain"             -> "Regn"
-        "heavyrain"        -> "Kraftig regn"
-        "lightrain"        -> "Lett regn"
-        "snow"             -> "Snø"
-        "sleet"            -> "Sludd"
-        "thunder"          -> "Torden"
-        else               -> symbol
+        "clearsky", "clearsky_day", "clearsky_night", "clearsky_polartwilight" -> "Klarvær"
+        "fair", "fair_day", "fair_night", "fair_polartwilight" -> "Lettskyet"
+        "partlycloudy", "partlycloudy_day", "partlycloudy_night" -> "Delvis skyet"
+        "cloudy" -> "Overskyet"
+        "fog" -> "Tåke"
+        "rain" -> "Regn"
+        "heavyrain" -> "Kraftig regn"
+        "lightrain" -> "Lett regn"
+        "snow" -> "Snø"
+        "sleet", "heavysleet" -> "Sludd"
+        "thunder" -> "Torden"
+        "heavyrainandthunder" -> "Kraftig regn og torden"
+
+        "sleetshowers_day" -> "Sluddbyger"
+
+        "heavyrainshowers_day",
+        "heavyrainshowers",
+        "heavyrainshowers_night",
+        "heavyrainshowers_polartwilight" -> "Kraftige regnbyger"
+
+        "heavysleetandthunder",
+        "heavyrainshowersandthunder_night",
+        "heavyrainshowersandthunder_day",
+        "heavyrainshowersandthunder_polartwilight" -> "Tordenbyger"
+        else -> symbol
     }
 }
 

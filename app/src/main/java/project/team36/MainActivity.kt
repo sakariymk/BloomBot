@@ -5,6 +5,12 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -24,63 +30,41 @@ import project.team36.data.local.AppDatabase
 import project.team36.data.local.LocationRepository
 import project.team36.data.mcp.MetMcpClient
 import project.team36.data.mcp.MetWeatherRepository
+import project.team36.data.network.ConnectivityObserver
 import project.team36.data.plant.PlantDataSource
 import project.team36.data.plant.PlantRepository
+import project.team36.ui.findplants.FindPlantsViewModelFactory
 import project.team36.ui.landingpage.LandingPageViewModel
 import project.team36.ui.landingpage.LandingPageViewModelFactory
 import project.team36.ui.map.MapViewModel
+import project.team36.ui.map.MapViewModelFactory
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.map.SavedPlacesViewModelFactory
 import project.team36.ui.myplants.MyPlantsViewModel
 import project.team36.ui.plant.PlantDetailsViewModel
+import project.team36.ui.plant.PlantDetailsViewModelFactory
 import project.team36.ui.theme.Team36Theme
+import androidx.compose.runtime.DisposableEffect
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.SystemBarStyle
+import androidx.core.view.WindowCompat
+import project.team36.ui.myplants.MyPlantsViewModelFactory
 
-
-class MapViewModelFactory(
-    private val repository: HybridAiRepository,
-    private val weatherRepository: MetWeatherRepository
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(MapViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return MapViewModel(repository, weatherRepository) as T
-        }
-        throw IllegalArgumentException("Ukjent ViewModel klasse")
-    }
-}
-
-class FindPlantsViewModelFactory(
-    private val plantRepository: PlantRepository,
-    private val locationRepository: LocationRepository,
-    private val savedPlacesViewModel: SavedPlacesViewModel
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(FindPlantsViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return FindPlantsViewModel(plantRepository, locationRepository, savedPlacesViewModel) as T
-        }
-        throw IllegalArgumentException("Ukjent ViewModel klasse")
-    }
-}
-
-class MyPlantsViewModelFactory(
-    private val repository: LocationRepository,
-    private val savedPlacesViewModel: SavedPlacesViewModel,
-    private val frostRepository: FrostRepository
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(MyPlantsViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return MyPlantsViewModel(repository, savedPlacesViewModel, frostRepository) as T
-        }
-        throw IllegalArgumentException("Ukjent ViewModel klasse")
-    }
-}
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        //gjør statusbaren gjennomsiktig i appen
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.light(
+                scrim = android.graphics.Color.TRANSPARENT,
+                darkScrim = android.graphics.Color.TRANSPARENT
+            ),
+            //setter fargen til telefonens navigasjonsknapper
+            navigationBarStyle = SystemBarStyle.dark(
+                scrim = 0xFF243B37.toInt()
+            )
+        )
         val dataSource = PlantDataSource(this)
         val db = AppDatabase.getDatabase(this)
         val locationRepository = LocationRepository(db.savedLocationDao(), db.savedPlantDao())
@@ -108,12 +92,7 @@ class MainActivity : ComponentActivity() {
             .build()
         val claudeApi = claudeRetrofit.create(ClaudeApi::class.java)
 
-        val metRetrofit = Retrofit.Builder()
-            .baseUrl("https://api.met.no/")
-            .build()
-
         val claudeKey = "***FJERNET***"
-        val frostClientId = "08b40da1-9456-4846-988a-e5283cf731cb"
 
         val mcpClient = MetMcpClient()
 
@@ -139,37 +118,56 @@ class MainActivity : ComponentActivity() {
             Team36Theme {
                 val navController = rememberNavController()
 
+                val connectivityObserver = remember { ConnectivityObserver(applicationContext) }
+
+                DisposableEffect(Unit) {
+                    connectivityObserver.register()
+                    onDispose { connectivityObserver.unregister() }
+                }
+
+                val isConnected by connectivityObserver.isConnected.collectAsState()
+
+                val snackbarHostState = remember { SnackbarHostState() }
+                LaunchedEffect(isConnected) {
+                    if (!isConnected) {
+                        snackbarHostState.showSnackbar(
+                            message = "Ingen internettforbindelse",
+                            duration = SnackbarDuration.Indefinite
+                        )
+                    }
+                }
+
                 val landingPageViewModel: LandingPageViewModel = viewModel(
                     factory = LandingPageViewModelFactory(metWeatherRepository, hybridAiRepository)
                 )
-
                 val savedPlacesViewModel: SavedPlacesViewModel = viewModel(
                     factory = SavedPlacesViewModelFactory(locationRepository)
                 )
                 val findPlantsViewModel: FindPlantsViewModel = viewModel(
-                    factory = FindPlantsViewModelFactory(plantRepository, locationRepository, savedPlacesViewModel)
+                    factory = FindPlantsViewModelFactory(
+                        plantRepository,
+                        locationRepository,
+                        savedPlacesViewModel
+                    )
                 )
-
                 val myPlantsViewModel: MyPlantsViewModel = viewModel(
-                    factory = MyPlantsViewModelFactory(locationRepository, savedPlacesViewModel, frostRepository)
+                    factory = MyPlantsViewModelFactory(
+                        locationRepository,
+                        savedPlacesViewModel,
+                        frostRepository
+                    )
                 )
-
                 val mapViewModel: MapViewModel = viewModel(
-                    factory = MapViewModelFactory(hybridAiRepository, metWeatherRepository)
+                    factory = MapViewModelFactory(metWeatherRepository, locationRepository)
                 )
 
-                // plantDetailsScreen ViewModel --> sjekk om den skal ligge her
                 val plantDetailsViewModel: PlantDetailsViewModel = viewModel(
-                    factory = object : ViewModelProvider.Factory {
-                        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                            @Suppress("UNCHECKED_CAST")
-                            return PlantDetailsViewModel(plantRepository, locationRepository) as T
-                        }
-                    }
+                    factory = PlantDetailsViewModelFactory(plantRepository, locationRepository)
                 )
 
                 AppNavHost(
                     navController = navController,
+                    snackbarHostState = snackbarHostState,
                     mapViewModel = mapViewModel,
                     findPlantsViewModel = findPlantsViewModel,
                     myPlantsViewModel = myPlantsViewModel,

@@ -1,12 +1,15 @@
 package project.team36.ui.myplants
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import project.team36.data.klima.frost.FrostRepository
@@ -17,6 +20,7 @@ import project.team36.ui.map.SavedPlacesViewModel
 import java.time.Instant
 import java.time.LocalDate
 import java.util.concurrent.TimeUnit
+import kotlin.collections.filter
 
 
 class MyPlantsViewModel(
@@ -58,11 +62,13 @@ class MyPlantsViewModel(
     //Metoder for vanning og å sjekke om den trenger vann, lagt til ny egenskap til SavedPlant - lastWateredDate som kan holde på nøyaktig tid for vanning
     fun markAsWatered(plant: SavedPlant) {
         viewModelScope.launch {
-            repository.updatePlant(plant.copy(
-                hasBeenWatered = true,
-                daysSinceWatered = 0,
-                lastWateredDate = System.currentTimeMillis()
-            ))
+            repository.updatePlant(
+                plant.copy(
+                    hasBeenWatered = true,
+                    daysSinceWatered = 0,
+                    lastWateredDate = System.currentTimeMillis()
+                )
+            )
         }
     }
 
@@ -98,9 +104,11 @@ class MyPlantsViewModel(
 
     fun markAsFertilized(plant: SavedPlant) {
         viewModelScope.launch {
-            repository.updatePlant(plant.copy(
-                lastFertilizationDate = System.currentTimeMillis()
-            ))
+            repository.updatePlant(
+                plant.copy(
+                    lastFertilizationDate = System.currentTimeMillis()
+                )
+            )
         }
     }
 
@@ -143,7 +151,35 @@ class MyPlantsViewModel(
             _precipitationPerDay.value = rainPerDay ?: emptyMap()
         }
     }
+
+    //henter alle planter som trenger vann for hver lokasjon
+    fun getPlantsNeedingWaterByLocation(locations: List<SavedLocation>): Flow<Map<SavedLocation, List<Pair<SavedPlant, String>>>> {
+        return allPlants.map { plants ->
+            locations.associateWith { location ->
+                plants
+                    .filter { plant ->
+                        plant.locationId == location.id && needsWater(plant) //filtrerer på de plantene som trenger vann
+                    }
+                    .map { plant -> plant to getWateringText(plant) } //henter også hvor ofte en plante må vannes
+            }
+        }
+    }
+
+    //For å få riktig tidsformat fra siste vanningsdato lagret for hver plante
+    fun Long.toIso8601(): String = Instant.ofEpochMilli(this).toString()
+
 }
 
-//For å få riktig tidsformat fra siste vanningsdato lagret for hver plante
-fun Long.toIso8601(): String = Instant.ofEpochMilli(this).toString()
+class MyPlantsViewModelFactory(
+    private val repository: LocationRepository,
+    private val savedPlacesViewModel: SavedPlacesViewModel,
+    private val frostRepository: FrostRepository
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(MyPlantsViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return MyPlantsViewModel(repository, savedPlacesViewModel, frostRepository) as T
+        }
+        throw IllegalArgumentException("Ukjent ViewModel klasse")
+    }
+}

@@ -7,8 +7,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DeviceThermostat
 import androidx.compose.material.icons.filled.WaterDrop
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -91,7 +94,8 @@ fun PlantDetailsScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent
-                )
+                ),
+                windowInsets = WindowInsets(0) //gjør at appen ikke legger til mye mellomrom på toppen av skjermen
             )
         }
     ) { innerPadding ->
@@ -126,36 +130,39 @@ fun PlantDetailsScreen(
                         text = plant.name,
                         fontSize = 36.sp,
                         fontWeight = FontWeight.Normal,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                     if (onAddPlant != null) {
-                        OutlinedButton(
+                        Button(
                             onClick = { onAddPlant() },
                             shape = RoundedCornerShape(50),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                containerColor = Color.White
-                            ),
-                            border = BorderStroke(0.dp, Color.Gray)
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary
+                            )
                         ) {
                             Text("Legg til i hage", color = MaterialTheme.colorScheme.onPrimary)
                         }
                     } else if (onDeletePlant != null) {
-                        OutlinedButton(
+                        Button(
                             onClick = {
                                 onDeletePlant()
                                 onBackClick()
                             },
                             shape = RoundedCornerShape(50),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                containerColor = Color.White
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.secondary
                             ),
-                            border = BorderStroke(0.dp, Color.Gray)
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                         ) {
-                            Text("Fjern plante fra hage", color = MaterialTheme.colorScheme.onPrimary)
+                            Text("Fjern plante fra hage", color = MaterialTheme.colorScheme.onSecondary)
                         }
                     }
 
                 }
+                PlantInfoCard(title = "Om planten") {
+                    Text("${plant.description}")
+                }
+                Spacer(modifier = Modifier.height(8.dp))
                 PlantInfoCard(title = "Plantingsmåned") {
                     Text("Dette er de ideelle månedene å plante denne planten.")
                     PlantingMonthBar(plantingMonth = plant.plantingMonth)
@@ -217,12 +224,12 @@ fun PlantDetailsScreen(
                 }
                 PlantInfoCard(title = "Jordtype") {
                     Text("Jorden planten trives aller best i når det gjelder struktur, sammensetning, næringsinnhold og surhetsgrad. Valg av jordtype avhenger av plantens behov, men generelt trives de fleste planter i en luftig, næringsrik jord med god drenering ")
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         plant.soil.forEach { soilType ->
                             OutlinedButton(
                                 onClick = {},
                                 shape = RoundedCornerShape(50),
-                                border = BorderStroke(1.dp, Color.LightGray)
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                             ) {
                                 Text(
                                     text = soilType.displayName,
@@ -283,7 +290,7 @@ fun PlantingMonthBar(plantingMonth: Set<Int>) {
                 .fillMaxWidth()
                 .height(20.dp)
                 .clip(RoundedCornerShape(50))
-                .background(Color(0xFFB0C080))
+                .background(MaterialTheme.colorScheme.background)
         ) {
             Spacer(modifier = Modifier.fillMaxWidth(startFraction))
             Box(
@@ -291,7 +298,7 @@ fun PlantingMonthBar(plantingMonth: Set<Int>) {
                     .fillMaxHeight()
                     .fillMaxWidth(widthFraction / (1f - startFraction))
                     .clip(RoundedCornerShape(50))
-                    .background(Color(0xFF5A7A3A)),
+                    .background(MaterialTheme.colorScheme.onBackground),
                 contentAlignment = Alignment.Center
             ) {
                 Text(label, fontSize = 11.sp, color = Color.White)
@@ -321,9 +328,9 @@ fun HardinessZoneTooltip() {
                         }
                     },
                     colors = TooltipDefaults.richTooltipColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                        contentColor = Color.Black,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        titleContentColor = MaterialTheme.colorScheme.onSurface,
+                        contentColor = MaterialTheme.colorScheme.onSurface,
                         actionContentColor = Color(0xFF2D5A27)
                     )
                 ) {
@@ -336,160 +343,18 @@ fun HardinessZoneTooltip() {
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                OutlinedButton(
+                Button(
                     onClick = { scope.launch { tooltipState.show() } },
                     shape = RoundedCornerShape(50),
-                    border = BorderStroke(1.dp, Color.LightGray),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = Color(0xFFE8F8E3)
+                        MaterialTheme.colorScheme.secondary
                     ),
                 ) {
-                    Text("Herdighetssone forklart", color = Color.Black)
+                    Text("Herdighetssone forklart", color = MaterialTheme.colorScheme.onSurface)
                 }
             }
 
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PlantDetailsScreenPreview() {
-    val fakePlant = PlantDetails(
-        name = "Lilje",
-        soil = setOf(SoilType.SAND, SoilType.CHALK),
-        light = setOf(LightType.FULL),
-        isFrostResistant = false,
-        waterPerWeek = 2f,
-        plantingMonth = setOf(6, 7, 8),
-        climateZone = 2,
-        hasBeenWatered = false,
-        daysSinceWatered = 3,
-        maxDaysWithoutWater = 12,
-        imageRes = R.drawable.pelargonia,
-        description = "En vakker lilje."
-    )
-
-    Team36Theme() {
-        PlantDetailsScreenPreview_Content(fakePlant)
-    }
-}
-
-@Composable
-fun PlantDetailsScreenPreview_Content(plant: PlantDetails) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFDFEAC0))
-            .verticalScroll(rememberScrollState())
-    ) {
-        Box(
-            modifier = Modifier
-                .padding(16.dp)
-                .size(48.dp)
-                .clip(CircleShape)
-                .background(Color.White),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Tilbake")
-        }
-
-        Image(
-            painter = painterResource(plant.imageRes),
-            contentDescription = plant.name,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(220.dp)
-                .padding(horizontal = 16.dp)
-                .clip(RoundedCornerShape(16.dp))
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(text = plant.name, fontSize = 36.sp, fontWeight = FontWeight.Normal)
-            OutlinedButton(
-                onClick = {},
-                shape = RoundedCornerShape(50),
-                colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.White),
-                border = BorderStroke(0.dp, Color.Transparent)
-            ) {
-                Text("Legg til", color = Color.Black)
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Plantingsmåned
-        PlantInfoCard(title = "Plantingsmåned") {
-            Text("Dette er de ideelle månedene å plante denne planten.")
-            PlantingMonthBar(plantingMonth = plant.plantingMonth)
-        }
-
-        PlantInfoCard(title = "Herdighet") {
-            Text("Den høyeste herdighetssonen planten tåler.")
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.DeviceThermostat,
-                    contentDescription = null,
-                    tint = Color(0xFF5A7A3A)
-                )
-                Text(
-                    "H${plant.climateZone}",
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 16.sp
-                )
-            }
-        }
-
-        PlantInfoCard(title = "Vanning") {
-            Text("Vi registrerer om det har regnet, slik at du kan få påminnelse om vanning dersom det ikke har regnet tilstrekkelig.")
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.WaterDrop,
-                    contentDescription = null,
-                    tint = Color(0xFF5A7A3A)
-                )
-                Text(
-                    "Hver ${plant.maxDaysWithoutWater}. dag",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                )
-            }
-        }
-
-        PlantInfoCard(title = "Jordtype") {
-            Text("Jordtypen påvirker hvor mye vann røttene får tilgang til, hvor god luftsirkulasjonen er, og hvor lett det er for røttene å vokse seg dypt.")
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                plant.soil.forEach { soilType ->
-                    OutlinedButton(
-                        onClick = {},
-                        shape = RoundedCornerShape(50),
-                        border = BorderStroke(1.dp, Color.LightGray)
-                    ) {
-                        Text(
-                            text = soilType.name.lowercase()
-                                .replaceFirstChar { it.uppercase() },
-                            color = Color.Black
-                        )
-                    }
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
     }
 }
