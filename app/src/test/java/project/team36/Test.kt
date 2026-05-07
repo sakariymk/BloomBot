@@ -1,7 +1,6 @@
 package project.team36
 
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Test
 import project.team36.data.klima.frost.getNearestStation

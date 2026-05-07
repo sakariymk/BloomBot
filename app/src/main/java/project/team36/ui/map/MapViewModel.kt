@@ -1,5 +1,6 @@
 package project.team36.ui.map
 
+import android.location.Geocoder
 import androidx.lifecycle.ViewModel
 import android.util.Log
 import androidx.lifecycle.ViewModelProvider
@@ -19,21 +20,20 @@ import com.mapbox.search.SearchSelectionCallback
 import com.mapbox.search.ApiType
 import com.mapbox.search.ResponseInfo
 import com.mapbox.search.SearchEngine
-import java.util.UUID
 import com.mapbox.geojson.Point
 import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.RenderedQueryGeometry
 import com.mapbox.maps.RenderedQueryOptions
 import kotlinx.coroutines.launch
-import project.team36.data.ai.HybridAiRepository
+import project.team36.data.local.LocationRepository
 import project.team36.data.mcp.MetWeatherRepository
 import project.team36.data.mcp.WeatherAlert
-import project.team36.model.ai.AiRecommendationResponse
 import project.team36.model.location.SavedLocation
-import project.team36.model.plant.PlantInfo
 import project.team36.ui.map.ClimateZoneConfig.LAYER_ID
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import android.content.Context
+import java.util.Locale
 
 data class MapUiState(
     val centerLng: Double = 9.30,
@@ -45,19 +45,19 @@ data class MapUiState(
     val showSaveDialog: Boolean = false,
     val placeNameInput: String = "",
     val selectedSavedLocation: SavedLocation? = null,
-    val aiResponse: AiRecommendationResponse? = null,
-    val isAiLoading: Boolean = false,
-    val isFutureAiLoading: Boolean = false,
     val weatherAlerts: List<WeatherAlert> = emptyList(),
     val locationAlerts: List<WeatherAlert> = emptyList(),
-    val rawApiData: String? = null,
-    val isAlertLoading: Boolean = false
+    val isAlertLoading: Boolean = false,
+    val userLat: Double? = null,
+    val userLon: Double? = null,
+    val liveLocationPending: Boolean = false,
+    val showLiveLocationConfirm: Boolean = false,
 )
 
 
 class MapViewModel(
-    private val repository: HybridAiRepository,
-    private val weatherRepository: MetWeatherRepository
+    private val weatherRepository: MetWeatherRepository,
+    private val savedLocationsRepository: LocationRepository
 ) : ViewModel() {
 
     val mapViewportState = MapViewportState().apply {
@@ -79,12 +79,9 @@ class MapViewModel(
         SearchEngineSettings()
     )
 
-    fun resetState() {
-        _uiState.value = MapUiState()
-        hasLoadedAlerts = false
-    }
 
     fun updateUserPosition(lat: Double, lon: Double) {
+        _uiState.value = _uiState.value.copy(userLat = lat, userLon = lon)
         if (!hasLoadedAlerts) {
             hasLoadedAlerts = true
             fetchAlerts(lat, lon)
@@ -94,11 +91,58 @@ class MapViewModel(
             }
             _uiState.value = _uiState.value.copy(locationAlerts = currentAlerts)
         }
+        if (_uiState.value.liveLocationPending) {
+            _uiState.value = _uiState.value.copy(
+                liveLocationPending = false,
+                showLiveLocationConfirm = true
+            )
+        }
+    }
+
+    fun requestLiveLocationSave() {
+        val lat = _uiState.value.userLat
+        val lon = _uiState.value.userLon
+        if (lat != null && lon != null) {
+            _uiState.value = _uiState.value.copy(showLiveLocationConfirm = true)
+        } else {
+            _uiState.value = _uiState.value.copy(liveLocationPending = true)
+        }
     }
 
 
-    fun dismissRawApiData() {
-        _uiState.value = _uiState.value.copy(rawApiData = null)
+    suspend fun getAddress(lat: Double, lon: Double, context: Context): String? {
+        return suspendCoroutine { continuation ->
+            val geocoder = Geocoder(context, Locale.getDefault())
+            geocoder.getFromLocation(lat, lon, 1) { results ->
+                continuation.resume(results.firstOrNull()?.getAddressLine(0))
+            }
+        }
+    }
+
+    fun confirmSaveLiveLocation(context: Context, onSaved: () -> Unit) {
+        val lat = _uiState.value.userLat ?: return
+        val lon = _uiState.value.userLon ?: return
+        viewModelScope.launch {
+
+            val address = getAddress(lat, lon, context)
+            val zone = getClimateZone(lng = lon, lat = lat)
+            savedLocationsRepository.insertLocation(
+                SavedLocation(
+                    name = "Min posisjon",
+                    lat = lat,
+                    lon = lon,
+                    address = address,
+                    zone = zone ?: 0
+                )
+            )
+            _uiState.value = _uiState.value.copy(showLiveLocationConfirm = false)
+            onSaved()
+        }
+    }
+
+    fun dismissLiveLocationConfirm() {
+        _uiState.value = _uiState.value.copy(showLiveLocationConfirm = false,
+            liveLocationPending = false)
     }
 
     fun onLocationReady() {
@@ -228,7 +272,7 @@ class MapViewModel(
         }
     }
 
-    fun confirmSavePlace(savedPlacesViewModel: SavedPlacesViewModel, onSaved: () -> Unit) {
+    fun confirmSavePlace(onSaved: () -> Unit) {
         val result = _uiState.value.selectedResult ?: return
         val name = _uiState.value.placeNameInput.ifEmpty { result.name }
         viewModelScope.launch {
@@ -237,7 +281,7 @@ class MapViewModel(
                 lat = result.coordinate.latitude()
             )
 
-            savedPlacesViewModel.addLocation(
+            savedLocationsRepository.insertLocation(
                 SavedLocation(
                     name = name,
                     lat = result.coordinate.latitude(),
@@ -250,7 +294,6 @@ class MapViewModel(
             onSaved()
         }
     }
-
     fun dismissSaveDialog() {
         _uiState.value = _uiState.value.copy(showSaveDialog = false, placeNameInput = "")
     }
@@ -262,41 +305,18 @@ class MapViewModel(
     fun dismissPlaceInfo() {
         _uiState.value = _uiState.value.copy(selectedSavedLocation = null)
     }
-
-    // <------ ENDRING: Fikset parameter til SavedLocation
-    fun fetchAiAdvice(location: SavedLocation) {
-        _uiState.value = _uiState.value.copy(isAiLoading = true, aiResponse = null)
-        viewModelScope.launch {
-            val response = repository.getPlantRecommendations(location)
-            _uiState.value = _uiState.value.copy(isAiLoading = false, aiResponse = response)
-        }
-    }
-
-    // <------ ENDRING: Lagt til Viewmodel funksjon for fremtidig råd
-    fun fetchFutureAiAdvice(location: SavedLocation) {
-        _uiState.value = _uiState.value.copy(isFutureAiLoading = true, aiResponse = null)
-        viewModelScope.launch {
-            val response = repository.getFuturePlantRecommendations(location)
-            _uiState.value = _uiState.value.copy(isFutureAiLoading = false, aiResponse = response)
-        }
-    }
-
-    // En liten funksjon for å lukke AI-svaret igjen:
-    fun dismissAiAdvice() {
-        _uiState.value = _uiState.value.copy(aiResponse = null)
-    }
 }
 
 
 
 class MapViewModelFactory(
-    private val repository: HybridAiRepository,
-    private val weatherRepository: MetWeatherRepository
+    private val weatherRepository: MetWeatherRepository,
+    private val savedLocationsRepository: LocationRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MapViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return MapViewModel(repository, weatherRepository) as T
+            return MapViewModel(weatherRepository, savedLocationsRepository ) as T
         }
         throw IllegalArgumentException("Ukjent ViewModel klasse")
     }

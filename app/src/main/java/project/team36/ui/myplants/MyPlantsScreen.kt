@@ -23,13 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.mapbox.maps.extension.style.expressions.dsl.generated.image
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.plant.PlantCard
-import project.team36.model.location.SavedLocation
-import project.team36.model.location.SavedPlant
-import project.team36.model.plant.PlantInfo
-import project.team36.ui.landingpage.LandingPageViewModel
 import project.team36.ui.navigation.BottomNavBar
 import project.team36.ui.theme.backgroundLight
 import project.team36.ui.theme.primaryContainerLight

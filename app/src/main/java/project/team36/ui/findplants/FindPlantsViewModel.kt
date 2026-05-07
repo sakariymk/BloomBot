@@ -1,6 +1,5 @@
 package project.team36.ui.findplants
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -38,7 +37,7 @@ class FindPlantsViewModel (
     //Legg til plante i en location
     fun addPlant(plant: PlantInfo) {
         viewModelScope.launch {
-            val locationId= savedPlacesViewModel.selectedLocation.value?.id ?: return@launch
+            val locationId = savedPlacesViewModel.selectedLocation.value?.id ?: return@launch
             locationRepository.insertPlant(
                 SavedPlant(
                     locationId = locationId,
