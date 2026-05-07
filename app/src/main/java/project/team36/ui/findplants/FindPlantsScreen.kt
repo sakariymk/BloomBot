@@ -147,20 +147,6 @@ fun FindPlantsScreen(
                         else -> ""
                     }
 
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
-                            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp))
-                            .padding(12.dp)
-                    ) {
-                        Text(
-                            text = infoText,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-
                     val displayedPlants = if (selectedTabIndex == 0) plants else notRecommendedPlants
 
                     LazyColumn(
@@ -173,6 +159,20 @@ fun FindPlantsScreen(
                             bottom = 100.dp
                         )
                     ) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp))
+                                    .padding(12.dp)
+                            ) {
+                                Text(
+                                    text = infoText,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            }
+                        }
                         items(displayedPlants) { plant ->
                             SimplePlantCard(
                                 plant = plant,
