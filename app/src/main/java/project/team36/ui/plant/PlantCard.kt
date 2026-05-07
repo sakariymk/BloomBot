@@ -322,7 +322,7 @@ private fun WeatherSection(
 
 @Composable
 fun PlantAlertInfo(alert: WeatherAlert, plant: SavedPlant) {
-    val isDangerous = alert.isDangerousForPlant(plant.isFrostResistant)
+    val isDangerous = true
 
     Column(
         modifier = Modifier
