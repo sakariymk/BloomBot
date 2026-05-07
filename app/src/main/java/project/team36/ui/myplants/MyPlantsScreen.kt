@@ -150,9 +150,6 @@ fun MyPlantsScreen(
                                             }
                                             savedPlacesViewModel.updateSelectedLocationName(newLocationName)
                                             showRenameDialog = false
-                                            navController.navigate("myPlants") {
-                                                popUpTo("myPlaces") { inclusive = false }
-                                            }
                                         },
                                         enabled = newLocationName.isNotBlank()
                                     ) { Text("Lagre") }
