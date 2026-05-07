@@ -79,10 +79,6 @@ class MapViewModel(
         SearchEngineSettings()
     )
 
-    fun resetState() {
-        _uiState.value = MapUiState()
-        hasLoadedAlerts = false
-    }
 
     fun updateUserPosition(lat: Double, lon: Double) {
         _uiState.value = _uiState.value.copy(userLat = lat, userLon = lon)

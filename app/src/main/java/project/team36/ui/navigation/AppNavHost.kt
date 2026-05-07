@@ -27,6 +27,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Snackbar
 import androidx.compose.foundation.layout.height
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import project.team36.ui.map.MapViewModelFactory
+
 
 //import project.team36.ui.plant.PlantSwipeViewModel
 
@@ -35,7 +38,7 @@ fun AppNavHost(
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState,
     navController: NavHostController,
-    mapViewModel: MapViewModel,
+    mapViewModelFactory: MapViewModelFactory,
     findPlantsViewModel: FindPlantsViewModel,
     myPlantsViewModel: MyPlantsViewModel,
     savedPlacesViewModel: SavedPlacesViewModel,
@@ -61,6 +64,7 @@ fun AppNavHost(
         modifier = modifier.padding(innerPadding)
     ){
         composable("map") {
+            val mapViewModel: MapViewModel = viewModel(factory = mapViewModelFactory)
             MapScreen(
                 modifier = modifier,
                 viewModel = mapViewModel,
