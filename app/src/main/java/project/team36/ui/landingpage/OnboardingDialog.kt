@@ -40,6 +40,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import project.team36.R
 import project.team36.ui.theme.Team36Theme
+import project.team36.ui.theme.backgroundLight
+import project.team36.ui.theme.onSurfaceLight
+import project.team36.ui.theme.outlineLight
+import project.team36.ui.theme.primaryLight
 
 @Composable
 fun OnboardingDialog(
@@ -49,14 +53,15 @@ fun OnboardingDialog(
     data class OnboardingStep(
         val title: String,
         val description: String,
-        val imageRes: Int
+        val imageRes: Int,
+        val imageHeight: Int
     )
 
     val steps = listOf(
-        OnboardingStep( "Velkommen til Bloombot!", "Hjelp plantene dine å trives med smarte tips, værdata og vekstsporing.", R.drawable.bloombot),
-        OnboardingStep("Registrer din hage", "Lagre en lokasjon for å ha oversikt over din hage. Vi gir deg også værvarsel tilpasset akkurat din hage.", R.drawable.defaultplant),
-        OnboardingStep("Legg til dine planter", "Få anbefalinger om planter som vil trives i din hage.", R.drawable.defaultplant),
-        OnboardingStep("Tilpasset KI-råd", "Vi overvåker været og gir beskjed om vanning. Ingen manuell jobb!", R.drawable.defaultplant)
+        OnboardingStep( "Velkommen til Bloombot", "Din digitale medgartner og plantedagbok for å hjelpe deg med å lykkes i din hage!", R.drawable.bloombot, 120),
+        OnboardingStep("Registrer din hage", "Lagre en lokasjon for å ha oversikt over din hage. Vi gir deg også værvarsel tilpasset akkurat din hage.", R.drawable.minesteder, 180),
+        OnboardingStep("Velg dine planter", "Få anbefalinger om planter som vil trives i akkurat din hage.", R.drawable.finnplanter, 180),
+        OnboardingStep("Tilpasset KI-råd", "Få tilpasset KI-råd for dine planter! \nVi gir tips som når de kan plantes ute, eller hvilke hageoppgaver som kan prioriteres basert på værdata.", R.drawable.aibloom, 120)
     )
 
     var currentStep by remember { mutableIntStateOf(0) }
@@ -66,17 +71,17 @@ fun OnboardingDialog(
     Dialog(onDismissRequest = onDismiss) {
         Card(
             shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E0))
+            colors = CardDefaults.cardColors(containerColor = backgroundLight)
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
-                // Hopp over
+                // Hopp over-knapp for å gi mulighet til å skippe tutorial
                 Box(modifier = Modifier.fillMaxWidth()) {
                     TextButton(
                         onClick = onDismiss,
                         modifier = Modifier.align(Alignment.TopEnd).padding(4.dp)
                     ) {
-                        Text("Hopp over", color = Color(0xFF386633), fontSize = 12.sp)
+                        Text("Hopp over", color = MaterialTheme.colorScheme.onSurface, fontSize = 12.sp)
                     }
                 }
 
@@ -87,7 +92,7 @@ fun OnboardingDialog(
                     contentScale = ContentScale.Fit,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(180.dp)
+                        .height(step.imageHeight.dp)
                         .padding(horizontal = 24.dp)
                 )
 
@@ -96,7 +101,7 @@ fun OnboardingDialog(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Animerte steg-prikker
+                    // Animerte steg-prikker for progresjon
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         steps.indices.forEach { index ->
                             Box(
@@ -104,8 +109,8 @@ fun OnboardingDialog(
                                     .height(6.dp)
                                     .width(if (index == currentStep) 24.dp else 6.dp)
                                     .background(
-                                        color = if (index == currentStep) Color(0xFF386633)
-                                        else Color(0xFF386633).copy(alpha = 0.3f),
+                                        color = if (index == currentStep) primaryLight
+                                        else primaryLight.copy(alpha = 0.3f),
                                         shape = CircleShape
                                     )
                             )
@@ -118,7 +123,7 @@ fun OnboardingDialog(
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
-                        color = Color(0xFF1B3A2D)
+                        color = primaryLight
                     )
 
                     // Beskrivelse
@@ -126,7 +131,7 @@ fun OnboardingDialog(
                         text = step.description,
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center,
-                        color = Color(0xFF386633)
+                        color = onSurfaceLight
                     )
 
                     Spacer(modifier = Modifier.height(4.dp))
@@ -141,9 +146,9 @@ fun OnboardingDialog(
                                 onClick = { currentStep-- },
                                 modifier = Modifier.weight(1.5f),
                                 shape = RoundedCornerShape(12.dp),
-                                border = BorderStroke(1.dp, Color(0xFF386633))
+                                border = BorderStroke(1.dp, outlineLight)
                             ) {
-                                Text("Tilbake", color = Color(0xFF386633))
+                                Text("Tilbake", color = onSurfaceLight)
                             }
                         }
                         Button(
@@ -151,13 +156,13 @@ fun OnboardingDialog(
                             modifier = Modifier.weight(2.5f),
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = if (isLastStep) Color(0xFF386633) else Color(0xFFB8D9B0)
+                                containerColor = if (isLastStep) primaryLight else Color(0xFFB8D9B0)
                             ),
 
                         ) {
                             Text(
                                 text = if (isLastStep) "Kom i gang!" else "Neste",
-                                color = if (isLastStep) Color.White else Color(0xFF386633),
+                                color = if (isLastStep) Color.White else primaryLight,
                                 fontWeight = FontWeight.Bold
                             )
                         }
