@@ -11,9 +11,19 @@ import project.team36.model.plant.SoilType
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.myplants.MyPlantsViewModel
 import io.mockk.every
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
+import org.junit.Before
 import java.util.concurrent.TimeUnit
 
 
@@ -43,21 +53,19 @@ class MyPlantsViewModelTest {
     }
 
     @Test
-    fun deletingPlantWithRemovePlantByName() = runTest {
-
+    fun deletingPlantWithRemovePlantByName() = runBlocking {
         val plant = opprettTestPlante()
 
         // every-lambdaene sørger for at man ikke får feil i kall til LocationRepository
         every { fakeSavedPlacesViewModel.selectedLocation } returns MutableStateFlow(null) // returnerer alltid null
-        every { fakeLocationRepo.getPlantsForLocation(any()) } returns flowOf(listOf(plant)) // mocker at SavedPlants-objektet ligger i databasen for en hvilken som helst locationId
+        every { fakeLocationRepo.getPlantsForLocation(any()) } returns flowOf(listOf(plant)) //mocker at SavedPlants-objektet ligger i databasen for en hvilken som helst locationId
 
-        val myPlantsViewModel = MyPlantsViewModel(fakeLocationRepo, fakeSavedPlacesViewModel,fakeFrostRepo)
+        val myPlantsViewModel = MyPlantsViewModel(fakeLocationRepo, fakeSavedPlacesViewModel, fakeFrostRepo)
 
+        myPlantsViewModel.plants.filter { it.isNotEmpty() }.first() //venter til testplanten er lastet inn i viewmodel
         myPlantsViewModel.removePlantByName("Pelargonia")
 
-        println("----Test result----")
-        println("deletePlantByName ble kalt med parameter: ${plant.name}")
-        coVerify { fakeLocationRepo.deletePlant(plant) } // sjekker at deletePlant-metode kalles under testen, med riktig SavedPlant objekt
+        coVerify { fakeLocationRepo.deletePlant(plant) } //bekrefter  at deletePlant blir kalt med riktig plante
     }
 
     private fun opprettTestPlante() = SavedPlant(
