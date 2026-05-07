@@ -11,19 +11,11 @@ import project.team36.model.plant.SoilType
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.myplants.MyPlantsViewModel
 import io.mockk.every
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
-import org.junit.After
-import org.junit.Before
 import java.util.concurrent.TimeUnit
 
 
