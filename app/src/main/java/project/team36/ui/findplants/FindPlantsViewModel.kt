@@ -34,7 +34,6 @@ class FindPlantsViewModel (
         _plants.value = plantRepository.initiatePlants().map { it.toPlantDetails() }
     }
 
-    //Legg til plante i en location
     fun addPlant(plant: PlantInfo) {
         viewModelScope.launch {
             val locationId = savedPlacesViewModel.selectedLocation.value?.id ?: return@launch
@@ -44,7 +43,6 @@ class FindPlantsViewModel (
                     name = plant.name,
                     soil = plant.soil,
                     light = plant.light,
-                    isFrostResistant = plant.isFrostResistant,
                     waterPerWeek = plant.waterPerWeek,
                     plantingMonth = plant.plantingMonth,
                     climateZone = plant.climateZone,
@@ -58,12 +56,10 @@ class FindPlantsViewModel (
         }
     }
 
-    //Når plante legges til i en location
     fun onPlantAdded(plant: PlantDetails) {
         _plants.value -= plant
     }
 
-    //når en bruker vil lagre plante -- bør ikke alt under gå på FindPlantsViewModel kanskje? for riktig sted for logikk
     fun requestAddPlant(plant: PlantDetails) {
         _pendingPlant.value = plant
     }
@@ -72,7 +68,6 @@ class FindPlantsViewModel (
         _pendingPlant.value = null
     }
 
-    //når bruker har valgt plante og lokasjon
     fun confirmAddPlant(plant: PlantDetails, location: SavedLocation) {
         viewModelScope.launch {
             locationRepository.insertPlant(
@@ -81,7 +76,6 @@ class FindPlantsViewModel (
                     name = plant.name,
                     soil = plant.soil,
                     light = plant.light,
-                    isFrostResistant = plant.isFrostResistant,
                     waterPerWeek = plant.waterPerWeek,
                     plantingMonth = plant.plantingMonth,
                     climateZone = plant.climateZone,
@@ -112,7 +106,6 @@ class FindPlantsViewModel (
                 }
         }
     }
-
 }
 
 

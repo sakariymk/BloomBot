@@ -11,7 +11,6 @@ data class PlantInfo(
     val name: String,
     val soil: Set<SoilType>,
     val light: Set<LightType>,
-    val isFrostResistant: Boolean,
     val waterPerWeek: Float,
     val plantingMonth: Set<Int>,
     val climateZone: Int,
