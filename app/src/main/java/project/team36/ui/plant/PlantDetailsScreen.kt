@@ -123,6 +123,7 @@ fun PlantDetailsScreen(
                         text = plant.name,
                         fontSize = 36.sp,
                         fontWeight = FontWeight.Normal,
+                        modifier = Modifier.weight(1f).padding(end = 8.dp),
                         color = MaterialTheme.colorScheme.onBackground
                     )
                     if (onAddPlant != null) {
@@ -133,7 +134,7 @@ fun PlantDetailsScreen(
                                 containerColor = MaterialTheme.colorScheme.primary
                             )
                         ) {
-                            Text("Legg til i hage", color = MaterialTheme.colorScheme.onPrimary)
+                            Text("Legg til", color = MaterialTheme.colorScheme.onPrimary)
                         }
                     } else if (onDeletePlant != null) {
                         Button(
