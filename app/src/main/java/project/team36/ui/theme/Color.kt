@@ -3,7 +3,6 @@ package project.team36.ui.theme
 import androidx.compose.ui.graphics.Color
 
 // Semantiske farger er laget med Material Theme Builder: https://material-foundation.github.io/material-theme-builder/
-
 val primaryLight = Color(0xFF316322)
 val onPrimaryLight = Color(0xFFFFFFFF)
 val secondaryLight = Color(0xFFE8F8E3)
@@ -31,3 +30,8 @@ val onSurfaceDark = Color(0xFFE2E3D8)
 val outlineDark = Color(0xFF8F9285)
 val primaryContainerDark = Color(0xFF354E16)
 val onPrimaryContainerDark = Color(0xFFCDEDA3)
+
+// Farger for MetAlerts
+val AlertRed = Color(0xFFFF5252)
+val AlertOrange = Color(0xFFFFAB40)
+val AlertYellow = Color(0xFFFFD740)
