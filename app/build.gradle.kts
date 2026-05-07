@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
-    id("com.google.devtools.ksp")
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -45,7 +45,7 @@ android {
 
 dependencies {
     //Navigations
-    implementation("androidx.navigation:navigation-compose:2.9.7")
+    implementation("androidx.navigation:navigation-compose:2.9.8")
     //MapBox
     implementation("com.mapbox.maps:android:11.19.0")
     implementation("com.mapbox.extension:maps-compose:11.19.0")
@@ -72,7 +72,7 @@ dependencies {
     implementation("io.ktor:ktor-client-android")
     implementation("io.ktor:ktor-client-content-negotiation")
     implementation("io.ktor:ktor-serialization-kotlinx-json")
-    implementation("io.ktor:ktor-client-cio:3.4.1")
+    implementation("io.ktor:ktor-client-cio:3.4.3")
 
     // Mockito for vanlige enhetstester (Unit tests i test-mappen)
     testImplementation("org.mockito:mockito-core:5.11.0")
@@ -99,10 +99,10 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
-    implementation("androidx.activity:activity-compose:1.8.2")
-    implementation("androidx.compose.material3:material3:1.2.0")
-    implementation("com.google.android.material:material:1.11.0")
-    implementation("androidx.compose.runtime:runtime:1.6.1")
+    implementation(libs.androidx.activity.compose)
+    implementation("androidx.compose.material3:material3:1.4.0")
+    implementation("com.google.android.material:material:1.13.0")
+    implementation("androidx.compose.runtime:runtime:1.11.0")
 
     //Room database
     implementation("androidx.room:room-runtime:2.8.4")

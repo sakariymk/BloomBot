@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Eco
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -25,6 +26,8 @@ import androidx.navigation.NavController
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.plant.PlantCard
 import project.team36.ui.navigation.BottomNavBar
+import project.team36.ui.theme.backgroundLight
+import project.team36.ui.theme.primaryContainerLight
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,16 +35,13 @@ fun MyPlantsScreen(
     navController: NavController,
     savedPlacesViewModel: SavedPlacesViewModel,
     myPlantsViewModel: MyPlantsViewModel,
-    //landingPageViewModel : LandingPageViewModel
 ) {
 
-    val savedLocations by savedPlacesViewModel.savedLocations.collectAsStateWithLifecycle()
     val selectedLocation by savedPlacesViewModel.selectedLocation.collectAsStateWithLifecycle()
 
     //hent planter for valgt sted
     val plants by myPlantsViewModel.plants.collectAsStateWithLifecycle()
 
-    //val landingUiState by landingPageViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(selectedLocation) {
         selectedLocation?.let {
@@ -73,10 +73,10 @@ fun MyPlantsScreen(
                 },
                 actions = {
 
-                    var expanded by remember { mutableStateOf(false) }
-                    var showDeleteDialog by remember { mutableStateOf(false) }
-                    var showRenameDialog by remember { mutableStateOf(false) }
-                    var newLocationName by remember { mutableStateOf("") }
+                    var expanded by rememberSaveable() { mutableStateOf(false) }
+                    var showDeleteDialog by rememberSaveable() { mutableStateOf(false) }
+                    var showRenameDialog by rememberSaveable() { mutableStateOf(false) }
+                    var newLocationName by rememberSaveable() { mutableStateOf("") }
 
                     Box {
                         IconButton(onClick = {expanded = true }) {
@@ -88,7 +88,8 @@ fun MyPlantsScreen(
                         }
                         DropdownMenu(
                             expanded = expanded,
-                            onDismissRequest = { expanded = false}
+                            onDismissRequest = { expanded = false},
+                            containerColor = MaterialTheme.colorScheme.background
                         ) {
                             DropdownMenuItem(
                                 text = { Text("Bytt navn") },
@@ -112,7 +113,7 @@ fun MyPlantsScreen(
                                 text = { Text("Du vil miste alle lagrede planter i denne hagen.") },
                                 onDismissRequest = { showDeleteDialog = false},
                                 confirmButton = {
-                                    TextButton(
+                                    OutlinedButton (
                                         onClick = {
                                             selectedLocation?.let { myPlantsViewModel.deleteLocation(it) }
                                             navController.navigate("myPlaces")
@@ -125,7 +126,8 @@ fun MyPlantsScreen(
                                     TextButton(onClick = { showDeleteDialog = false } ) {
                                         Text("Behold hage")
                                     }
-                                }
+                                },
+                                containerColor = MaterialTheme.colorScheme.background
                             )
                         }
                         if (showRenameDialog) {
@@ -200,13 +202,7 @@ fun MyPlantsScreen(
                     )
                 }
             } else {
-                // Vi mater inn riktig liste, og tegner opp nøyaktig det elementet vi er på.
                 items(plants){ plant ->
-                    /*
-                    val alertsForLocation = selectedLocation?.let {loc ->
-                        landingUiState.locationAlerts[loc.id]
-                    } ?: emptyList()
-*/
                     PlantCard(
                         plant = plant,
                         needsWater = myPlantsViewModel.needsWater(plant),
@@ -215,7 +211,6 @@ fun MyPlantsScreen(
                         onMarkAsWatered = { myPlantsViewModel.markAsWatered(plant) },
                         onMarkAsFertilized = { myPlantsViewModel.markAsFertilized(plant) },
                         onNavigateToDetails = { navController.navigate("plantDetailsScreen/${plant.name}/delete") }
-                        //alerts = alertsForLocation
                     )
                 }
             }
