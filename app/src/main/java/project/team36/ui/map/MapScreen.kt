@@ -25,7 +25,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -64,6 +63,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.saveable.rememberSaveable
+
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
@@ -80,14 +81,11 @@ fun MapScreen(
     val locationPermissionState = rememberPermissionState(
         Manifest.permission.ACCESS_FINE_LOCATION
     )
-    var showLocationChoiceDialog by remember(savedLocations.isEmpty()) {
+    var showLocationChoiceDialog by rememberSaveable(savedLocations.isEmpty()) {
         mutableStateOf(savedLocations.isEmpty())
     }
-    var permissionRequested by remember { mutableStateOf(false) }
+    var permissionRequested by rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(navController.currentBackStackEntry) {
-        viewModel.resetState()
-    }
     LaunchedEffect(locationPermissionState.status.isGranted) {
         if (permissionRequested && locationPermissionState.status.isGranted) {
             viewModel.requestLiveLocationSave()

@@ -157,9 +157,7 @@ class MainActivity : ComponentActivity() {
                         frostRepository
                     )
                 )
-                val mapViewModel: MapViewModel = viewModel(
-                    factory = MapViewModelFactory(metWeatherRepository, locationRepository)
-                )
+                val mapViewModelFactory = MapViewModelFactory(metWeatherRepository, locationRepository)
 
                 val plantDetailsViewModel: PlantDetailsViewModel = viewModel(
                     factory = PlantDetailsViewModelFactory(plantRepository, locationRepository)
@@ -168,7 +166,7 @@ class MainActivity : ComponentActivity() {
                 AppNavHost(
                     navController = navController,
                     snackbarHostState = snackbarHostState,
-                    mapViewModel = mapViewModel,
+                    mapViewModelFactory = mapViewModelFactory,
                     findPlantsViewModel = findPlantsViewModel,
                     myPlantsViewModel = myPlantsViewModel,
                     savedPlacesViewModel = savedPlacesViewModel,
