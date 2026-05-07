@@ -43,9 +43,6 @@ import com.google.accompanist.permissions.rememberPermissionState
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.navigation.BottomNavBar
 import androidx.compose.material3.*
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.unit.sp
-import com.mapbox.maps.extension.style.expressions.dsl.generated.color
 import project.team36.ui.myplants.MyPlantsViewModel
 import project.team36.data.mcp.WeatherAlert
 

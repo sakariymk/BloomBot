@@ -1,6 +1,5 @@
 package project.team36.ui.landingpage
 
-import android.R.attr.src
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
