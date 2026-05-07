@@ -38,7 +38,7 @@ class FindPlantsViewModel (
     //Legg til plante i en location
     fun addPlant(plant: PlantInfo) {
         viewModelScope.launch {
-            val locationId= savedPlacesViewModel.selectedLocation.value?.id ?: return@launch
+            val locationId = savedPlacesViewModel.selectedLocation.value?.id ?: return@launch
             locationRepository.insertPlant(
                 SavedPlant(
                     locationId = locationId,
