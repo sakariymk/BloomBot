@@ -64,6 +64,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.saveable.rememberSaveable
+import com.mapbox.maps.extension.style.expressions.dsl.generated.color
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -282,6 +283,7 @@ fun MapScreen(
                 AlertDialog(
                     onDismissRequest = { viewModel.dismissLiveLocationConfirm() },
                     title = { Text("Lagre sted?") },
+                    containerColor = MaterialTheme.colorScheme.surface,
                     text = { Text("Vil du lagre din nåværende posisjon?") },
                     confirmButton = {
                         TextButton(onClick = {
@@ -298,6 +300,7 @@ fun MapScreen(
                 AlertDialog(
                     onDismissRequest = { viewModel.dismissSaveDialog() },
                     title = { Text("Lagre hage?") },
+                    containerColor = MaterialTheme.colorScheme.surface,
                     confirmButton = {
                         TextButton(
                             onClick = {

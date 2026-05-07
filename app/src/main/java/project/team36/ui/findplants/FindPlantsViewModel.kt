@@ -112,7 +112,11 @@ class FindPlantsViewModel (
                 }
         }
     }
-
+    // Tømme visning for planter dersom lagret sted slettes
+    fun clearPlants() {
+        _plants.value = emptyList()
+        _notRecommendedPlants.value = emptyList()
+    }
 }
 
 

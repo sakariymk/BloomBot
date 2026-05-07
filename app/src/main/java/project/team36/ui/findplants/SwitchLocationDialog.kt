@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -28,12 +29,13 @@ fun SwitchLocationDialog (
     var selectedLocation by remember() { mutableStateOf(savedLocations.find { it.name == currentLocationName }) }
 
     AlertDialog (
+        containerColor = MaterialTheme.colorScheme.surface,
         onDismissRequest = onDismiss,
         title = { Text("Endre hage") },
         text = {
             Column {
                 if (savedLocations.isEmpty()) {
-                    Text("Du har ingen lagrede hager enda. Legg til en ny hage.") // kanskje ordne CTA til kartet her?
+                    Text("Du har ingen lagrede hager enda. Legg til en ny hage.") // kanskje ordne CTA til kartet her? TODO: send til mine planter herfra
                 } else {
                     savedLocations.forEach { location ->
                         Row(

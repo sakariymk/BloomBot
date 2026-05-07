@@ -71,10 +71,12 @@ fun FindPlantsScreen(
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val tabs = listOf("Anbefalte planter", "Andre planter")
 
+    //Laster inn anbefalte planter, eller tømmer view om det ikke er noen steder lagret
+    // SelectedLocation settes allerede fra landingpage
     LaunchedEffect(selectedLocation) {
         selectedLocation?.let {
             findPlantsViewModel.loadRecommendedPlants(it)
-        }
+        } ?: findPlantsViewModel.clearPlants()
     }
 
     Scaffold(
