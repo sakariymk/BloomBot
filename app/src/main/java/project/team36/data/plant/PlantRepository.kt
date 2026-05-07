@@ -28,7 +28,7 @@ class PlantRepository(
         val savedPlantNames = savedPlants.map { it.name }.toSet()
 
         return cachedPlants.filter {
-            it.climateZone <= location.zone && it.name !in savedPlantNames
+            it.climateZone >= location.zone && it.name !in savedPlantNames
         }
     }
 
@@ -39,7 +39,7 @@ class PlantRepository(
         val savedPlantNames = savedPlants.map { it.name }.toSet()
 
         return cachedPlants.filter {
-            it.climateZone > location.zone && it.name !in savedPlantNames
+            it.climateZone < location.zone && it.name !in savedPlantNames
         }
     }
 }
