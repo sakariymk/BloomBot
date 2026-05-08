@@ -162,7 +162,7 @@ class MainActivity : ComponentActivity() {
                 val mapViewModelFactory = MapViewModelFactory(metWeatherRepository, locationRepository)
 
                 val plantDetailsViewModel: PlantDetailsViewModel = viewModel(
-                    factory = PlantDetailsViewModelFactory(plantRepository, locationRepository)
+                    factory = PlantDetailsViewModelFactory(plantRepository)
                 )
 
                 AppNavHost(
