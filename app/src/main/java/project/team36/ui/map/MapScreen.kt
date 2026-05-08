@@ -1,6 +1,7 @@
 package project.team36.ui.map
 
 import android.Manifest
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -302,14 +303,21 @@ fun MapScreen(
                     title = { Text("Lagre hage?") },
                     containerColor = MaterialTheme.colorScheme.surface,
                     confirmButton = {
-                        TextButton(
+                        OutlinedButton(
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            ),
                             onClick = {
                                 viewModel.confirmSavePlace { navController.navigate("myPlaces") }
                                 viewModel.dismissSaveDialog()
                             }) { Text("Ja") }
                     },
                     dismissButton = {
-                        TextButton(onClick = { viewModel.dismissSaveDialog() }) { Text("Nei") }
+                        OutlinedButton(
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+                            onClick = { viewModel.dismissSaveDialog() }
+                        ) { Text("Nei") }
                     }
                 )
             }

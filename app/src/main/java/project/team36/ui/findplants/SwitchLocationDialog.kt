@@ -1,5 +1,6 @@
 package project.team36.ui.findplants
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.AlertDialog
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -7,7 +8,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -24,7 +27,8 @@ fun SwitchLocationDialog (
     savedLocations: List<SavedLocation>,
     currentLocationName: String,
     onConfirm: (SavedLocation) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onNavigateToMap: () -> Unit
 ) {
     var selectedLocation by remember() { mutableStateOf(savedLocations.find { it.name == currentLocationName }) }
 
@@ -35,7 +39,7 @@ fun SwitchLocationDialog (
         text = {
             Column {
                 if (savedLocations.isEmpty()) {
-                    Text("Du har ingen lagrede hager enda. Legg til en ny hage.") // kanskje ordne CTA til kartet her? TODO: send til mine planter herfra
+                    Text("Du har ingen lagrede hager enda. Legg til en ny hage for å komme i gang!") // kanskje ordne CTA til kartet her? TODO: send til mine planter herfra
                 } else {
                     savedLocations.forEach { location ->
                         Row(
@@ -58,13 +62,34 @@ fun SwitchLocationDialog (
             }
         },
         confirmButton = {
-            TextButton(
-                onClick = {selectedLocation?.let { onConfirm(it) } },
-                enabled = selectedLocation != null,
-            ) { Text("Bekreft") }
+            if (savedLocations.isEmpty()) {
+                OutlinedButton(
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    onClick = { onNavigateToMap(); onDismiss() }
+                ) {
+                    Text("Legg til")
+                }
+            } else {
+                OutlinedButton(
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                    onClick = { selectedLocation?.let { onConfirm(it) } },
+                    enabled = selectedLocation != null
+                ) { Text("Bekreft") }
+            }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Avbryt") }
+            if (savedLocations.isNotEmpty()) {
+                OutlinedButton(
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+                    onClick = onDismiss
+                ) { Text("Avbryt") }
+            }
         }
     )
 }

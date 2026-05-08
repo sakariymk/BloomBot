@@ -341,7 +341,7 @@ fun LocationAlertBanner(alert: WeatherAlert) {
             modifier = Modifier.size(24.dp)
         )
         Spacer(Modifier.width(12.dp))
-        Column {
+        Column (modifier = Modifier.padding(vertical = 6.dp)) {
             Text(
                 text = alert.event.uppercase(),
                 fontWeight = FontWeight.ExtraBold,

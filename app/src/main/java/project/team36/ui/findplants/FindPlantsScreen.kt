@@ -244,7 +244,8 @@ fun FindPlantsScreen(
                 showSwitchLocationDialog = false
                 navController.navigate("findPlants/${location.name}")
             },
-            onDismiss = { showSwitchLocationDialog = false }
+            onDismiss = { showSwitchLocationDialog = false },
+            onNavigateToMap = { navController.navigate("map") }
         )
     }
 }
