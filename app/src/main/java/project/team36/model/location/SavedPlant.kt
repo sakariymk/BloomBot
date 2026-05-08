@@ -22,17 +22,16 @@ data class SavedPlant(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val locationId: Long,
     val name: String,
-    val soil: Set<SoilType>, //kommaseparert streng av jordtyper
-    val light: Set<LightType>,//kommaseparert streng av lystyper
-    val isFrostResistant: Boolean,
+    val soil: Set<SoilType>,
+    val light: Set<LightType>,
     val waterPerWeek: Float,
-    val plantingMonth: Set<Int>, //kommaseparert streng av tall
+    val plantingMonth: Set<Int>,
     val climateZone: Int,
     val hasBeenWatered: Boolean,
     val daysSinceWatered: Int,
     val maxDaysWithoutWater: Int,
     val imageRes: Int,
     val description: String,
-    val lastWateredDate: Long = System.currentTimeMillis(), //for å tracke vanning noe bedre
-    val lastFertilizationDate: Long = 0L //tracke når man har gjødslet planten
+    val lastWateredDate: Long = System.currentTimeMillis(),
+    val lastFertilizationDate: Long = 0L
 )

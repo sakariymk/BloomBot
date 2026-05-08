@@ -83,7 +83,6 @@ fun SimplePlantInfoCardPreview() {
         name = "Lilje",
         soil = setOf(SoilType.SAND),
         light = setOf(LightType.FULL),
-        isFrostResistant = false,
         waterPerWeek = 2f,
         plantingMonth = setOf(6, 7, 8),
         climateZone = 2,

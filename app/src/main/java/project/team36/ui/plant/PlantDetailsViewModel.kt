@@ -17,12 +17,11 @@ class PlantDetailsViewModel (
     private val locationRepository: LocationRepository
 ) : ViewModel() {
     private val _plant = MutableStateFlow<PlantDetails?>(null)
-    val plant : StateFlow<PlantDetails?> = _plant.asStateFlow() // offentlig read-only state, observeres av UI
+    val plant : StateFlow<PlantDetails?> = _plant.asStateFlow()
 
-    //Planter som lastes inn fra CSV
     fun loadPlant(plantName: String) {
         _plant.value = plantRepository.initiatePlants()
-            .find { it.name == plantName } // henter listen av planter, går gjennom og returnerer planten som matcher plantName
+            .find { it.name == plantName }
             ?.toPlantDetails()
     }
 
@@ -33,19 +32,16 @@ class PlantDetailsViewModel (
     }
 }
 
-//Hjelpeklasser for å lettere kobinere data fra PlantInfo og SavedPlant, så vi kan bruke et skjerm til å displaye lik informasjon.
 data class PlantDetails(
     val name: String,
     val description: String,
     val imageRes: Int,
     val climateZone: Int,
     val waterPerWeek: Float,
-    val isFrostResistant: Boolean,
     val soil: Set<SoilType>,
     val light: Set<LightType>,
     val plantingMonth: Set<Int>,
     val maxDaysWithoutWater: Int,
-    // SavedPlant-spesifikke, null hvis fra PlantInfo og csv
     val id: Long? = null,
     val locationId: Long? = null,
     val hasBeenWatered: Boolean? = null,
@@ -60,7 +56,6 @@ fun PlantInfo.toPlantDetails() = PlantDetails(
     imageRes = imageRes,
     climateZone = climateZone,
     waterPerWeek = waterPerWeek,
-    isFrostResistant = isFrostResistant,
     soil = soil,
     light = light,
     plantingMonth = plantingMonth,
@@ -73,7 +68,6 @@ fun SavedPlant.toPlantDetails() = PlantDetails(
     imageRes = imageRes,
     climateZone = climateZone,
     waterPerWeek = waterPerWeek,
-    isFrostResistant = isFrostResistant,
     soil = soil,
     light = light,
     plantingMonth = plantingMonth,
@@ -81,6 +75,7 @@ fun SavedPlant.toPlantDetails() = PlantDetails(
     lastWateredDate = lastWateredDate,
     locationId = locationId
 )
+
 class PlantDetailsViewModelFactory(
     private val plantRepository: PlantRepository,
     private val locationRepository: LocationRepository
