@@ -136,7 +136,7 @@ class MapViewModel(
                 }
             )
             //Delay for å rekke å laste inn klimasone
-            delay(600)
+            delay(700)
             val zone = getClimateZone(lng = lon, lat = lat)
 
             savedLocationsRepository.insertLocation(
@@ -291,7 +291,7 @@ class MapViewModel(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSaving = true)
             // Delay som trengs for å gi features med klimasoner skal rekke å laste inn
-            delay(500)
+            delay(700)
             val zone = getClimateZone(
                 lng = result.coordinate.longitude(),
                 lat = result.coordinate.latitude()

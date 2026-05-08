@@ -17,7 +17,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -66,7 +65,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.saveable.rememberSaveable
-import com.mapbox.maps.extension.style.expressions.dsl.generated.color
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -330,13 +328,15 @@ fun MapScreen(
                     containerColor = MaterialTheme.colorScheme.surface,
                     confirmButton = {
                         OutlinedButton(
-                            enabled = !uiState.isSaving,
+                            enabled = true,
                             colors = ButtonDefaults.outlinedButtonColors(
                                 containerColor = MaterialTheme.colorScheme.primary,
                                 contentColor = MaterialTheme.colorScheme.onPrimary
                             ),
                             onClick = {
-                                viewModel.confirmSavePlace { navController.navigate("myPlaces") }
+                                if (!uiState.isSaving) { // ignorer klikk hvis allerede lagrer
+                                    viewModel.confirmSavePlace { navController.navigate("myPlaces") }
+                                }
                             }
                         ) {
                             if (uiState.isSaving) {
