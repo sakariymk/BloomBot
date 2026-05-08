@@ -124,7 +124,7 @@ fun LandingPageScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
-                windowInsets = WindowInsets(0) //gjør at appen ikke legger til mye mellomrom på toppen av skjermen
+                windowInsets = WindowInsets(0)
             )
         },
         bottomBar = { BottomNavBar(navController = navController, savedPlacesViewModel) }
@@ -210,7 +210,7 @@ fun LandingPageScreen(
                     }
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Text(text = "Værvarsel", style = MaterialTheme.typography.labelLarge)
+//                    Text(text = "Værvarsel", style = MaterialTheme.typography.labelLarge)
 
                     WeatherCard(
                         weatherUiState = uiState.locationForecasts[selectedLocation.id],
@@ -220,36 +220,23 @@ fun LandingPageScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Button(
-                        onClick = { landingPageViewModel.fetchAiAdvice(selectedLocation) }, // FIKSET: location -> selectedLocation
+                        onClick = { landingPageViewModel.fetchAiAdvice(selectedLocation) },
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(42.dp),
+                            .fillMaxWidth(),
                         enabled = !uiState.isAiLoading && !uiState.isFutureAiLoading,
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, disabledContainerColor = Color(0xFF4CAF50), disabledContentColor = Color.White),
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         if (uiState.isAiLoading) {
-                            CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                            CircularProgressIndicator(color = Color.White, modifier = Modifier.size(28.dp), strokeWidth = 2.dp)
                         } else {
-                            Text("✨ Dagens råd", fontSize = 13.sp, color = MaterialTheme.colorScheme.onPrimary)
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    Button(
-                        onClick = { landingPageViewModel.fetchFutureAiAdvice(selectedLocation) }, // FIKSET: location -> selectedLocation
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(42.dp),
-                        enabled = !uiState.isAiLoading && !uiState.isFutureAiLoading,
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, disabledContainerColor = Color(0xFF2E7D32), disabledContentColor = Color.White),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        if (uiState.isFutureAiLoading) {
-                            CircularProgressIndicator(color = Color.White, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
-                        } else {
-                            Text("🔮 Fremtids-råd", fontSize = 13.sp, color = MaterialTheme.colorScheme.onPrimary)
+                            Image(
+                                painter = painterResource(id = R.drawable.lightbulb),
+                                contentDescription = null,
+                                modifier = Modifier.size(30.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Få råd fra Bloombot", fontSize = 12.sp, color = MaterialTheme.colorScheme.onPrimary)
                         }
                     }
 
@@ -260,7 +247,18 @@ fun LandingPageScreen(
                     AlertDialog(
                         onDismissRequest = { landingPageViewModel.dismissAiAdvice() },
                         containerColor = MaterialTheme.colorScheme.surface,
-                        title = { Text("Hageråd fra Claude 🌱", fontWeight = FontWeight.Bold) },
+                        title = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.bloombot_yap),
+                                    contentDescription = "Bloombot",
+                                    modifier = Modifier.size(48.dp),
+                                    contentScale = ContentScale.Fit
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Bloombot sier:", fontWeight = FontWeight.Bold)
+                            }
+                        },
                         text = {
                             Column(
                                 modifier = Modifier.verticalScroll(rememberScrollState()),
@@ -270,7 +268,6 @@ fun LandingPageScreen(
                                     Text("Været:", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                                     Text(uiState.aiResponse!!.weatherSummary)
                                 }
-
                                 if (uiState.aiResponse!!.plantAdvice.isNotEmpty()) {
                                     Column {
                                         Text("Dine planter:", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
@@ -281,7 +278,6 @@ fun LandingPageScreen(
                                         }
                                     }
                                 }
-
                                 if (uiState.aiResponse!!.generalTasks.isNotEmpty()) {
                                     Column {
                                         Text("Hageoppgaver:", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)

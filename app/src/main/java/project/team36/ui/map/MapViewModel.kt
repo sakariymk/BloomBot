@@ -255,30 +255,29 @@ class MapViewModel(
         mapboxMap = map
     }
 
-    suspend fun getClimateZone(
-        lng: Double,
-        lat: Double
-    ): Int? = suspendCoroutine { continuation ->
+    suspend fun getClimateZone(lng: Double, lat: Double): Int? = suspendCoroutine { continuation ->
         val map = mapboxMap ?: run {
+            Log.e("ClimateZone", "mapboxMap er null!")
             continuation.resume(null)
             return@suspendCoroutine
         }
 
-        val pointOnScreen = map.pixelForCoordinate(
-            Point.fromLngLat(lng, lat)
-        )
+        val pointOnScreen = map.pixelForCoordinate(Point.fromLngLat(lng, lat))
+        Log.d("ClimateZone", "Sjekker punkt: lng=$lng, lat=$lat, pixel=$pointOnScreen")
 
         map.queryRenderedFeatures(
             RenderedQueryGeometry(pointOnScreen),
             RenderedQueryOptions(listOf(LAYER_ID), null)
-        ) {
-                result ->
-            val zone = result.value
+        ) { result ->
+            val features = result.value
+            Log.d("ClimateZone", "Antall features: ${features?.size}, første: ${features?.firstOrNull()?.queriedFeature?.feature}")
+            val zone = features
                 ?.firstOrNull()
                 ?.queriedFeature
                 ?.feature
                 ?.getNumberProperty("Klasse")
                 ?.toInt()
+            Log.d("ClimateZone", "Sone: $zone")
             continuation.resume(zone)
         }
     }
