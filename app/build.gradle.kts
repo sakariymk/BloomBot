@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "project.team36"
-        minSdk = 26
+        minSdk = 33
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -98,7 +98,9 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-
+    implementation("androidx.core:core-ktx:1.x.x")
+    implementation("io.coil-kt.coil3:coil-compose:3.4.0")
+    implementation("io.coil-kt.coil3:coil-svg:3.4.0")
     implementation(libs.androidx.activity.compose)
     implementation("androidx.compose.material3:material3:1.4.0")
     implementation("com.google.android.material:material:1.13.0")

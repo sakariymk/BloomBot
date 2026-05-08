@@ -41,9 +41,6 @@ import androidx.compose.ui.window.Dialog
 import project.team36.R
 import project.team36.ui.theme.Team36Theme
 import project.team36.ui.theme.backgroundLight
-import project.team36.ui.theme.onSurfaceLight
-import project.team36.ui.theme.outlineLight
-import project.team36.ui.theme.primaryLight
 
 //Dialog som vises første gangen appen kjøres, og er tilgjengelig via toppappbar på landingpage senere.
 //Gir en rask introduksjon til appen, og sender bruker til Mine Steder, der hen blir oppfordret til å legge til første hage.
