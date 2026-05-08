@@ -72,6 +72,7 @@ fun MyPlacesScreen (
     if (showMaxLocationsDialog) {
         AlertDialog(
             onDismissRequest = { savedPlacesViewModel.dismissMaxLocationsDialog() },
+            containerColor = MaterialTheme.colorScheme.surface,
             title = { Text("Maks antall hager nådd") },
             text = { Text("Du kan maksimum ha 5 lagrede hager. Slett en hage for å legge til en ny.") },
             confirmButton = {

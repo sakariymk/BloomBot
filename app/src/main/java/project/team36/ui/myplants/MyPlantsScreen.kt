@@ -1,5 +1,7 @@
 package project.team36.ui.myplants
 
+import android.R
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -114,6 +116,7 @@ fun MyPlantsScreen(
                                 onDismissRequest = { showDeleteDialog = false},
                                 confirmButton = {
                                     OutlinedButton (
+                                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                                         onClick = {
                                             selectedLocation?.let { myPlantsViewModel.deleteLocation(it) }
                                             navController.navigate("myPlaces")
@@ -123,16 +126,20 @@ fun MyPlantsScreen(
                                     ) { Text("Slett") }
                                 },
                                 dismissButton = {
-                                    TextButton(onClick = { showDeleteDialog = false } ) {
-                                        Text("Behold hage")
-                                    }
+                                    OutlinedButton(
+                                        onClick = { showDeleteDialog = false },
+                                        colors = ButtonDefaults.outlinedButtonColors(
+                                            containerColor = MaterialTheme.colorScheme.primary
+                                        )
+                                    ) { Text("Behold hage", color = Color.White) }
                                 },
-                                containerColor = MaterialTheme.colorScheme.background
+                                containerColor = MaterialTheme.colorScheme.surface
                             )
                         }
                         if (showRenameDialog) {
                             AlertDialog(
                                 title = { Text("Bytt navn på hagen") },
+                                containerColor = MaterialTheme.colorScheme.surface,
                                 text = {
                                     OutlinedTextField(
                                         value = newLocationName,
@@ -143,7 +150,11 @@ fun MyPlantsScreen(
                                 },
                                 onDismissRequest = { showRenameDialog = false },
                                 confirmButton = {
-                                    TextButton(
+                                    OutlinedButton(
+                                        colors = ButtonDefaults.outlinedButtonColors(
+                                            containerColor = MaterialTheme.colorScheme.primary,
+                                            contentColor = MaterialTheme.colorScheme.onPrimary
+                                        ),
                                         onClick = {
                                             selectedLocation?.let {
                                                 myPlantsViewModel.renameLocation(it, newLocationName)
@@ -155,7 +166,10 @@ fun MyPlantsScreen(
                                     ) { Text("Lagre") }
                                 },
                                 dismissButton = {
-                                    TextButton(onClick =  { showRenameDialog = false }) {
+                                    OutlinedButton(
+                                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+                                        onClick =  { showRenameDialog = false }
+                                    ) {
                                         Text("Avbryt")
                                     }
                                 }

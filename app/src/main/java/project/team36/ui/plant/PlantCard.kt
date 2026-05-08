@@ -147,7 +147,7 @@ fun PlantCard(
                             else -> "$daysUntilWatering dager til neste vanning"
                         },
                         buttonText = "Jeg har vannet",
-                        buttonColor = MaterialTheme.colorScheme.onPrimary,
+                        buttonColor = MaterialTheme.colorScheme.primary,
                         onButtonClick = onMarkAsWatered
                     )
 
@@ -164,7 +164,7 @@ fun PlantCard(
                             "$daysSinceFertilizing dager siden sist gjødsling (${plant.lastFertilizationDate.toDisplayDate()})"
                         },
                         buttonText = "Jeg har gjødslet",
-                        buttonColor = MaterialTheme.colorScheme.onPrimary,
+                        buttonColor = MaterialTheme.colorScheme.primary,
                         onButtonClick = onMarkAsFertilized
                     )
                     // Knapp for å navigere til detaljskjerm for plante med en slett-knapp

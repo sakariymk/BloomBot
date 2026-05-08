@@ -66,6 +66,7 @@ fun DailyTasksCard (
         Card(
             modifier = Modifier
                 .padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
         ) {
 
@@ -76,7 +77,7 @@ fun DailyTasksCard (
                     shape = RoundedCornerShape(16.dp)
                 ) {
                     Text(
-                        text = "Ingen planter trenger vann i dag!",
+                        text = "Ingen planter trenger vann i dag.",
                         modifier = Modifier.padding(16.dp),
                         color = MaterialTheme.colorScheme.onSurface
                     )

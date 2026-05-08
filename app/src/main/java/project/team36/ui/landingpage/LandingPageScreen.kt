@@ -92,9 +92,14 @@ fun LandingPageScreen(
 
     LaunchedEffect(Unit) { locationPermission.launchPermissionRequest() }
 
+    // 1. Avslutter LaunchedEffect-blokken tidlig dersom det er ingen lagrede steder
+    // 2. Henter data for lagrede steder
+    // 3. Setter selectedLocation til første tab når siden lastes inn, så anbefalte planter kan displaye for denne hagen med en gang
     LaunchedEffect(savedLocations) {
-        if (savedLocations.isNotEmpty()) {
-            landingPageViewModel.loadDataForLocations(savedLocations)
+        if (savedLocations.isEmpty()) return@LaunchedEffect
+        landingPageViewModel.loadDataForLocations(savedLocations)
+        if (savedPlacesViewModel.selectedLocation.value == null) {
+            savedPlacesViewModel.selectLocation(savedLocations[0])
         }
     }
 
@@ -336,7 +341,7 @@ fun LocationAlertBanner(alert: WeatherAlert) {
             modifier = Modifier.size(24.dp)
         )
         Spacer(Modifier.width(12.dp))
-        Column {
+        Column (modifier = Modifier.padding(vertical = 6.dp)) {
             Text(
                 text = alert.event.uppercase(),
                 fontWeight = FontWeight.ExtraBold,

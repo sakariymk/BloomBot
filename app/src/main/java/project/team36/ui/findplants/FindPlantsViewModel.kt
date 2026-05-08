@@ -34,32 +34,7 @@ class FindPlantsViewModel (
         _plants.value = plantRepository.initiatePlants().map { it.toPlantDetails() }
     }
 
-    fun addPlant(plant: PlantInfo) {
-        viewModelScope.launch {
-            val locationId = savedPlacesViewModel.selectedLocation.value?.id ?: return@launch
-            locationRepository.insertPlant(
-                SavedPlant(
-                    locationId = locationId,
-                    name = plant.name,
-                    soil = plant.soil,
-                    light = plant.light,
-                    waterPerWeek = plant.waterPerWeek,
-                    plantingMonth = plant.plantingMonth,
-                    climateZone = plant.climateZone,
-                    hasBeenWatered = plant.hasBeenWatered,
-                    daysSinceWatered = plant.daysSinceWatered,
-                    maxDaysWithoutWater = plant.maxDaysWithoutWater,
-                    imageRes = plant.imageRes,
-                    description = plant.description
-                )
-            )
-        }
-    }
-
-    fun onPlantAdded(plant: PlantDetails) {
-        _plants.value -= plant
-    }
-
+    //når en bruker vil lagre plante -- bør ikke alt under gå på FindPlantsViewModel kanskje? for riktig sted for logikk
     fun requestAddPlant(plant: PlantDetails) {
         _pendingPlant.value = plant
     }
@@ -68,6 +43,7 @@ class FindPlantsViewModel (
         _pendingPlant.value = null
     }
 
+    //når bruker har valgt plante og lokasjon
     fun confirmAddPlant(plant: PlantDetails, location: SavedLocation) {
         viewModelScope.launch {
             locationRepository.insertPlant(
@@ -105,6 +81,11 @@ class FindPlantsViewModel (
                     _notRecommendedPlants.value = notRecommended
                 }
         }
+    }
+    // Tømme visning for planter dersom lagret sted slettes
+    fun clearPlants() {
+        _plants.value = emptyList()
+        _notRecommendedPlants.value = emptyList()
     }
 }
 

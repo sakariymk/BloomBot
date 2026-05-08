@@ -1,6 +1,7 @@
 package project.team36.ui.map
 
 import android.Manifest
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -64,6 +65,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.saveable.rememberSaveable
+import com.mapbox.maps.extension.style.expressions.dsl.generated.color
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -282,6 +284,7 @@ fun MapScreen(
                 AlertDialog(
                     onDismissRequest = { viewModel.dismissLiveLocationConfirm() },
                     title = { Text("Lagre sted?") },
+                    containerColor = MaterialTheme.colorScheme.surface,
                     text = { Text("Vil du lagre din nåværende posisjon?") },
                     confirmButton = {
                         TextButton(onClick = {
@@ -298,15 +301,23 @@ fun MapScreen(
                 AlertDialog(
                     onDismissRequest = { viewModel.dismissSaveDialog() },
                     title = { Text("Lagre hage?") },
+                    containerColor = MaterialTheme.colorScheme.surface,
                     confirmButton = {
-                        TextButton(
+                        OutlinedButton(
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            ),
                             onClick = {
                                 viewModel.confirmSavePlace { navController.navigate("myPlaces") }
                                 viewModel.dismissSaveDialog()
                             }) { Text("Ja") }
                     },
                     dismissButton = {
-                        TextButton(onClick = { viewModel.dismissSaveDialog() }) { Text("Nei") }
+                        OutlinedButton(
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+                            onClick = { viewModel.dismissSaveDialog() }
+                        ) { Text("Nei") }
                     }
                 )
             }
