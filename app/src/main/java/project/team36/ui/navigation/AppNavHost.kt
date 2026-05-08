@@ -113,7 +113,6 @@ fun AppNavHost(
 
             PlantDetailsScreen(
                 navController = navController,
-                plantName = plantName,
                 plantDetailsViewModel = plantDetailsViewModel,
                 onBackClick = { navController.popBackStack() },
                 onAddPlant = if (action == "add") {
