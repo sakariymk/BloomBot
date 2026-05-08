@@ -148,7 +148,7 @@ fun PlantDetailsScreen(
                             ),
                             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                         ) {
-                            Text("Fjern plante fra hage", color = MaterialTheme.colorScheme.onSecondary)
+                            Text("Fjern plante", color = MaterialTheme.colorScheme.onSecondary)
                         }
                     }
 
@@ -163,7 +163,7 @@ fun PlantDetailsScreen(
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 PlantInfoCard(title = "Herdighetssone") {
-                    Text("Herdighetssone sier noe om hvor planten vil trives best med tanke på lokalklima.")
+                    Text("Hjelper deg å velge planter som passer ditt klima.")
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -182,7 +182,7 @@ fun PlantDetailsScreen(
                     HardinessZoneTooltip()
                 }
                 PlantInfoCard("Solforhold") {
-                    Text("Ulike planter har ulike behov for sol, noen trives best med full sollys, mens andre foretrekker mer skygge for å trives best.")
+                    Text("Ulike planter har ulike behov for sol. Noen trives best med full sollys, mens andre foretrekker mer skygge for å trives best.")
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         plant.light.forEach { lightType ->
                             OutlinedButton(
@@ -328,7 +328,7 @@ fun HardinessZoneTooltip() {
                         actionContentColor = Color(0xFF2D5A27)
                     )
                 ) {
-                    Text("Herdighetstallene må betraktes som en rettesnor som kan gi hjelp når du skal velge planter, men de gir ingen garanti om et godt resultat. Det er tryggest å plante i tråd med klimasoneangivelsene, men på lune steder kan det likevel være forsøket verdt å prøve med planter som ut fra det grove kartet tilsynelatende ikke skulle klare seg. \\nSom hovedregel kan du gå for planter som er merket med den herdighetssonen du bor i – og alle tallene over. For eksempel trives en plante med herdighetssone 8 i alle soner, mens herdighetssone 4 trives i sone 1 til 4. ")
+                    Text("Herdighetstallene må betraktes som en rettesnor som kan gi hjelp når du skal velge planter, men de gir ingen garanti om et godt resultat. Det er tryggest å plante i tråd med klimasoneangivelsene, men på lune steder kan det likevel være forsøket verdt å prøve med planter som ut fra det grove kartet tilsynelatende ikke skulle klare seg. \nSom hovedregel kan du gå for planter som er merket med den herdighetssonen du bor i – og alle tallene over. For eksempel trives en plante med herdighetssone 8 i alle soner, mens herdighetssone 4 trives i sone 1 til 4. Jo høyere tall, jo mer hardfør er planten! ")
                 }
             },
             state = tooltipState

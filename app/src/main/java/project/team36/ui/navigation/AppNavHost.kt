@@ -2,7 +2,6 @@ package project.team36.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -16,7 +15,6 @@ import project.team36.ui.myplants.MyPlantsScreen
 import project.team36.ui.myplants.MyPlantsViewModel
 import project.team36.ui.plant.PlantDetailsScreen
 import project.team36.ui.plant.PlantDetailsViewModel
-import project.team36.ui.findplants.SavePlantDialog
 import project.team36.ui.myplaces.MyPlacesScreen
 import project.team36.ui.landingpage.LandingPageScreen
 import project.team36.ui.landingpage.LandingPageViewModel
@@ -96,8 +94,6 @@ fun AppNavHost(
             composable ("plantDetailsScreen/{plantName}/{action}") { backStackEntry ->
                 val plantName = backStackEntry.arguments?.getString("plantName") ?: return@composable
                 val action = backStackEntry.arguments?.getString("action") ?: ""
-                val savedLocations = savedPlacesViewModel.savedLocations.collectAsState()
-                val pendingPlant = findPlantsViewModel.pendingPlant.collectAsState()
 
                 LaunchedEffect(plantName) {
                     if (action == "add") {
@@ -119,18 +115,6 @@ fun AppNavHost(
                     } else null
                 )
 
-                pendingPlant.value?.let { plant ->
-                    SavePlantDialog(
-                        plant = plant,
-                        savedLocations = savedLocations.value,
-                        onConfirm = { location ->
-                            findPlantsViewModel.confirmAddPlant(plant, location)
-                            savedPlacesViewModel.selectLocation(location)
-                            navController.navigate("myPlants")
-                        },
-                        onDismiss = { findPlantsViewModel.dismissAddPlant() }
-                    )
-                }
             }
             composable("myPlaces") {
                 MyPlacesScreen(
