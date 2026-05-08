@@ -24,8 +24,10 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Snackbar
 import androidx.compose.foundation.layout.height
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import project.team36.ui.findplants.SavePlantDialog
 import project.team36.ui.map.MapViewModelFactory
 
 @Composable
@@ -94,6 +96,8 @@ fun AppNavHost(
             composable ("plantDetailsScreen/{plantName}/{action}") { backStackEntry ->
                 val plantName = backStackEntry.arguments?.getString("plantName") ?: return@composable
                 val action = backStackEntry.arguments?.getString("action") ?: ""
+                val savedLocations = savedPlacesViewModel.savedLocations.collectAsState()
+                val pendingPlant = findPlantsViewModel.pendingPlant.collectAsState()
 
                 LaunchedEffect(plantName) {
                     if (action == "add") {
@@ -114,6 +118,18 @@ fun AppNavHost(
                         { myPlantsViewModel.removePlantByName(plantName) }
                     } else null
                 )
+                pendingPlant.value?.let { plant ->
+                    SavePlantDialog(
+                        plant = plant,
+                        savedLocations = savedLocations.value,
+                        onConfirm = { location ->
+                            findPlantsViewModel.confirmAddPlant(plant, location)
+                            savedPlacesViewModel.selectLocation(location)
+                            navController.navigate("myPlants")
+                        },
+                        onDismiss = { findPlantsViewModel.dismissAddPlant() }
+                    )
+                }
 
             }
             composable("myPlaces") {

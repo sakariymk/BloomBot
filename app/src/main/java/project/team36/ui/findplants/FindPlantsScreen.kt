@@ -146,7 +146,7 @@ fun FindPlantsScreen(
                     }
                     val location = selectedLocation
                     val infoText = when (selectedTabIndex) {
-                        0 -> "Planter som egner seg for hagens herdighetssone og vokseforhold. Din herdighetssone for ${location?.name} er ${location?.zone}, dermed vil planter med sone 1 til ${location?.zone} trives godt her🌱"
+                        0 -> "Planter som egner seg for hagens herdighetssone og vokseforhold. Din herdighetssone for ${location?.name} er ${location?.zone}, dermed vil planter med sone ${location?.zone} til 8 trives godt her🌱"
                         1 -> "Disse plantene egner seg ikke like godt for din hage, men kan likevel trives om du har et lunt hjørne plantene kan vokse i."
                         else -> ""
                     }

@@ -167,7 +167,7 @@ fun PlantCard(
                         onClick = onNavigateToDetails,
                         modifier = Modifier
                             .align(Alignment.Start)
-                            .padding(top = 8.dp),
+                            .padding(start = 14.dp, top = 8.dp),
                         colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary)
                     ) {
                         Row(
@@ -219,7 +219,7 @@ private fun InfoSection(
             .fillMaxWidth()
             .background(color = MaterialTheme.colorScheme.surface,RoundedCornerShape(12.dp))
             .padding(horizontal = 14.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.Top
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
