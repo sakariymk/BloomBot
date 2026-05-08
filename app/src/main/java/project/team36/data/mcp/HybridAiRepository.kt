@@ -89,7 +89,7 @@ class HybridAiRepository(
                 "Brukeren har foreløpig ingen planter på denne lokasjonen. Gi generelle hageråd for dette området."
             } else {
                 getPlantData(location, plantDataSource).take(15).joinToString("\n") {
-                    "- ${it.name}: Sone: ${it.climateZone}, Lysbehov: ${it.light}, Vann Per Uke: ${it.waterPerWeek}, Frostsikker: ${it.isFrostResistant}"
+                    "- ${it.name}: Sone: ${it.climateZone}, Lysbehov: ${it.light}, Vann Per Uke: ${it.waterPerWeek}"
                 }
             }
             return plantsText

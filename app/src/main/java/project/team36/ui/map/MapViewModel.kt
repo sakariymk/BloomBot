@@ -123,9 +123,20 @@ class MapViewModel(
         val lat = _uiState.value.userLat ?: return
         val lon = _uiState.value.userLon ?: return
         viewModelScope.launch {
-
             val address = getAddress(lat, lon, context)
+
+            // Bytt fra followPuck til fast kameraposisjon for å kunne hente klimasone
+            mapViewportState.flyTo(
+                cameraOptions {
+                    center(Point.fromLngLat(lon, lat))
+                    zoom(14.0)
+                }
+            )
+            //delayen trengs for at kartet skal rekke å laste inn klimasonelaget, da den ellers lagrer det med 0
+            kotlinx.coroutines.delay(1000)
+
             val zone = getClimateZone(lng = lon, lat = lat)
+
             savedLocationsRepository.insertLocation(
                 SavedLocation(
                     name = "Min posisjon",

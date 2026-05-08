@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForwardIos
+import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -20,13 +20,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import project.team36.R
-import project.team36.model.plant.LightType
-import project.team36.model.plant.SoilType
-import project.team36.ui.theme.Team36Theme
 
 // SimplePlantCard brukes som plantekort i findPlants
 
@@ -67,35 +63,11 @@ fun SimplePlantCard (
                 color = MaterialTheme.colorScheme.onSurface
             )
             Icon(
-                imageVector = Icons.Default.ArrowForwardIos,
+                imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
                 contentDescription =  "Se mer",
                 tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(end = 16.dp)
             )
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SimplePlantInfoCardPreview() {
-    val fakePlant = PlantDetails(
-        name = "Lilje",
-        soil = setOf(SoilType.SAND),
-        light = setOf(LightType.FULL),
-        isFrostResistant = false,
-        waterPerWeek = 2f,
-        plantingMonth = setOf(6, 7, 8),
-        climateZone = 2,
-        hasBeenWatered = false,
-        daysSinceWatered = 3,
-        maxDaysWithoutWater = 12,
-        imageRes = R.drawable.pelargonia,
-        description = "En vakker lilje."
-
-    )
-
-    Team36Theme {
-        SimplePlantCard(plant = fakePlant)
     }
 }

@@ -8,7 +8,6 @@ import project.team36.model.plant.PlantInfo
 
 class PlantRepository(
     private val plantDataSource: PlantDataSource,
-    private val locationRepository: LocationRepository
 ) {
     private var cachedPlants: List<PlantInfo> = emptyList()
 
@@ -19,7 +18,6 @@ class PlantRepository(
         return cachedPlants
     }
 
-    // Anbefaler planter basert på lokasjon
 
     fun recommendPlants(location: SavedLocation, savedPlants: List<SavedPlant>): List<PlantInfo> {
         if (cachedPlants.isEmpty()) {
@@ -42,21 +40,5 @@ class PlantRepository(
         return cachedPlants.filter {
             it.climateZone < location.zone && it.name !in savedPlantNames
         }
-    }
-
-    // Returnerer alle lagrede steder en spesifik plante kan plantes
-
-    suspend fun locationsForPlants(plantName: String): List<String> {
-        if (cachedPlants.isEmpty()) {
-            cachedPlants = plantDataSource.fetchPlants()
-        }
-        val plant = cachedPlants.find { it.name == plantName }
-            ?: return emptyList()
-
-        val allLocations = locationRepository.allLocations.first()
-
-        return allLocations
-            .filter { plant.climateZone >= it.zone }
-            .mapNotNull { it.name }
     }
 }

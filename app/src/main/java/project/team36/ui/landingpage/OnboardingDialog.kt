@@ -45,6 +45,8 @@ import project.team36.ui.theme.onSurfaceLight
 import project.team36.ui.theme.outlineLight
 import project.team36.ui.theme.primaryLight
 
+//Dialog som vises første gangen appen kjøres, og er tilgjengelig via toppappbar på landingpage senere.
+//Gir en rask introduksjon til appen, og sender bruker til Mine Steder, der hen blir oppfordret til å legge til første hage.
 @Composable
 fun OnboardingDialog(
     onDismiss: () -> Unit,
@@ -58,7 +60,7 @@ fun OnboardingDialog(
     )
 
     val steps = listOf(
-        OnboardingStep( "Velkommen til Bloombot", "Din digitale medgartner og plantedagbok for å hjelpe deg med å lykkes i din hage!", R.drawable.bloombot, 120),
+        OnboardingStep( "Velkommen til Bloombot", "Din digitale medgartner og plantedagbok for å hjelpe deg med å lykkes i din hage!", R.drawable.bloombot_logo_med_navnetrekk, 120),
         OnboardingStep("Registrer din hage", "Lagre en lokasjon for å ha oversikt over din hage. Vi gir deg også værvarsel tilpasset akkurat din hage.", R.drawable.minesteder, 180),
         OnboardingStep("Velg dine planter", "Få anbefalinger om planter som vil trives i akkurat din hage.", R.drawable.finnplanter, 180),
         OnboardingStep("Tilpasset KI-råd", "Få tilpasset KI-råd for dine planter! \nVi gir tips som når de kan plantes ute, eller hvilke hageoppgaver som kan prioriteres basert på værdata.", R.drawable.aibloom, 120)
@@ -110,7 +112,7 @@ fun OnboardingDialog(
                                     .width(if (index == currentStep) 24.dp else 6.dp)
                                     .background(
                                         color = if (index == currentStep) MaterialTheme.colorScheme.primary
-                                        else primaryLight.copy(alpha = 0.3f),
+                                        else MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
                                         shape = CircleShape
                                     )
                             )
@@ -146,7 +148,7 @@ fun OnboardingDialog(
                                 onClick = { currentStep-- },
                                 modifier = Modifier.weight(1.5f),
                                 shape = RoundedCornerShape(12.dp),
-                                border = BorderStroke(1.dp, outlineLight)
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                             ) {
                                 Text("Tilbake", color = MaterialTheme.colorScheme.onBackground)
                             }

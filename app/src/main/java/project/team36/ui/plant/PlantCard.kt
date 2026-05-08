@@ -13,7 +13,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -26,20 +25,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import project.team36.R
-import project.team36.data.mcp.WeatherAlert
 import project.team36.model.location.SavedPlant
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 // Farger for kortet - se om de kan lagres i Theme
-
 
 @Composable
 fun PlantCard(
@@ -49,8 +44,7 @@ fun PlantCard(
     daysSinceFertilizing: Long,
     onMarkAsWatered: () -> Unit,
     onMarkAsFertilized: () -> Unit,
-    onNavigateToDetails: () -> Unit, //Endret fra navController, så ikke composable vet noe om navigasjon :)
-    //alerts: List<WeatherAlert>
+    onNavigateToDetails: () -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -151,10 +145,6 @@ fun PlantCard(
                         onButtonClick = onMarkAsWatered
                     )
 
-
-//                    // Farevarsler (Værvarsel)
-//                    WeatherSection(alerts = alerts, plant = plant)
-
                     //Gjødsling av planten, oppdaterer dato for sist gjødsel gitt for sporing
                     InfoSection(
                         title = "Gjødsel",
@@ -212,30 +202,6 @@ fun PlantCard(
 }
 
 @Composable
-private fun StatusChip(text: String, color: Color) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .background(color, RoundedCornerShape(50))
-            .padding(horizontal = 12.dp, vertical = 6.dp)
-    ) {
-        Icon(
-            painter = painterResource(id = R.drawable.wateringcan),
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.onError,
-            modifier = Modifier.size(14.dp)
-        )
-        Spacer(modifier = Modifier.width(4.dp))
-        Text(
-            text = text,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White
-        )
-    }
-}
-
-@Composable
 private fun InfoSection(
     title: String,
     subtitle: String,
@@ -279,89 +245,10 @@ private fun InfoSection(
         }
     }
 }
+
 //Hjelpefunksjon for å definere displayformatet på dato fra database
 fun Long.toDisplayDate(): String {
     if (this == 0L) return "Ikke gjødslet enda"
     val sdf = SimpleDateFormat("dd.MMMM yyyy", Locale.forLanguageTag("no"))
     return sdf.format(Date(this))
-}
-
-@Composable
-private fun WeatherSection(
-    alerts: List<WeatherAlert>,
-    plant: SavedPlant
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background, RoundedCornerShape(12.dp))
-            .padding(12.dp)
-    ) {
-        Text(
-            text = "Værvarsel",
-            fontSize = 14.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = Color.Black,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        if (alerts.isEmpty()) {
-            Text(
-                text = "Ingen dårlig vær i sikte for dine planter.",
-                fontSize = 13.sp,
-                color = Color.Gray
-            )
-        } else {
-            alerts.forEach { alert ->
-                PlantAlertInfo(alert = alert, plant = plant)
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-        }
-    }
-}
-
-@Composable
-fun PlantAlertInfo(alert: WeatherAlert, plant: SavedPlant) {
-    val isDangerous = alert.isDangerousForPlant(plant.isFrostResistant)
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
-            .background(alert.color.copy(alpha = 0.2f))
-            .border(1.dp, alert.color, RoundedCornerShape(8.dp))
-            .padding(10.dp)
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                imageVector = if (isDangerous) Icons.Default.Warning else Icons.Default.Info,
-                contentDescription = null,
-                tint = alert.color,
-                modifier = Modifier.size(18.dp)
-            )
-            Spacer(Modifier.width(8.dp))
-            Text(
-                text = alert.event.uppercase(),
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 13.sp,
-                color = Color.Black
-            )
-        }
-
-        Text(
-            text = alert.description,
-            fontSize = 12.sp,
-            color = Color.DarkGray,
-            modifier = Modifier.padding(top = 4.dp),
-            lineHeight = 16.sp
-        )
-
-        Text(
-            text = if (isDangerous) "Kritisk for denne planten!" else "Planten bør tåle dette",
-            fontWeight = FontWeight.Bold,
-            fontSize = 12.sp,
-            color = if (isDangerous) Color(0xFFD32F2F) else Color(0xFF2E7D32),
-            modifier = Modifier.padding(top = 6.dp)
-        )
-    }
 }

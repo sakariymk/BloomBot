@@ -20,7 +20,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DeviceThermostat
 import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.Button
@@ -38,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
@@ -62,7 +63,6 @@ import project.team36.model.plant.displayName
 @Composable
 fun PlantDetailsScreen(
     navController: NavController,
-    plantName: String,
     plantDetailsViewModel: PlantDetailsViewModel,
     onBackClick: () -> Unit,
     onAddPlant: (() -> Unit)? = null,
@@ -79,7 +79,7 @@ fun PlantDetailsScreen(
                 navigationIcon = {
                     IconButton( onClick = { navController.popBackStack() }) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Tilbake",
                             tint = MaterialTheme.colorScheme.primary
                         )
@@ -123,6 +123,7 @@ fun PlantDetailsScreen(
                         text = plant.name,
                         fontSize = 36.sp,
                         fontWeight = FontWeight.Normal,
+                        modifier = Modifier.weight(1f).padding(end = 8.dp),
                         color = MaterialTheme.colorScheme.onBackground
                     )
                     if (onAddPlant != null) {
@@ -133,7 +134,7 @@ fun PlantDetailsScreen(
                                 containerColor = MaterialTheme.colorScheme.primary
                             )
                         ) {
-                            Text("Legg til i hage", color = MaterialTheme.colorScheme.onPrimary)
+                            Text("Legg til", color = MaterialTheme.colorScheme.onPrimary)
                         }
                     } else if (onDeletePlant != null) {
                         Button(
@@ -153,9 +154,7 @@ fun PlantDetailsScreen(
 
                 }
                 PlantInfoCard(title = "Om planten") {
-                    Text("${plant.description}",
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                    Text(plant.description)
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 PlantInfoCard(title = "Plantingsmåned") {
@@ -321,7 +320,7 @@ fun HardinessZoneTooltip() {
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         TooltipBox(
-            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+            positionProvider = TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Above),
             tooltip = {
                 RichTooltip(
                     title = { Text("Herdighetssoner") },

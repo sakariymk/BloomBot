@@ -2,6 +2,7 @@ package project.team36.ui.map
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -46,8 +47,9 @@ fun PlaceInfoCard(
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                Text(text = location.name ?: "Ukjent", fontWeight = FontWeight.Bold, fontSize = 18.sp)
 
+                Text(text = location.name ?: "Ukjent", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = location.address ?: "Ingen adresse",
                     modifier = Modifier.padding(top = 4.dp),
@@ -78,7 +80,7 @@ fun PlaceInfoCard(
                         fontWeight = FontWeight(400)
                     )
                 }
-
+                Spacer(modifier = Modifier.height(16.dp))
                 TextButton(
                     onClick = onDismiss,
                     modifier = Modifier

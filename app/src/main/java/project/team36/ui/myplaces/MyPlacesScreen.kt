@@ -21,8 +21,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.House
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -50,7 +50,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import project.team36.model.location.SavedLocation
 import project.team36.ui.map.SavedPlacesViewModel
@@ -66,12 +65,12 @@ fun MyPlacesScreen (
 
 ) {
     val savedLocations by savedPlacesViewModel.savedLocations.collectAsState()
-    val selectedLocation by savedPlacesViewModel.selectedLocation.collectAsStateWithLifecycle()
     val showMaxLocationsDialog by savedPlacesViewModel.showMaxLocationsDialog.collectAsState()
 
     if (showMaxLocationsDialog) {
         AlertDialog(
             onDismissRequest = { savedPlacesViewModel.dismissMaxLocationsDialog() },
+            containerColor = MaterialTheme.colorScheme.surface,
             title = { Text("Maks antall hager nådd") },
             text = { Text("Du kan maksimum ha 5 lagrede hager. Slett en hage for å legge til en ny.") },
             confirmButton = {
@@ -250,7 +249,7 @@ fun LocationCard (
                 )
             }
             Icon(
-                imageVector = Icons.Default.ArrowForwardIos,
+                imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
                 contentDescription = "Gå til $location.name",
                 tint = MaterialTheme.colorScheme.onSurface
             )

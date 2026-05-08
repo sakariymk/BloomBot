@@ -1,5 +1,6 @@
 package project.team36.ui.myplants
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -7,8 +8,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Eco
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
@@ -26,8 +27,6 @@ import androidx.navigation.NavController
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.plant.PlantCard
 import project.team36.ui.navigation.BottomNavBar
-import project.team36.ui.theme.backgroundLight
-import project.team36.ui.theme.primaryContainerLight
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,7 +64,7 @@ fun MyPlantsScreen(
                 navigationIcon = {
                     IconButton(onClick = { navController.navigate("myPlaces")} ) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Tilbake",
                             tint = MaterialTheme.colorScheme.onBackground
                         )
@@ -73,10 +72,10 @@ fun MyPlantsScreen(
                 },
                 actions = {
 
-                    var expanded by rememberSaveable() { mutableStateOf(false) }
-                    var showDeleteDialog by rememberSaveable() { mutableStateOf(false) }
-                    var showRenameDialog by rememberSaveable() { mutableStateOf(false) }
-                    var newLocationName by rememberSaveable() { mutableStateOf("") }
+                    var expanded by rememberSaveable { mutableStateOf(false) }
+                    var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
+                    var showRenameDialog by rememberSaveable { mutableStateOf(false) }
+                    var newLocationName by rememberSaveable { mutableStateOf("") }
 
                     Box {
                         IconButton(onClick = {expanded = true }) {
@@ -114,6 +113,7 @@ fun MyPlantsScreen(
                                 onDismissRequest = { showDeleteDialog = false},
                                 confirmButton = {
                                     OutlinedButton (
+                                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
                                         onClick = {
                                             selectedLocation?.let { myPlantsViewModel.deleteLocation(it) }
                                             navController.navigate("myPlaces")
@@ -123,16 +123,20 @@ fun MyPlantsScreen(
                                     ) { Text("Slett") }
                                 },
                                 dismissButton = {
-                                    TextButton(onClick = { showDeleteDialog = false } ) {
-                                        Text("Behold hage")
-                                    }
+                                    OutlinedButton(
+                                        onClick = { showDeleteDialog = false },
+                                        colors = ButtonDefaults.outlinedButtonColors(
+                                            containerColor = MaterialTheme.colorScheme.primary
+                                        )
+                                    ) { Text("Behold hage", color = Color.White) }
                                 },
-                                containerColor = MaterialTheme.colorScheme.background
+                                containerColor = MaterialTheme.colorScheme.surface
                             )
                         }
                         if (showRenameDialog) {
                             AlertDialog(
                                 title = { Text("Bytt navn på hagen") },
+                                containerColor = MaterialTheme.colorScheme.surface,
                                 text = {
                                     OutlinedTextField(
                                         value = newLocationName,
@@ -143,7 +147,11 @@ fun MyPlantsScreen(
                                 },
                                 onDismissRequest = { showRenameDialog = false },
                                 confirmButton = {
-                                    TextButton(
+                                    OutlinedButton(
+                                        colors = ButtonDefaults.outlinedButtonColors(
+                                            containerColor = MaterialTheme.colorScheme.primary,
+                                            contentColor = MaterialTheme.colorScheme.onPrimary
+                                        ),
                                         onClick = {
                                             selectedLocation?.let {
                                                 myPlantsViewModel.renameLocation(it, newLocationName)
@@ -155,7 +163,10 @@ fun MyPlantsScreen(
                                     ) { Text("Lagre") }
                                 },
                                 dismissButton = {
-                                    TextButton(onClick =  { showRenameDialog = false }) {
+                                    OutlinedButton(
+                                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+                                        onClick =  { showRenameDialog = false }
+                                    ) {
                                         Text("Avbryt")
                                     }
                                 }
