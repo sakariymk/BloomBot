@@ -31,8 +31,8 @@ import project.team36.data.mcp.WeatherAlert
 import project.team36.model.location.SavedLocation
 import project.team36.ui.map.ClimateZoneConfig.LAYER_ID
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import android.content.Context
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.delay
 import java.util.Locale
 
@@ -113,7 +113,7 @@ class MapViewModel(
 
 
     suspend fun getAddress(lat: Double, lon: Double, context: Context): String? {
-        return suspendCoroutine { continuation ->
+        return suspendCancellableCoroutine { continuation ->
             val geocoder = Geocoder(context, Locale.getDefault())
             geocoder.getFromLocation(lat, lon, 1) { results ->
                 continuation.resume(results.firstOrNull()?.getAddressLine(0))
@@ -260,10 +260,10 @@ class MapViewModel(
     suspend fun getClimateZone(
         lng: Double,
         lat: Double
-    ): Int? = suspendCoroutine { continuation ->
+    ): Int? = suspendCancellableCoroutine { continuation ->
         val map = mapboxMap ?: run {
             continuation.resume(null)
-            return@suspendCoroutine
+            return@suspendCancellableCoroutine
         }
 
         val pointOnScreen = map.pixelForCoordinate(
@@ -273,8 +273,7 @@ class MapViewModel(
         map.queryRenderedFeatures(
             RenderedQueryGeometry(pointOnScreen),
             RenderedQueryOptions(listOf(LAYER_ID), null)
-        ) {
-                result ->
+        ) { result ->
             val zone = result.value
                 ?.firstOrNull()
                 ?.queriedFeature

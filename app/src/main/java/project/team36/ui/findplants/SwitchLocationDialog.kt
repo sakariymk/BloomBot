@@ -13,7 +13,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,7 +29,7 @@ fun SwitchLocationDialog (
     onDismiss: () -> Unit,
     onNavigateToMap: () -> Unit
 ) {
-    var selectedLocation by remember() { mutableStateOf(savedLocations.find { it.name == currentLocationName }) }
+    var selectedLocation by remember { mutableStateOf(savedLocations.find { it.name == currentLocationName }) }
 
     AlertDialog (
         containerColor = MaterialTheme.colorScheme.surface,

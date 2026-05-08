@@ -26,10 +26,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -67,7 +67,7 @@ fun FindPlantsScreen(
     val pendingPlant by findPlantsViewModel.pendingPlant.collectAsState()
     val savedLocations by savedPlacesViewModel.savedLocations.collectAsState()
     val selectedLocation by savedPlacesViewModel.selectedLocation.collectAsState()
-    var showSwitchLocationDialog by remember { mutableStateOf(false) }
+    val showSwitchLocationDialog = remember { mutableStateOf(false) }
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val tabs = listOf("Anbefalte planter", "Andre planter")
 
@@ -115,7 +115,7 @@ fun FindPlantsScreen(
                         style = MaterialTheme.typography.bodyLarge
                     )
                 } else {
-                    TabRow(
+                    PrimaryTabRow(
                         selectedTabIndex = selectedTabIndex,
                         containerColor = Color.Transparent,
                         divider = {},
@@ -217,7 +217,7 @@ fun FindPlantsScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 ExtendedFloatingActionButton(
-                    onClick = { showSwitchLocationDialog = true },
+                    onClick = { showSwitchLocationDialog.value = true },
                     icon = { Icon(Icons.Default.SwapHoriz, contentDescription = "Bytt hage") },
                     text = { Text("Bytt hage") },
                     containerColor = MaterialTheme.colorScheme.primary,
@@ -237,16 +237,15 @@ fun FindPlantsScreen(
         )
     }
 
-    if (showSwitchLocationDialog) {
+    if (showSwitchLocationDialog.value) {
         SwitchLocationDialog(
             savedLocations = savedLocations,
             currentLocationName = locationName,
             onConfirm = { location ->
                 savedPlacesViewModel.selectLocation(location)
-                showSwitchLocationDialog = false
                 navController.navigate("findPlants/${location.name}")
             },
-            onDismiss = { showSwitchLocationDialog = false },
+            onDismiss = { showSwitchLocationDialog.value = false },
             onNavigateToMap = { navController.navigate("map") }
         )
     }

@@ -1,16 +1,13 @@
 package project.team36.ui.landingpage
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import project.team36.R
+import coil3.compose.AsyncImage
 
 @Composable
 fun WeatherCard(
@@ -18,7 +15,6 @@ fun WeatherCard(
     isLoading: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
 
     Card(
         modifier = modifier
@@ -35,11 +31,8 @@ fun WeatherCard(
                 ) { CircularProgressIndicator() }
             }
             weatherUiState != null -> {
-                val iconRes = context.resources.getIdentifier(
-                    weatherUiState.iconName, "drawable", context.packageName
-                )
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    modifier     = Modifier.fillMaxWidth().padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -53,8 +46,9 @@ fun WeatherCard(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(bottom = 4.dp)
                         )
-                        Image(
-                            painter = painterResource(if (iconRes != 0) iconRes else R.drawable.cloudy),
+                        //Vær ikonene blir nå henta direkte fra assets med Coil. API'et gir allerede navn for været i string, slipper mapping når man bruker assets
+                        AsyncImage(
+                            model = "file:///android_asset/${weatherUiState.iconName}.svg",
                             contentDescription = weatherUiState.description,
                             modifier = Modifier.size(40.dp)
                         )
