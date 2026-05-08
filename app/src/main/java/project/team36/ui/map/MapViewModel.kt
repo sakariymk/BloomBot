@@ -33,6 +33,7 @@ import project.team36.ui.map.ClimateZoneConfig.LAYER_ID
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import android.content.Context
+import kotlinx.coroutines.delay
 import java.util.Locale
 
 data class MapUiState(
@@ -52,6 +53,7 @@ data class MapUiState(
     val userLon: Double? = null,
     val liveLocationPending: Boolean = false,
     val showLiveLocationConfirm: Boolean = false,
+    val isSaving: Boolean = false
 )
 
 
@@ -123,6 +125,7 @@ class MapViewModel(
         val lat = _uiState.value.userLat ?: return
         val lon = _uiState.value.userLon ?: return
         viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isSaving = true)
             val address = getAddress(lat, lon, context)
 
             // Bytt fra followPuck til fast kameraposisjon for å kunne hente klimasone
@@ -132,9 +135,8 @@ class MapViewModel(
                     zoom(14.0)
                 }
             )
-            //delayen trengs for at kartet skal rekke å laste inn klimasonelaget, da den ellers lagrer det med 0
-            kotlinx.coroutines.delay(1000)
-
+            //Delay for å rekke å laste inn klimasone
+            delay(600)
             val zone = getClimateZone(lng = lon, lat = lat)
 
             savedLocationsRepository.insertLocation(
@@ -146,7 +148,7 @@ class MapViewModel(
                     zone = zone ?: 0
                 )
             )
-            _uiState.value = _uiState.value.copy(showLiveLocationConfirm = false)
+            _uiState.value = _uiState.value.copy(isSaving = false, showLiveLocationConfirm = false)
             onSaved()
         }
     }
@@ -287,6 +289,9 @@ class MapViewModel(
         val result = _uiState.value.selectedResult ?: return
         val name = _uiState.value.placeNameInput.ifEmpty { result.name }
         viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isSaving = true)
+            // Delay som trengs for å gi features med klimasoner skal rekke å laste inn
+            delay(500)
             val zone = getClimateZone(
                 lng = result.coordinate.longitude(),
                 lat = result.coordinate.latitude()
@@ -301,6 +306,7 @@ class MapViewModel(
                     zone = zone ?: 0
                 )
             )
+            _uiState.value = _uiState.value.copy(isSaving = false)
             dismissSaveDialog()
             onSaved()
         }
