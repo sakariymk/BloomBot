@@ -148,8 +148,7 @@ class MainActivity : ComponentActivity() {
                 val findPlantsViewModel: FindPlantsViewModel = viewModel(
                     factory = FindPlantsViewModelFactory(
                         plantRepository,
-                        locationRepository,
-                        savedPlacesViewModel
+                        locationRepository
                     )
                 )
                 val myPlantsViewModel: MyPlantsViewModel = viewModel(

@@ -9,18 +9,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import project.team36.data.local.LocationRepository
-import project.team36.model.plant.PlantInfo
 import project.team36.data.plant.PlantRepository
 import project.team36.model.location.SavedLocation
 import project.team36.model.location.SavedPlant
-import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.plant.PlantDetails
 import project.team36.ui.plant.toPlantDetails
 
 class FindPlantsViewModel (
     private val plantRepository: PlantRepository,
-    private val locationRepository: LocationRepository,
-    private val savedPlacesViewModel: SavedPlacesViewModel
+    private val locationRepository: LocationRepository
 ) : ViewModel() {
     private val _plants = MutableStateFlow<List<PlantDetails>>(emptyList())
     val plants: StateFlow<List<PlantDetails>> = _plants.asStateFlow()
@@ -93,12 +90,11 @@ class FindPlantsViewModel (
 class FindPlantsViewModelFactory(
     private val plantRepository: PlantRepository,
     private val locationRepository: LocationRepository,
-    private val savedPlacesViewModel: SavedPlacesViewModel
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(FindPlantsViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return FindPlantsViewModel(plantRepository, locationRepository, savedPlacesViewModel) as T
+            return FindPlantsViewModel(plantRepository, locationRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
