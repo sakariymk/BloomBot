@@ -30,9 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import project.team36.ui.map.MapViewModelFactory
 
-
-//import project.team36.ui.plant.PlantSwipeViewModel
-
 @Composable
 fun AppNavHost(
     modifier: Modifier = Modifier,
@@ -58,93 +55,91 @@ fun AppNavHost(
             }
         }
     ) { innerPadding ->
-    NavHost(
-        navController = navController,
-        startDestination = "landingpage",
-        modifier = modifier.padding(innerPadding)
-    ){
-        composable("map") {
-            val mapViewModel: MapViewModel = viewModel(factory = mapViewModelFactory)
-            MapScreen(
-                modifier = modifier,
-                viewModel = mapViewModel,
-                navController = navController,
-                savedPlacesViewModel = savedPlacesViewModel
-            )
-        }
-        composable ("myPlants"){
-            MyPlantsScreen(
-                navController = navController,
-                savedPlacesViewModel = savedPlacesViewModel,
-                myPlantsViewModel = myPlantsViewModel,
-            )
-        }
-        composable("findPlants/{locationName}") { backStackEntry ->
-            val locationName = backStackEntry.arguments?.getString("locationName") ?: ""
-            FindPlantsScreen(
-                findPlantsViewModel = findPlantsViewModel,
-                navController = navController,
-                savedPlacesViewModel = savedPlacesViewModel,
-                locationName = locationName
-            )
-        }
-        composable("landingpage") {
-            LandingPageScreen(
-                navController = navController,
-                savedPlacesViewModel = savedPlacesViewModel,
-                landingPageViewModel = landingPageViewModel,
-                myPlantsViewModel = myPlantsViewModel
-            )
-        }
-        // plantDetailScreen
-        composable ("plantDetailsScreen/{plantName}/{action}") { backStackEntry ->
-            val plantName = backStackEntry.arguments?.getString("plantName") ?: return@composable
-            val action = backStackEntry.arguments?.getString("action") ?: ""
-            val savedLocations = savedPlacesViewModel.savedLocations.collectAsState()
-            val pendingPlant = findPlantsViewModel.pendingPlant.collectAsState()
+        NavHost(
+            navController = navController,
+            startDestination = "landingpage",
+            modifier = modifier.padding(innerPadding)
+        ){
+            composable("map") {
+                val mapViewModel: MapViewModel = viewModel(factory = mapViewModelFactory)
+                MapScreen(
+                    modifier = modifier,
+                    viewModel = mapViewModel,
+                    navController = navController,
+                    savedPlacesViewModel = savedPlacesViewModel
+                )
+            }
+            composable ("myPlants"){
+                MyPlantsScreen(
+                    navController = navController,
+                    savedPlacesViewModel = savedPlacesViewModel,
+                    myPlantsViewModel = myPlantsViewModel,
+                )
+            }
+            composable("findPlants/{locationName}") { backStackEntry ->
+                val locationName = backStackEntry.arguments?.getString("locationName") ?: ""
+                FindPlantsScreen(
+                    findPlantsViewModel = findPlantsViewModel,
+                    navController = navController,
+                    savedPlacesViewModel = savedPlacesViewModel,
+                    locationName = locationName
+                )
+            }
+            composable("landingpage") {
+                LandingPageScreen(
+                    navController = navController,
+                    savedPlacesViewModel = savedPlacesViewModel,
+                    landingPageViewModel = landingPageViewModel,
+                    myPlantsViewModel = myPlantsViewModel
+                )
+            }
+            composable ("plantDetailsScreen/{plantName}/{action}") { backStackEntry ->
+                val plantName = backStackEntry.arguments?.getString("plantName") ?: return@composable
+                val action = backStackEntry.arguments?.getString("action") ?: ""
+                val savedLocations = savedPlacesViewModel.savedLocations.collectAsState()
+                val pendingPlant = findPlantsViewModel.pendingPlant.collectAsState()
 
-            LaunchedEffect(plantName) {
-                if (action == "add") {
-                    plantDetailsViewModel.loadPlant(plantName)
-                } else {
-                    plantDetailsViewModel.loadSavedPlant(plantName, myPlantsViewModel.plants.value)
+                LaunchedEffect(plantName) {
+                    if (action == "add") {
+                        plantDetailsViewModel.loadPlant(plantName)
+                    } else {
+                        plantDetailsViewModel.loadSavedPlant(plantName, myPlantsViewModel.plants.value)
+                    }
+                }
+
+                PlantDetailsScreen(
+                    navController = navController,
+                    plantDetailsViewModel = plantDetailsViewModel,
+                    onBackClick = { navController.popBackStack() },
+                    onAddPlant = if (action == "add") {
+                        { plantDetailsViewModel.plant.value?.let { findPlantsViewModel.requestAddPlant(it) } }
+                    } else null,
+                    onDeletePlant = if (action == "delete") {
+                        { myPlantsViewModel.removePlantByName(plantName) }
+                    } else null
+                )
+
+                pendingPlant.value?.let { plant ->
+                    SavePlantDialog(
+                        plant = plant,
+                        savedLocations = savedLocations.value,
+                        onConfirm = { location ->
+                            findPlantsViewModel.confirmAddPlant(plant, location)
+                            savedPlacesViewModel.selectLocation(location)
+                            navController.navigate("myPlants")
+                        },
+                        onDismiss = { findPlantsViewModel.dismissAddPlant() }
+                    )
                 }
             }
-
-            PlantDetailsScreen(
-                navController = navController,
-                plantName = plantName,
-                plantDetailsViewModel = plantDetailsViewModel,
-                onBackClick = { navController.popBackStack() },
-                onAddPlant = if (action == "add") {
-                    { plantDetailsViewModel.plant.value?.let { findPlantsViewModel.requestAddPlant(it) } }
-                } else null,
-                onDeletePlant = if (action == "delete") {
-                    { myPlantsViewModel.removePlantByName(plantName) }
-                } else null
-            )
-
-            pendingPlant.value?.let { plant ->
-                SavePlantDialog(
-                    plant = plant,
-                    savedLocations = savedLocations.value,
-                    onConfirm = { location ->
-                        findPlantsViewModel.confirmAddPlant(plant, location)
-                        savedPlacesViewModel.selectLocation(location)
-                        navController.navigate("myPlants")     
-                    },
-                    onDismiss = { findPlantsViewModel.dismissAddPlant() }
+            composable("myPlaces") {
+                MyPlacesScreen(
+                    navController = navController,
+                    savedPlacesViewModel = savedPlacesViewModel,
+                    onLocationCardClick = { navController.navigate("myPlants") },
+                    onAddPlaceClick = { navController.navigate("map") },
                 )
             }
         }
-        composable("myPlaces") {
-            MyPlacesScreen(
-                navController = navController,
-                savedPlacesViewModel = savedPlacesViewModel,
-                onLocationCardClick = { navController.navigate("myPlants") },
-                onAddPlaceClick = { navController.navigate("map") },
-            )
-        }
-    }
     }
 }

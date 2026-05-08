@@ -66,7 +66,6 @@ class MyPlantsViewModelTest {
         name = "Pelargonia",
         soil = setOf(SoilType.SAND),
         light = setOf(LightType.FULL),
-        isFrostResistant = false,
         waterPerWeek = 2f,
         plantingMonth = setOf(5,6),
         climateZone = 3,

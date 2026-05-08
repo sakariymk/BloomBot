@@ -10,13 +10,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -137,15 +137,6 @@ fun MapScreen(
                 if (locationPermissionState.status.isGranted) {
                     @Suppress("COMPOSE_APPLIER_CALL_MISMATCH")
                     MapEffect(Unit) { mapView ->
-                        mapView.location.updateSettings {
-                            locationPuck = createDefault2DPuck(withBearing = true)
-                            enabled = true
-                            puckBearingEnabled = false
-                        }
-                        mapView.location.addOnIndicatorPositionChangedListener { point ->
-                            viewModel.updateUserPosition(point.latitude(), point.longitude())
-                        }
-                        viewModel.onLocationReady()
                         viewModel.onMapReady(mapView.mapboxMap)
 
                         mapView.mapboxMap.getStyle { style ->
@@ -156,6 +147,18 @@ fun MapScreen(
                                 sourceLayer(ClimateZoneConfig.SOURCE_LAYER)
                                 fillOpacity(literal(0.0))
                             })
+                        }
+
+                        if (locationPermissionState.status.isGranted) {
+                            mapView.location.updateSettings {
+                                locationPuck = createDefault2DPuck(withBearing = true)
+                                enabled = true
+                                puckBearingEnabled = false
+                            }
+                            mapView.location.addOnIndicatorPositionChangedListener { point ->
+                                viewModel.updateUserPosition(point.latitude(), point.longitude())
+                            }
+                            viewModel.onLocationReady()
                         }
                     }
                 }
@@ -286,12 +289,34 @@ fun MapScreen(
                     containerColor = MaterialTheme.colorScheme.surface,
                     text = { Text("Vil du lagre din nåværende posisjon?") },
                     confirmButton = {
-                        TextButton(onClick = {
-                            viewModel.confirmSaveLiveLocation(context) { navController.navigate("myPlaces") }
-                        }) { Text("Ja") }
+                        OutlinedButton(
+                            enabled = !uiState.isSaving,
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            ),
+                            onClick = {
+                                viewModel.confirmSaveLiveLocation(context) { navController.navigate("myPlaces") }
+                            }
+                        ) {
+                            if (uiState.isSaving) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(18.dp),
+                                    strokeWidth = 2.dp,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+
+
+                            } else {
+                                Text("Ja")
+                            }
+                        }
                     },
                     dismissButton = {
-                        TextButton(onClick = { viewModel.dismissLiveLocationConfirm() }) { Text("Nei") }
+                        OutlinedButton(
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+                            onClick = { viewModel.dismissLiveLocationConfirm() }
+                        ) { Text("Nei") }
                     }
                 )
             }
@@ -303,14 +328,28 @@ fun MapScreen(
                     containerColor = MaterialTheme.colorScheme.surface,
                     confirmButton = {
                         OutlinedButton(
+                            enabled = true,
                             colors = ButtonDefaults.outlinedButtonColors(
                                 containerColor = MaterialTheme.colorScheme.primary,
                                 contentColor = MaterialTheme.colorScheme.onPrimary
                             ),
                             onClick = {
-                                viewModel.confirmSavePlace { navController.navigate("myPlaces") }
-                                viewModel.dismissSaveDialog()
-                            }) { Text("Ja") }
+                                if (!uiState.isSaving) { // ignorer klikk hvis allerede lagrer
+                                    viewModel.confirmSavePlace { navController.navigate("myPlaces") }
+                                }
+                            }
+                        ) {
+                            if (uiState.isSaving) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(18.dp),
+                                    strokeWidth = 2.dp,
+                                    color = MaterialTheme.colorScheme.onPrimary
+                                )
+
+                            } else {
+                                Text("Ja")
+                            }
+                        }
                     },
                     dismissButton = {
                         OutlinedButton(

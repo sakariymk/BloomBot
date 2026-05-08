@@ -11,8 +11,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -36,7 +34,6 @@ import project.team36.data.plant.PlantRepository
 import project.team36.ui.findplants.FindPlantsViewModelFactory
 import project.team36.ui.landingpage.LandingPageViewModel
 import project.team36.ui.landingpage.LandingPageViewModelFactory
-import project.team36.ui.map.MapViewModel
 import project.team36.ui.map.MapViewModelFactory
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.map.SavedPlacesViewModelFactory
@@ -47,7 +44,6 @@ import project.team36.ui.theme.Team36Theme
 import androidx.compose.runtime.DisposableEffect
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.SystemBarStyle
-import androidx.core.view.WindowCompat
 import project.team36.ui.myplants.MyPlantsViewModelFactory
 
 
@@ -70,7 +66,7 @@ class MainActivity : ComponentActivity() {
         val dataSource = PlantDataSource(this)
         val db = AppDatabase.getDatabase(this)
         val locationRepository = LocationRepository(db.savedLocationDao(), db.savedPlantDao())
-        val plantRepository = PlantRepository(dataSource, locationRepository)
+        val plantRepository = PlantRepository(dataSource)
         val frostRepository = FrostRepository()
 
 
@@ -98,7 +94,7 @@ class MainActivity : ComponentActivity() {
 
         val mcpClient = MetMcpClient()
 
-        //thrower exception hvis det ikke er internett tilgang, så appen ikke krasjer
+        //kaster exception hvis det ikke er internett tilgang, så appen ikke krasjer
         try {
             runBlocking { mcpClient.connect() }
         } catch (e: Exception) {
@@ -111,7 +107,6 @@ class MainActivity : ComponentActivity() {
         val hybridAiRepository = HybridAiRepository(
             claudeApi = claudeApi,
             mcpClient = mcpClient,
-            // <------ ENDRING: Vi sender inn locationRepository (lokal database) i stedet for dataSource (CSV)
             plantDataSource = locationRepository,
             claudeApiKey = claudeKey
         )
@@ -161,7 +156,7 @@ class MainActivity : ComponentActivity() {
                 val mapViewModelFactory = MapViewModelFactory(metWeatherRepository, locationRepository)
 
                 val plantDetailsViewModel: PlantDetailsViewModel = viewModel(
-                    factory = PlantDetailsViewModelFactory(plantRepository, locationRepository)
+                    factory = PlantDetailsViewModelFactory(plantRepository)
                 )
 
                 AppNavHost(

@@ -1,6 +1,5 @@
 package project.team36.ui.myplants
 
-import android.R
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -9,8 +8,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Eco
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
@@ -28,8 +27,6 @@ import androidx.navigation.NavController
 import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.plant.PlantCard
 import project.team36.ui.navigation.BottomNavBar
-import project.team36.ui.theme.backgroundLight
-import project.team36.ui.theme.primaryContainerLight
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,7 +64,7 @@ fun MyPlantsScreen(
                 navigationIcon = {
                     IconButton(onClick = { navController.navigate("myPlaces")} ) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Tilbake",
                             tint = MaterialTheme.colorScheme.onBackground
                         )
@@ -75,10 +72,10 @@ fun MyPlantsScreen(
                 },
                 actions = {
 
-                    var expanded by rememberSaveable() { mutableStateOf(false) }
-                    var showDeleteDialog by rememberSaveable() { mutableStateOf(false) }
-                    var showRenameDialog by rememberSaveable() { mutableStateOf(false) }
-                    var newLocationName by rememberSaveable() { mutableStateOf("") }
+                    var expanded by rememberSaveable { mutableStateOf(false) }
+                    var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
+                    var showRenameDialog by rememberSaveable { mutableStateOf(false) }
+                    var newLocationName by rememberSaveable { mutableStateOf("") }
 
                     Box {
                         IconButton(onClick = {expanded = true }) {
