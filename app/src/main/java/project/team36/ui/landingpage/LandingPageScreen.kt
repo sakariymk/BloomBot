@@ -46,6 +46,7 @@ import project.team36.ui.navigation.BottomNavBar
 import androidx.compose.material3.*
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.edit
 import project.team36.ui.myplants.MyPlantsViewModel
 import project.team36.data.mcp.WeatherAlert
 
@@ -73,7 +74,7 @@ fun LandingPageScreen(
     LaunchedEffect(Unit) {
         if (!prefs.getBoolean("has_seen_intro", false)) {
             landingPageViewModel.showInfoDialog()
-            prefs.edit().putBoolean("has_seen_intro", true).apply()
+            prefs.edit { putBoolean("has_seen_intro", true) }
         }
     }
 
