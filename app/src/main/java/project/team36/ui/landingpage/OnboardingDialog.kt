@@ -71,7 +71,7 @@ fun OnboardingDialog(
     Dialog(onDismissRequest = onDismiss) {
         Card(
             shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = backgroundLight)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
@@ -109,7 +109,7 @@ fun OnboardingDialog(
                                     .height(6.dp)
                                     .width(if (index == currentStep) 24.dp else 6.dp)
                                     .background(
-                                        color = if (index == currentStep) primaryLight
+                                        color = if (index == currentStep) MaterialTheme.colorScheme.primary
                                         else primaryLight.copy(alpha = 0.3f),
                                         shape = CircleShape
                                     )
@@ -123,7 +123,7 @@ fun OnboardingDialog(
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
-                        color = primaryLight
+                        color = MaterialTheme.colorScheme.onSurface
                     )
 
                     // Beskrivelse
@@ -131,7 +131,7 @@ fun OnboardingDialog(
                         text = step.description,
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center,
-                        color = onSurfaceLight
+                        color = MaterialTheme.colorScheme.onSurface
                     )
 
                     Spacer(modifier = Modifier.height(4.dp))
@@ -148,7 +148,7 @@ fun OnboardingDialog(
                                 shape = RoundedCornerShape(12.dp),
                                 border = BorderStroke(1.dp, outlineLight)
                             ) {
-                                Text("Tilbake", color = onSurfaceLight)
+                                Text("Tilbake", color = MaterialTheme.colorScheme.onBackground)
                             }
                         }
                         Button(
@@ -156,13 +156,13 @@ fun OnboardingDialog(
                             modifier = Modifier.weight(2.5f),
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = if (isLastStep) primaryLight else Color(0xFFB8D9B0)
+                                containerColor = if (isLastStep) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary //Color(0xFFB8D9B0)
                             ),
 
                         ) {
                             Text(
                                 text = if (isLastStep) "Kom i gang!" else "Neste",
-                                color = if (isLastStep) Color.White else primaryLight,
+                                color = if (isLastStep) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondary,
                                 fontWeight = FontWeight.Bold
                             )
                         }

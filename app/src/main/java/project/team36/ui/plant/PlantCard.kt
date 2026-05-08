@@ -147,7 +147,7 @@ fun PlantCard(
                             else -> "$daysUntilWatering dager til neste vanning"
                         },
                         buttonText = "Jeg har vannet",
-                        buttonColor = MaterialTheme.colorScheme.onPrimary,
+                        buttonColor = MaterialTheme.colorScheme.primary,
                         onButtonClick = onMarkAsWatered
                     )
 
@@ -164,7 +164,7 @@ fun PlantCard(
                             "$daysSinceFertilizing dager siden sist gjødsling (${plant.lastFertilizationDate.toDisplayDate()})"
                         },
                         buttonText = "Jeg har gjødslet",
-                        buttonColor = MaterialTheme.colorScheme.onPrimary,
+                        buttonColor = MaterialTheme.colorScheme.primary,
                         onButtonClick = onMarkAsFertilized
                     )
                     // Knapp for å navigere til detaljskjerm for plante med en slett-knapp
@@ -246,7 +246,7 @@ private fun InfoSection(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.background, RoundedCornerShape(12.dp))
+            .background(color = MaterialTheme.colorScheme.surface,RoundedCornerShape(12.dp))
             .padding(horizontal = 14.dp, vertical = 10.dp),
         verticalAlignment = Alignment.Top
     ) {
@@ -365,40 +365,3 @@ fun PlantAlertInfo(alert: WeatherAlert, plant: SavedPlant) {
         )
     }
 }
-
-/*
-@Preview(showBackground = true)
-@Composable
-fun PlantCardPreview() {
-    val fakePlant = SavedPlant(
-        id = 1,
-        locationId = 1,
-        name = "Pelargonia",
-        soil = setOf(SoilType.LOAM),
-        light = setOf(LightType.FULL),
-        isFrostResistant = false,
-        waterPerWeek = 3f,
-        plantingMonth = setOf(4, 5),
-        climateZone = 3,
-        hasBeenWatered = false,
-        daysSinceWatered = 2,
-        maxDaysWithoutWater = 3,
-        imageRes = 0,
-        description = "En vakker plante.",
-        lastWateredDate = System.currentTimeMillis() - (2 * 24 * 60 * 60 * 1000L),
-        lastFertilizationDate = System.currentTimeMillis()
-    )
-
-    MaterialTheme {
-        PlantCard(
-            plant = fakePlant,
-            needsWater = true,
-            daysUntilWatering = 1L,
-            daysSinceFertilizing = 0L,
-            onMarkAsWatered = {},
-            onMarkAsFertilized = {},
-            onNavigateToDetails = {}
-        )
-    }
-}
-*/

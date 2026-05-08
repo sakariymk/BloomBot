@@ -241,13 +241,13 @@ fun EmptyPlantCard(
                     .fillMaxHeight()
                     .width(80.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFF2E7D32)),
+                    .background(MaterialTheme.colorScheme.primary),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.Eco,
                     contentDescription = "Ikon av plante",
-                    tint = Color(0xFFE8F5E2),
+                    tint = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(40.dp)
                 )
             }
@@ -255,12 +255,12 @@ fun EmptyPlantCard(
                 Text(
                     text = "Ingen planter i denne hagen enda.\nGro din første plante!",
                     fontSize = 14.sp,
-                    color = Color.Black
+                    color = MaterialTheme.colorScheme.onBackground
                 )
                 Button(
                     onClick = onClick ,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF2E7D32)
+                        containerColor = MaterialTheme.colorScheme.primary
                     ),
                     shape = RoundedCornerShape(50),
                     modifier = Modifier.fillMaxWidth(),
@@ -268,7 +268,7 @@ fun EmptyPlantCard(
                 ) {
                     Icon(Icons.Default.Add, contentDescription = "Legg til")
                     Spacer(Modifier.width(6.dp))
-                    Text("Ny Plante")
+                    Text("Ny Plante", color = MaterialTheme.colorScheme.onPrimary)
                     Spacer(Modifier.weight(1f))
                 }
             }

@@ -153,16 +153,18 @@ fun PlantDetailsScreen(
 
                 }
                 PlantInfoCard(title = "Om planten") {
-                    Text("${plant.description}")
+                    Text("${plant.description}",
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 PlantInfoCard(title = "Plantingsmåned") {
-                    Text("Dette er de ideelle månedene å plante denne planten.")
+                    Text("Dette er de ideelle månedene å plante denne planten.", color = MaterialTheme.colorScheme.onSurface)
                     PlantingMonthBar(plantingMonth = plant.plantingMonth)
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 PlantInfoCard(title = "Herdighetssone") {
-                    Text("Herdighetssone sier noe om hvor planten vil trives best med tanke på lokalklima.")
+                    Text("Herdighetssone sier noe om hvor planten vil trives best med tanke på lokalklima.", color = MaterialTheme.colorScheme.onSurface)
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -174,6 +176,7 @@ fun PlantDetailsScreen(
                         )
                         Text(
                             "H${plant.climateZone}",
+                            color = MaterialTheme.colorScheme.onSurface,
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 16.sp
                         )
@@ -181,13 +184,15 @@ fun PlantDetailsScreen(
                     HardinessZoneTooltip()
                 }
                 PlantInfoCard("Solforhold") {
-                    Text("Ulike planter har ulike behov for sol, noen trives best med full sollys, mens andre foretrekker mer skygge for å trives best.")
+                    Text("Ulike planter har ulike behov for sol, noen trives best med full sollys, mens andre foretrekker mer skygge for å trives best.",
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         plant.light.forEach { lightType ->
                             OutlinedButton(
                                 onClick = {},
                                 shape = RoundedCornerShape(50),
-                                border = BorderStroke(1.dp, Color.LightGray)
+                                border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.outline)
                             ) {
                                 Text(
                                     text = lightType.displayName,
@@ -198,7 +203,9 @@ fun PlantDetailsScreen(
                     }
                 }
                 PlantInfoCard(title = "Vanning") {
-                    Text("Vi registrerer om det har regnet, slik at du kan få påminnelse om vanning dersom det ikke har regnet tilstrekkelig.")
+                    Text("Vi registrerer om det har regnet, slik at du kan få påminnelse om vanning dersom det ikke har regnet tilstrekkelig.",
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -210,13 +217,16 @@ fun PlantDetailsScreen(
                         )
                         Text(
                             "Vannes ca. hver ${plant.maxDaysWithoutWater}. dag",
+                            color = MaterialTheme.colorScheme.onSurface,
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp
                         )
                     }
                 }
                 PlantInfoCard(title = "Jordtype") {
-                    Text("Jorden planten trives aller best i når det gjelder struktur, sammensetning, næringsinnhold og surhetsgrad. Valg av jordtype avhenger av plantens behov, men generelt trives de fleste planter i en luftig, næringsrik jord med god drenering ")
+                    Text("Jorden planten trives aller best i når det gjelder struktur, sammensetning, næringsinnhold og surhetsgrad. Valg av jordtype avhenger av plantens behov, men generelt trives de fleste planter i en luftig, næringsrik jord med god drenering ",
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         plant.soil.forEach { soilType ->
                             OutlinedButton(
@@ -251,7 +261,7 @@ fun PlantInfoCard(title: String, content: @Composable ColumnScope.() -> Unit) {
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Text(title, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+            Text(title, color = MaterialTheme.colorScheme.onSurface, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
             content()
         }
     }
@@ -274,9 +284,9 @@ fun PlantingMonthBar(plantingMonth: Set<Int>) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("jan", fontSize = 12.sp, color = Color.Gray)
-            Text("jun", fontSize = 12.sp, color = Color.Gray)
-            Text("des", fontSize = 12.sp, color = Color.Gray)
+            Text("jan", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface)
+            Text("jun", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface)
+            Text("des", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface)
         }
         Row(
             modifier = Modifier
@@ -291,10 +301,10 @@ fun PlantingMonthBar(plantingMonth: Set<Int>) {
                     .fillMaxHeight()
                     .fillMaxWidth(widthFraction / (1f - startFraction))
                     .clip(RoundedCornerShape(50))
-                    .background(MaterialTheme.colorScheme.onBackground),
+                    .background(MaterialTheme.colorScheme.primaryContainer),
                 contentAlignment = Alignment.Center
             ) {
-                Text(label, fontSize = 11.sp, color = Color.White)
+                Text(label, fontSize = 11.sp, color = MaterialTheme.colorScheme.onPrimaryContainer)
             }
         }
     }
@@ -317,7 +327,7 @@ fun HardinessZoneTooltip() {
                     title = { Text("Herdighetssoner") },
                     action = {
                         TextButton(onClick = {scope.launch { tooltipState.dismiss() }}) {
-                            Text("Lukk")
+                            Text("Lukk", color = MaterialTheme.colorScheme.onSurface)
                         }
                     },
                     colors = TooltipDefaults.richTooltipColors(
@@ -344,7 +354,7 @@ fun HardinessZoneTooltip() {
                         MaterialTheme.colorScheme.secondary
                     ),
                 ) {
-                    Text("Herdighetssone forklart", color = MaterialTheme.colorScheme.onSurface)
+                    Text("Herdighetssone forklart", color = MaterialTheme.colorScheme.onSecondary)
                 }
             }
 

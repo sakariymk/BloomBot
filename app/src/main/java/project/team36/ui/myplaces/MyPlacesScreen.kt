@@ -160,7 +160,7 @@ fun EmptyLocationCard(
             .fillMaxWidth()
             .border(
                 width = 2.dp,
-                color = MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.outline,
                 shape = RoundedCornerShape(16.dp)
             ),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent)
@@ -239,12 +239,13 @@ fun LocationCard (
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = location.name ?: "Ukjent hage",
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp
                 )
                 Text(
                     text = location.address ?: "Ingen adresse funnet",
-                    color = Color.Gray,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 12.sp
                 )
             }
