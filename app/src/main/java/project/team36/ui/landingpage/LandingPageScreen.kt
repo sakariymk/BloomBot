@@ -44,6 +44,7 @@ import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.navigation.BottomNavBar
 import androidx.compose.material3.*
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.edit
 import project.team36.ui.myplants.MyPlantsViewModel
@@ -61,7 +62,7 @@ fun LandingPageScreen(
 
     val uiState by landingPageViewModel.uiState.collectAsStateWithLifecycle()
     val savedLocations by savedPlacesViewModel.savedLocations.collectAsStateWithLifecycle()
-    var selectedTabIndex by remember { mutableIntStateOf(0) }
+    var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
 
     // for onboarding
     val context = LocalContext.current

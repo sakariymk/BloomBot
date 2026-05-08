@@ -67,7 +67,7 @@ fun FindPlantsScreen(
     val pendingPlant by findPlantsViewModel.pendingPlant.collectAsState()
     val savedLocations by savedPlacesViewModel.savedLocations.collectAsState()
     val selectedLocation by savedPlacesViewModel.selectedLocation.collectAsState()
-    val showSwitchLocationDialog = remember { mutableStateOf(false) }
+    val showSwitchLocationDialog = rememberSaveable { mutableStateOf(false) }
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     val tabs = listOf("Anbefalte planter", "Andre planter")
 
