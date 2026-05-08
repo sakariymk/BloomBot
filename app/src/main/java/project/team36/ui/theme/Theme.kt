@@ -53,7 +53,7 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun Team36Theme(
-    darkTheme: Boolean = true,
+    darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
