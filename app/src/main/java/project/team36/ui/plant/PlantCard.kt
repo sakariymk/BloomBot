@@ -132,6 +132,11 @@ fun PlantCard(
                         .padding(top = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+
+                    HorizontalDivider(
+                        modifier = Modifier.padding(vertical = 12.dp),
+                        color = MaterialTheme.colorScheme.outline
+                    )
                     //Teller ned på vanningsdager siden sist vanning, eller siden det sist regnet 5 mm
                     InfoSection(
                         title = "Vanningsbehov",

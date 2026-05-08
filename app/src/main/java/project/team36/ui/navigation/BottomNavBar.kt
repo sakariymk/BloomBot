@@ -26,11 +26,11 @@ fun BottomNavBar(navController: NavController, savedPlacesViewModel : SavedPlace
 
 
     val navItemColors = NavigationBarItemDefaults.colors(
-        selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        selectedIconColor = MaterialTheme.colorScheme.onSecondary,
         unselectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
         selectedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
         unselectedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
-        indicatorColor = MaterialTheme.colorScheme.primary
+        indicatorColor = MaterialTheme.colorScheme.secondary
     )
 
     NavigationBar(
