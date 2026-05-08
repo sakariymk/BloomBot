@@ -2,8 +2,6 @@ package project.team36.ui.landingpage
 
 import android.Manifest
 import android.content.Context
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -47,14 +45,9 @@ import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.navigation.BottomNavBar
 import androidx.compose.material3.*
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.window.Dialog
 import project.team36.ui.myplants.MyPlantsViewModel
 import project.team36.data.mcp.WeatherAlert
-import project.team36.R
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
@@ -64,7 +57,6 @@ fun LandingPageScreen(
     landingPageViewModel: LandingPageViewModel,
     myPlantsViewModel: MyPlantsViewModel
 ) {
-    val backgroundColor = MaterialTheme.colorScheme.background
     val tabButtonColor = MaterialTheme.colorScheme.primary
 
     val uiState by landingPageViewModel.uiState.collectAsStateWithLifecycle()
