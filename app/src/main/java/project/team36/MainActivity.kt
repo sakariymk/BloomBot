@@ -70,7 +70,7 @@ class MainActivity : ComponentActivity() {
         val dataSource = PlantDataSource(this)
         val db = AppDatabase.getDatabase(this)
         val locationRepository = LocationRepository(db.savedLocationDao(), db.savedPlantDao())
-        val plantRepository = PlantRepository(dataSource, locationRepository)
+        val plantRepository = PlantRepository(dataSource)
         val frostRepository = FrostRepository()
 
 
