@@ -25,7 +25,6 @@ class PlantRepositoryTest {
         climateZone = climateZone,
         soil = setOf(SoilType.SOIL),
         light = setOf(LightType.FULL),
-        isFrostResistant = false,
         waterPerWeek = 1.0f,
         plantingMonth = setOf(5),
         hasBeenWatered = false,
@@ -40,7 +39,6 @@ class PlantRepositoryTest {
         name = name,
         soil = setOf(SoilType.SOIL),
         light = setOf(LightType.FULL),
-        isFrostResistant = false,
         waterPerWeek = 1.0f,
         plantingMonth = setOf(5),
         climateZone = 4,
@@ -67,7 +65,7 @@ class PlantRepositoryTest {
             testPlant("Palme", climateZone = 2)    // Kun anbefalt for sone 2 og lavere – for svak for H4
         )
         every { mockDataSource.fetchPlants() } returns plants
-        plantRepository = PlantRepository(mockDataSource, mockLocationRepo)
+        plantRepository = PlantRepository(mockDataSource)
     }
 
     @Test

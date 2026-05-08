@@ -8,7 +8,6 @@ import project.team36.model.plant.PlantInfo
 
 class PlantRepository(
     private val plantDataSource: PlantDataSource,
-    private val locationRepository: LocationRepository
 ) {
     private var cachedPlants: List<PlantInfo> = emptyList()
 
