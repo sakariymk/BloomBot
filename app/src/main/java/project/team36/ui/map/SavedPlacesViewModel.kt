@@ -10,7 +10,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import project.team36.data.local.LocationRepository
 import project.team36.model.location.SavedLocation
 
@@ -18,7 +17,7 @@ import project.team36.model.location.SavedLocation
 //Flyttet savedPlaces til en egen viewmodel, så flere skjermer har tilgang til lagrede steder
 
 class SavedPlacesViewModel(
-    private val repository: LocationRepository
+    repository: LocationRepository
 ) : ViewModel() {
 
     //Begynner å lytte etter locations fra Room, Flow sørger for at det blir automatisk oppdatert
@@ -35,20 +34,6 @@ class SavedPlacesViewModel(
     //Velg location, som kan brukes av dropdown osv
     fun selectLocation(location: SavedLocation) {
         _selectedLocation.value = location
-    }
-
-    //Legg til Location
-    fun addLocation(location: SavedLocation){
-        viewModelScope.launch {
-            repository.insertLocation(location)
-        }
-    }
-
-    //Oppdater location
-    fun updateLocation(location: SavedLocation) {
-        viewModelScope.launch {
-            repository.updateLocation(location)
-        }
     }
 
     fun updateSelectedLocationName(newName: String) {

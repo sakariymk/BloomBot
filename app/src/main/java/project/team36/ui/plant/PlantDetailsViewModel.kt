@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModelProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import project.team36.data.local.LocationRepository
 import project.team36.data.plant.PlantRepository
 import project.team36.model.location.SavedPlant
 import project.team36.model.plant.LightType
@@ -14,7 +13,6 @@ import project.team36.model.plant.SoilType
 
 class PlantDetailsViewModel (
     private val plantRepository: PlantRepository,
-    private val locationRepository: LocationRepository
 ) : ViewModel() {
     private val _plant = MutableStateFlow<PlantDetails?>(null)
     val plant : StateFlow<PlantDetails?> = _plant.asStateFlow()
@@ -77,13 +75,12 @@ fun SavedPlant.toPlantDetails() = PlantDetails(
 )
 
 class PlantDetailsViewModelFactory(
-    private val plantRepository: PlantRepository,
-    private val locationRepository: LocationRepository
+    private val plantRepository: PlantRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(PlantDetailsViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return PlantDetailsViewModel(plantRepository, locationRepository) as T
+            return PlantDetailsViewModel(plantRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

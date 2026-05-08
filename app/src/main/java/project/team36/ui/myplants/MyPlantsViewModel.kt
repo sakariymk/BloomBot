@@ -25,7 +25,7 @@ import kotlin.collections.filter
 
 class MyPlantsViewModel(
     private val repository: LocationRepository,
-    private val savedPlacesViewModel: SavedPlacesViewModel,
+    savedPlacesViewModel: SavedPlacesViewModel,
     private val frostRepository: FrostRepository
 ) : ViewModel() {
 
@@ -43,15 +43,7 @@ class MyPlantsViewModel(
         repository.getAllPlants()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-
-    // SLETTES?
-    fun removePlant(plant: SavedPlant) {
-        viewModelScope.launch {
-            repository.deletePlant(plant)
-        }
-    }
-
-    // for å slette plante basert på navn, brukes i AppNavHost på PlantDetailsScreen
+    // Sletter plante basert på navn, brukes i AppNavHost på PlantDetailsScreen
     fun removePlantByName(plantName: String) {
         viewModelScope.launch {
             val plant = plants.value.find { it.name == plantName }
@@ -59,7 +51,7 @@ class MyPlantsViewModel(
         }
     }
 
-    //Metoder for vanning og å sjekke om den trenger vann, lagt til ny egenskap til SavedPlant - lastWateredDate som kan holde på nøyaktig tid for vanning
+    //Metode for vanning og å sjekke om den trenger vann
     fun markAsWatered(plant: SavedPlant) {
         viewModelScope.launch {
             repository.updatePlant(
