@@ -57,14 +57,15 @@ fun DailyTasksCard(
         Text(
             text = "Dagens oppgaver",
             style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(start = 16.dp, bottom = 6.dp),
+            modifier = Modifier.padding(start = 6.dp, bottom = 6.dp),
             color = MaterialTheme.colorScheme.onBackground
         )
 
 
         Card(
             modifier = Modifier
-                .padding(16.dp),
+                .padding(horizontal = 6.dp, vertical = 6.dp)
+                .fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
         ) {
