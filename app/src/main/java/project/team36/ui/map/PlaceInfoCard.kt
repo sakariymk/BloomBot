@@ -26,6 +26,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import project.team36.model.location.SavedLocation
 
+//lite kort som vises når bruker trykker på en pin på kartet
+//viser navn, adresse og knapp for å navigere screen til stedet
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaceInfoCard(
@@ -56,6 +58,7 @@ fun PlaceInfoCard(
                     color = Color(0xFF6F8069)
                 )
 
+                //knapp for å navigere screen til det lagrede stedet, oversikt over planter på det stedet
                 Button(
                     onClick = { navController.navigate("myPlants")},
                     modifier = Modifier

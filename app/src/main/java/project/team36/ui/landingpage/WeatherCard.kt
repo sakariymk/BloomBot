@@ -9,6 +9,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 
+//værkort som viser temperatur, vær ikon, vær beskrivelse, nedbør
 @Composable
 fun WeatherCard(
     weatherUiState: WeatherUiState?,
@@ -40,13 +41,14 @@ fun WeatherCard(
                         modifier = Modifier.weight(1f),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        //Værbeskrivelse
                         Text(
                             text = weatherUiState.description,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(bottom = 4.dp)
                         )
-                        //Vær ikonene blir nå henta direkte fra assets med Coil. API'et gir allerede navn for været i string, slipper mapping når man bruker assets
+                        //Vær ikonene blir henta direkte fra assets med Coil. API'et gir allerede navn for været i string, slipper mapping når man bruker assets
                         AsyncImage(
                             model = "file:///android_asset/${weatherUiState.iconName}.svg",
                             contentDescription = weatherUiState.description,
@@ -55,6 +57,7 @@ fun WeatherCard(
                     }
                     Spacer(modifier = Modifier.width(3.dp))
 
+                    //Tekst som viser temperatur og nedbær
                     Column(horizontalAlignment = Alignment.End) {
                         Text(
                             text = weatherUiState.temperature,
@@ -67,6 +70,7 @@ fun WeatherCard(
                     }
                 }
             }
+            //Hvis man ikke er koblet til internett eller hvis API-kall til MET ikke fungerer
             else -> {
                 Text(
                     text = "Kunne ikke hente vær",
@@ -76,18 +80,4 @@ fun WeatherCard(
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun WeatherCardPreview() {
-    WeatherCard(
-        weatherUiState = WeatherUiState(
-            temperature = "12.5°C",
-            precipitation = "🌧 0.0 mm",
-            description = "Delvis skyet",
-            iconName = "partlycloudy_day"
-        ),
-        isLoading = false
-    )
 }

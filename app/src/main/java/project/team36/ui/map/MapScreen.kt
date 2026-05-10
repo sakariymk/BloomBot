@@ -20,7 +20,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -79,19 +78,15 @@ fun MapScreen(
     val mapViewportState = viewModel.mapViewportState
     val context = LocalContext.current
 
+
+    //henter live lokasjon
     val locationPermissionState = rememberPermissionState(
         Manifest.permission.ACCESS_FINE_LOCATION
     )
+
+    //hvis ingen steder er lagret enda, viser en liten velkomstdialog
     var showLocationChoiceDialog by rememberSaveable(savedLocations.isEmpty()) {
         mutableStateOf(savedLocations.isEmpty())
-    }
-    var permissionRequested by rememberSaveable { mutableStateOf(false) }
-
-    LaunchedEffect(locationPermissionState.status.isGranted) {
-        if (permissionRequested && locationPermissionState.status.isGranted) {
-            viewModel.requestLiveLocationSave()
-            showLocationChoiceDialog = false
-        }
     }
 
     Scaffold(
@@ -143,6 +138,7 @@ fun MapScreen(
                             style.addSource(vectorSource(ClimateZoneConfig.SOURCE_ID) {
                                 tiles(listOf(ClimateZoneConfig.TILE_URL))
                             })
+                            //legger til klimasonekart som en usynlig overlay, gjørat man kan hente ut data om klimasone på kartet
                             style.addLayer(fillLayer(ClimateZoneConfig.LAYER_ID, ClimateZoneConfig.SOURCE_ID) {
                                 sourceLayer(ClimateZoneConfig.SOURCE_LAYER)
                                 fillOpacity(literal(0.0))
@@ -163,7 +159,7 @@ fun MapScreen(
                     }
                 }
 
-                // Viser midlertidig markør for søkeresultat
+                // Viser midlertidig markør for valgt søkeresultat
                 uiState.selectedResult?.coordinate?.let { coord ->
                     val marker = rememberIconImage(
                         key = R.drawable.plant_map_marker,
@@ -211,6 +207,7 @@ fun MapScreen(
             }
 
             if (showLocationChoiceDialog) {
+                //dialogboks som popper opp første gangen man lagrer et sted (eller har 0 lagrde steder)
                 Dialog(onDismissRequest = { showLocationChoiceDialog = false }) {
                     Card(
                         shape = RoundedCornerShape(24.dp),
@@ -251,13 +248,15 @@ fun MapScreen(
 
                             Spacer(modifier = Modifier.height(24.dp))
 
+                            //knapp for å lagre sted med live lokasjon
                             Button(
+                                //hvis man har gitt tillatelse for å bruke lokasjon, så lagres lokasjonen
                                 onClick = {
                                     if (locationPermissionState.status.isGranted) {
                                         viewModel.requestLiveLocationSave()
                                         showLocationChoiceDialog = false
+                                        //hvis man ikke har gitt lokasjonstillatelse, så trigges den på nytt når man trykker på knappen
                                     } else {
-                                        permissionRequested = true
                                         locationPermissionState.launchPermissionRequest()
                                     }
                                 },
@@ -270,6 +269,7 @@ fun MapScreen(
 
                             Spacer(modifier = Modifier.height(8.dp))
 
+                            //knapp som lukker dialogboksen slik at brukeren får søke opp adresse
                             OutlinedButton(
                                 onClick = { showLocationChoiceDialog = false },
                                 modifier = Modifier.fillMaxWidth(),
@@ -282,6 +282,7 @@ fun MapScreen(
                 }
             }
 
+            //Dialogboks som lar brukeren bekrefte om de har lyst til å lagre stedet
             if (uiState.showLiveLocationConfirm) {
                 AlertDialog(
                     onDismissRequest = { viewModel.dismissLiveLocationConfirm() },
@@ -295,6 +296,7 @@ fun MapScreen(
                                 containerColor = MaterialTheme.colorScheme.primary,
                                 contentColor = MaterialTheme.colorScheme.onPrimary
                             ),
+                            //når brukern lagrer stedet, blir man navigert til stedet
                             onClick = {
                                 viewModel.confirmSaveLiveLocation(context) { navController.navigate("myPlaces") }
                             }
@@ -305,8 +307,6 @@ fun MapScreen(
                                     strokeWidth = 2.dp,
                                     color = MaterialTheme.colorScheme.primary
                                 )
-
-
                             } else {
                                 Text("Ja")
                             }
@@ -335,7 +335,7 @@ fun MapScreen(
                             ),
                             onClick = {
                                 if (!uiState.isSaving) { // ignorer klikk hvis allerede lagrer
-                                    viewModel.confirmSavePlace { navController.navigate("myPlaces") }
+                                    viewModel.confirmSavePlace { navController.navigate("myPlaces") } //bruker blir navigert til stedet når man har lagra
                                 }
                             }
                         ) {
@@ -361,7 +361,7 @@ fun MapScreen(
             }
         }
 
-        // Info-kort for lagret sted
+        //Info-kort for lagret sted
         uiState.selectedSavedLocation?.let { location ->
             PlaceInfoCard(
                 location = location,

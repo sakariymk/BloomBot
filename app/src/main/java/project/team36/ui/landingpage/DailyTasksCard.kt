@@ -69,6 +69,7 @@ fun DailyTasksCard(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
         ) {
 
+            //hvis det ikke er noen planter som trengs å vannes
             if (!hasAnyPlants) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -82,7 +83,7 @@ fun DailyTasksCard(
                     )
                 }
             } else {
-
+                //går gjennom alle lokasjoner og planter som trengs å vannes
                 plantsByLocation.forEach { (location, plantsWithText) ->
                     if (plantsWithText.isNotEmpty()) {
                         Text(
@@ -99,6 +100,7 @@ fun DailyTasksCard(
                             shape = RoundedCornerShape(16.dp),
                             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                         ) {
+                            //column med alle planter som trengs å vannes
                             Column(modifier = Modifier.padding(8.dp)) {
                                 plantsWithText.forEach { (plant, wateringText) ->
                                     WateringPlantCard(
@@ -117,6 +119,7 @@ fun DailyTasksCard(
     }
 }
 
+//kort for hver plante som må vannes
 @Composable
 fun WateringPlantCard(
     plant: SavedPlant,
@@ -138,6 +141,7 @@ fun WateringPlantCard(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            //bilde av planten
             Image(
                 painter = painterResource(id = imageId),
                 contentDescription = plant.name,
