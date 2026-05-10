@@ -7,7 +7,6 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import project.team36.data.local.LocationRepository
 import project.team36.model.location.SavedLocation
 import project.team36.model.location.SavedPlant
 import project.team36.model.plant.LightType
@@ -17,7 +16,6 @@ import project.team36.model.plant.SoilType
 class PlantRepositoryTest {
 
     private val mockDataSource = mockk<PlantDataSource>(relaxed = true)
-    private val mockLocationRepo = mockk<LocationRepository>(relaxed = true)
     private lateinit var plantRepository: PlantRepository
 
     private fun testPlant(name: String, climateZone: Int) = PlantInfo(
@@ -60,9 +58,9 @@ class PlantRepositoryTest {
     @Before
     fun setup() {
         val plants = listOf(
-            testPlant("Rose", climateZone = 4),    // Anbefalt for sone 4 og lavere (tåler H4)
-            testPlant("Tulipan", climateZone = 6), // Anbefalt for sone 6 og lavere (tåler H6)
-            testPlant("Palme", climateZone = 2)    // Kun anbefalt for sone 2 og lavere – for svak for H4
+            testPlant("Rose", climateZone = 4),
+            testPlant("Tulipan", climateZone = 6),
+            testPlant("Palme", climateZone = 2)
         )
         every { mockDataSource.fetchPlants() } returns plants
         plantRepository = PlantRepository(mockDataSource)
