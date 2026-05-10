@@ -36,6 +36,7 @@ data class LandingPageUiState(
     val showInfoDialog: Boolean = false
 )
 
+//oversetter værsymboler fra Met til vær beskrivelser som vises på værkort
 private fun weatherSymbolToDescription(symbol: String): String {
     return when (symbol) {
         "clearsky", "clearsky_day", "clearsky_night", "clearsky_polartwilight" -> "Klarvær"
@@ -95,7 +96,7 @@ private fun weatherSymbolToDescription(symbol: String): String {
     }
 }
 
-
+//værvarsel som vises på værkort, temperatut og nedbør
 private fun WeatherForecast.toUiState() = WeatherUiState(
     temperature = "${temperature}°C",
     precipitation = "🌧 $precipitation mm",
@@ -117,14 +118,6 @@ class LandingPageViewModel(
         viewModelScope.launch {
             val response = aiRepository.getPlantRecommendations(location)
             _uiState.value = _uiState.value.copy(isAiLoading = false, aiResponse = response)
-        }
-    }
-
-    fun fetchFutureAiAdvice(location: SavedLocation) {
-        _uiState.value = _uiState.value.copy(isFutureAiLoading = true, aiResponse = null)
-        viewModelScope.launch {
-            val response = aiRepository.getFuturePlantRecommendations(location)
-            _uiState.value = _uiState.value.copy(isFutureAiLoading = false, aiResponse = response)
         }
     }
 
