@@ -156,11 +156,6 @@ fun LandingPageScreen(
                         Tab(
                             selected = selectedTabIndex == index,
                             onClick = { selectedTabIndex = index; locationsViewModel.selectLocation(location) },
-                            onClick = {
-                                selectedTabIndex = index; savedPlacesViewModel.selectLocation(
-                                location
-                            )
-                            },
                             modifier = Modifier
                                 .padding(end = 8.dp)
                                 .height(40.dp)
