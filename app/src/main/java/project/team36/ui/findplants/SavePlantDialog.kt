@@ -1,13 +1,16 @@
 package project.team36.ui.findplants
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,13 +29,14 @@ fun SavePlantDialog(
     onConfirm: (SavedLocation) -> Unit,
     onDismiss: () -> Unit
 ) {
-    var selectedLocation by remember() { mutableStateOf<SavedLocation?>(null) } //endret fra rememberSaveable, grunnen til kræsj av app ved testing
+    var selectedLocation by remember { mutableStateOf<SavedLocation?>(null) } //endret fra rememberSaveable, grunnen til kræsj av app ved testing
 
     AlertDialog(
         onDismiss,
-        title = { Text("Hvor vil du lagre ${plant.name}?") },
+        title = { Text("Hvor vil du lagre ${plant.name.replaceFirstChar { it.lowercase() }}?") },
+        containerColor = MaterialTheme.colorScheme.surface,
         text = {
-            Column() {
+            Column {
                 if (savedLocations.isEmpty()) {
                     Text("Du har ingen lagrede hager enda. Legg til en hage på kartet først.")
                 }
@@ -58,12 +62,23 @@ fun SavePlantDialog(
             }
         },
         confirmButton = {
-            TextButton(
+            OutlinedButton(
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+                    disabledContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f)
+                ),
                 onClick = { selectedLocation?.let { onConfirm(it) } },
                 enabled = selectedLocation != null
             ) { Text("Legg til") }
         },
-        dismissButton = { TextButton(onClick = onDismiss) {Text("Avbryt")}
+        dismissButton = {
+            OutlinedButton(
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+                onClick = onDismiss
+            ) {Text("Avbryt")
+            }
         }
     )
 }

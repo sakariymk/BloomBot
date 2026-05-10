@@ -29,7 +29,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -40,7 +39,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import project.team36.R
 import project.team36.ui.theme.Team36Theme
-import project.team36.ui.theme.backgroundLight
 
 //Dialog som vises første gangen appen kjøres, og er tilgjengelig via toppappbar på landingpage senere.
 //Gir en rask introduksjon til appen, og sender bruker til Mine Steder, der hen blir oppfordret til å legge til første hage.
@@ -70,7 +68,7 @@ fun OnboardingDialog(
     Dialog(onDismissRequest = onDismiss) {
         Card(
             shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = backgroundLight)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
@@ -122,7 +120,7 @@ fun OnboardingDialog(
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.onSurface
                     )
 
                     // Beskrivelse
@@ -147,7 +145,7 @@ fun OnboardingDialog(
                                 shape = RoundedCornerShape(12.dp),
                                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                             ) {
-                                Text("Tilbake", color = MaterialTheme.colorScheme.onSurface)
+                                Text("Tilbake", color = MaterialTheme.colorScheme.onBackground)
                             }
                         }
                         Button(
@@ -155,13 +153,13 @@ fun OnboardingDialog(
                             modifier = Modifier.weight(2.5f),
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary
+                                containerColor = if (isLastStep) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary //Color(0xFFB8D9B0)
                             ),
 
                         ) {
                             Text(
                                 text = if (isLastStep) "Kom i gang!" else "Neste",
-                                color = Color.White,
+                                color = if (isLastStep) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondary,
                                 fontWeight = FontWeight.Bold
                             )
                         }

@@ -41,10 +41,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
-import project.team36.ui.map.SavedPlacesViewModel
+import project.team36.ui.map.LocationsViewModel
 import project.team36.ui.navigation.BottomNavBar
 import androidx.compose.material3.*
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -57,15 +58,14 @@ import project.team36.R
 @Composable
 fun LandingPageScreen(
     navController: NavController,
-    savedPlacesViewModel: SavedPlacesViewModel,
+    locationsViewModel: LocationsViewModel,
     landingPageViewModel: LandingPageViewModel,
     myPlantsViewModel: MyPlantsViewModel
 ) {
-    val tabButtonColor = MaterialTheme.colorScheme.primary
 
     val uiState by landingPageViewModel.uiState.collectAsStateWithLifecycle()
-    val savedLocations by savedPlacesViewModel.savedLocations.collectAsStateWithLifecycle()
-    var selectedTabIndex by remember { mutableIntStateOf(0) }
+    val savedLocations by locationsViewModel.savedLocations.collectAsStateWithLifecycle()
+    var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
 
     // for onboarding
     val context = LocalContext.current
@@ -95,8 +95,8 @@ fun LandingPageScreen(
     LaunchedEffect(savedLocations) {
         if (savedLocations.isEmpty()) return@LaunchedEffect
         landingPageViewModel.loadDataForLocations(savedLocations)
-        if (savedPlacesViewModel.selectedLocation.value == null) {
-            savedPlacesViewModel.selectLocation(savedLocations[0])
+        if (locationsViewModel.selectedLocation.value == null) {
+            locationsViewModel.selectLocation(savedLocations[0])
         }
     }
 
@@ -124,7 +124,7 @@ fun LandingPageScreen(
                 windowInsets = WindowInsets(0)
             )
         },
-        bottomBar = { BottomNavBar(navController = navController, savedPlacesViewModel) }
+        bottomBar = { BottomNavBar(navController = navController, locationsViewModel) }
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -155,6 +155,7 @@ fun LandingPageScreen(
                         val isSelected = selectedTabIndex == index
                         Tab(
                             selected = selectedTabIndex == index,
+                            onClick = { selectedTabIndex = index; locationsViewModel.selectLocation(location) },
                             onClick = {
                                 selectedTabIndex = index; savedPlacesViewModel.selectLocation(
                                 location
@@ -164,19 +165,19 @@ fun LandingPageScreen(
                                 .padding(end = 8.dp)
                                 .height(40.dp)
                                 .background(
-                                    color = if (isSelected) tabButtonColor else MaterialTheme.colorScheme.secondary,
+                                    color = if (isSelected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.tertiary,
                                     shape = CircleShape
                                 )
                                 .border(
                                     width = 1.dp,
-                                    color = tabButtonColor,
+                                    color = MaterialTheme.colorScheme.outline,
                                     shape = CircleShape
                                 ),
                             text = {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
                                         text = location.name ?: "Hage",
-                                        color = if (isSelected) MaterialTheme.colorScheme.secondary else tabButtonColor,
+                                        color = if (isSelected) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onTertiary,
                                         style = MaterialTheme.typography.bodyMedium,
                                         fontWeight = FontWeight.Medium
                                     )
@@ -214,7 +215,7 @@ fun LandingPageScreen(
                     }
                     Spacer(modifier = Modifier.height(8.dp))
 
-//                    Text(text = "Værvarsel", style = MaterialTheme.typography.labelLarge)
+                    Text(text = "Værvarsel", style = MaterialTheme.typography.labelLarge)
 
                     WeatherCard(
                         weatherUiState = uiState.locationForecasts[selectedLocation.id],

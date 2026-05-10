@@ -52,29 +52,29 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import project.team36.model.location.SavedLocation
-import project.team36.ui.map.SavedPlacesViewModel
+import project.team36.ui.map.LocationsViewModel
 import project.team36.ui.navigation.BottomNavBar
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MyPlacesScreen (
-    savedPlacesViewModel: SavedPlacesViewModel,
+    locationsViewModel: LocationsViewModel,
     onLocationCardClick: (SavedLocation) -> Unit,
     onAddPlaceClick: () -> Unit,
     navController: NavController,
 
 ) {
-    val savedLocations by savedPlacesViewModel.savedLocations.collectAsState()
-    val showMaxLocationsDialog by savedPlacesViewModel.showMaxLocationsDialog.collectAsState()
+    val savedLocations by locationsViewModel.savedLocations.collectAsState()
+    val showMaxLocationsDialog by locationsViewModel.showMaxLocationsDialog.collectAsState()
 
     if (showMaxLocationsDialog) {
         AlertDialog(
-            onDismissRequest = { savedPlacesViewModel.dismissMaxLocationsDialog() },
+            onDismissRequest = { locationsViewModel.dismissMaxLocationsDialog() },
             containerColor = MaterialTheme.colorScheme.surface,
             title = { Text("Maks antall hager nådd") },
             text = { Text("Du kan maksimum ha 5 lagrede hager. Slett en hage for å legge til en ny.") },
             confirmButton = {
-                TextButton(onClick = { savedPlacesViewModel.dismissMaxLocationsDialog() }) {
+                TextButton(onClick = { locationsViewModel.dismissMaxLocationsDialog() }) {
                     Text("OK")
                 }
             }
@@ -103,7 +103,7 @@ fun MyPlacesScreen (
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = {
-                    if (savedPlacesViewModel.onAddLocationClicked()) {
+                    if (locationsViewModel.onAddLocationClicked()) {
                         onAddPlaceClick()
                     }
                 },
@@ -114,7 +114,7 @@ fun MyPlacesScreen (
                 shape = RoundedCornerShape(50)
             )
         },
-            bottomBar = { BottomNavBar(navController = navController, savedPlacesViewModel)}
+            bottomBar = { BottomNavBar(navController = navController, locationsViewModel)}
 
     ) { innerPadding ->
         Box(
@@ -135,7 +135,7 @@ fun MyPlacesScreen (
                             LocationCard(
                                 location = location,
                                 onClick = {
-                                    savedPlacesViewModel.selectLocation(location)
+                                    locationsViewModel.selectLocation(location)
                                     onLocationCardClick(location)
                                 }
                             )
@@ -159,7 +159,7 @@ fun EmptyLocationCard(
             .fillMaxWidth()
             .border(
                 width = 2.dp,
-                color = MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.outline,
                 shape = RoundedCornerShape(16.dp)
             ),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent)
@@ -238,12 +238,13 @@ fun LocationCard (
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = location.name ?: "Ukjent hage",
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp
                 )
                 Text(
                     text = location.address ?: "Ingen adresse funnet",
-                    color = Color.Gray,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 12.sp
                 )
             }
