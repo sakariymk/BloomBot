@@ -84,7 +84,8 @@ fun LandingPageScreen(
     val locationPermission = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
 
     val plantsByLocation by remember(savedLocations) {
-        myPlantsViewModel.getPlantsNeedingWaterByLocation(savedLocations) }.collectAsStateWithLifecycle(initialValue = emptyMap())
+        myPlantsViewModel.getPlantsNeedingWaterByLocation(savedLocations)
+    }.collectAsStateWithLifecycle(initialValue = emptyMap())
 
     LaunchedEffect(Unit) { locationPermission.launchPermissionRequest() }
 
@@ -149,11 +150,16 @@ fun LandingPageScreen(
                     savedLocations.forEachIndexed { index, location ->
                         val alerts = uiState.locationAlerts[location.id] ?: emptyList()
                         val hasAlert = alerts.isNotEmpty()
-                        val alertColor = alerts.firstOrNull()?.color ?: Color.Red // får å hente ut selve fargen til alerte og display samme farge på weather-kortet
+                        val alertColor = alerts.firstOrNull()?.color
+                            ?: Color.Red // får å hente ut selve fargen til alerte og display samme farge på weather-kortet
                         val isSelected = selectedTabIndex == index
                         Tab(
                             selected = selectedTabIndex == index,
-                            onClick = { selectedTabIndex = index; savedPlacesViewModel.selectLocation(location) },
+                            onClick = {
+                                selectedTabIndex = index; savedPlacesViewModel.selectLocation(
+                                location
+                            )
+                            },
                             modifier = Modifier
                                 .padding(end = 8.dp)
                                 .height(40.dp)
@@ -189,8 +195,10 @@ fun LandingPageScreen(
                     }
                 }
 
-                val selectedLocation = savedLocations.getOrNull(selectedTabIndex) ?: savedLocations[0]
-                val alertsForSelectedLocation: List<WeatherAlert> = uiState.locationAlerts[selectedLocation.id] ?: emptyList()
+                val selectedLocation =
+                    savedLocations.getOrNull(selectedTabIndex) ?: savedLocations[0]
+                val alertsForSelectedLocation: List<WeatherAlert> =
+                    uiState.locationAlerts[selectedLocation.id] ?: emptyList()
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -215,138 +223,177 @@ fun LandingPageScreen(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Button(
-                        onClick = { landingPageViewModel.fetchAiAdvice(selectedLocation) },
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        enabled = !uiState.isAiLoading && !uiState.isFutureAiLoading,
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, disabledContainerColor = Color(0xFF4CAF50), disabledContentColor = Color.White),
-                        shape = RoundedCornerShape(12.dp)
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
                     ) {
-                        if (uiState.isAiLoading) {
-                            CircularProgressIndicator(color = Color.White, modifier = Modifier.size(28.dp), strokeWidth = 2.dp)
-                        } else {
-                            Image(
-                                painter = painterResource(id = R.drawable.lightbulb),
-                                contentDescription = null,
-                                modifier = Modifier.size(30.dp)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Få råd fra Bloombot", fontSize = 12.sp, color = MaterialTheme.colorScheme.onPrimary)
+                        Button(
+                            onClick = { landingPageViewModel.fetchAiAdvice(selectedLocation) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(64.dp),
+                            enabled = !uiState.isAiLoading && !uiState.isFutureAiLoading,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                disabledContainerColor = Color(0xFF4CAF50),
+                                disabledContentColor = Color.White
+                            ),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            if (uiState.isAiLoading) {
+                                CircularProgressIndicator(
+                                    color = Color.White,
+                                    modifier = Modifier.size(28.dp),
+                                    strokeWidth = 2.dp
+                                )
+                            } else {
+                                Image(
+                                    painter = painterResource(id = R.drawable.lightbulb),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(30.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    "Få råd fra Bloombot",
+                                    fontSize = 12.sp,
+                                    color = MaterialTheme.colorScheme.onPrimary
+                                )
+                            }
                         }
                     }
 
-                }
 
-
-                if (uiState.aiResponse != null) {
-                    AlertDialog(
-                        onDismissRequest = { landingPageViewModel.dismissAiAdvice() },
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        title = {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.bloombot_yap),
-                                    contentDescription = "Bloombot",
-                                    modifier = Modifier.size(48.dp),
-                                    contentScale = ContentScale.Fit
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("Bloombot sier:", fontWeight = FontWeight.Bold)
-                            }
-                        },
-                        text = {
-                            Column(
-                                modifier = Modifier.verticalScroll(rememberScrollState()),
-                                verticalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                Column {
-                                    Text("Været:", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-                                    Text(uiState.aiResponse!!.weatherSummary)
+                    if (uiState.aiResponse != null) {
+                        AlertDialog(
+                            onDismissRequest = { landingPageViewModel.dismissAiAdvice() },
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            title = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.bloombot_yap),
+                                        contentDescription = "Bloombot",
+                                        modifier = Modifier.size(48.dp),
+                                        contentScale = ContentScale.Fit
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Bloombot sier:", fontWeight = FontWeight.Bold)
                                 }
-                                if (uiState.aiResponse!!.plantAdvice.isNotEmpty()) {
+                            },
+                            text = {
+                                Column(
+                                    modifier = Modifier.verticalScroll(rememberScrollState()),
+                                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
                                     Column {
-                                        Text("Dine planter:", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-                                        uiState.aiResponse!!.plantAdvice.forEach { advice ->
-                                            Spacer(modifier = Modifier.height(4.dp))
-                                            Text("• ${advice.plantName}", fontWeight = FontWeight.SemiBold)
-                                            Text(advice.advice, modifier = Modifier.padding(start = 12.dp), color = MaterialTheme.colorScheme.onSurface)
+                                        Text(
+                                            "Været:",
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                        Text(uiState.aiResponse!!.weatherSummary)
+                                    }
+                                    if (uiState.aiResponse!!.plantAdvice.isNotEmpty()) {
+                                        Column {
+                                            Text(
+                                                "Dine planter:",
+                                                fontWeight = FontWeight.Bold,
+                                                color = MaterialTheme.colorScheme.onSurface
+                                            )
+                                            uiState.aiResponse!!.plantAdvice.forEach { advice ->
+                                                Spacer(modifier = Modifier.height(4.dp))
+                                                Text(
+                                                    "• ${advice.plantName}",
+                                                    fontWeight = FontWeight.SemiBold
+                                                )
+                                                Text(
+                                                    advice.advice,
+                                                    modifier = Modifier.padding(start = 12.dp),
+                                                    color = MaterialTheme.colorScheme.onSurface
+                                                )
+                                            }
+                                        }
+                                    }
+                                    if (uiState.aiResponse!!.generalTasks.isNotEmpty()) {
+                                        Column {
+                                            Text(
+                                                "Hageoppgaver:",
+                                                fontWeight = FontWeight.Bold,
+                                                color = MaterialTheme.colorScheme.onSurface
+                                            )
+                                            uiState.aiResponse!!.generalTasks.forEach { task ->
+                                                Text(
+                                                    "- $task",
+                                                    modifier = Modifier.padding(start = 4.dp)
+                                                )
+                                            }
                                         }
                                     }
                                 }
-                                if (uiState.aiResponse!!.generalTasks.isNotEmpty()) {
-                                    Column {
-                                        Text("Hageoppgaver:", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-                                        uiState.aiResponse!!.generalTasks.forEach { task ->
-                                            Text("- $task", modifier = Modifier.padding(start = 4.dp))
-                                        }
-                                    }
+                            },
+                            confirmButton = {
+                                TextButton(onClick = { landingPageViewModel.dismissAiAdvice() }) {
+                                    Text("Lukk", color = MaterialTheme.colorScheme.onSurface)
                                 }
                             }
-                        },
-                        confirmButton = {
-                            TextButton(onClick = { landingPageViewModel.dismissAiAdvice() }) {
-                                Text("Lukk", color = MaterialTheme.colorScheme.onSurface)
-                            }
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    DailyTasksCard(
+                        plantsByLocation = plantsByLocation,
+                        onMarkAsWatered = { myPlantsViewModel.markAsWatered(it) },
+                        onNavigateToPlant = { plant ->
+                            navController.navigate("plantDetailsScreen/${plant.name}/view")
                         }
                     )
                 }
+            }
+        }
+    }
 
-                Spacer(modifier = Modifier.height(16.dp))
+        if (uiState.showInfoDialog) {
+            OnboardingDialog(
+                onDismiss = { landingPageViewModel.dismissInfoDialog() },
+                onFinish = {
+                    landingPageViewModel.dismissInfoDialog()
+                    navController.navigate("myPlaces")
+                }
+            )
+        }
+    }
 
-                DailyTasksCard(
-                    plantsByLocation = plantsByLocation,
-                    onMarkAsWatered = { myPlantsViewModel.markAsWatered(it) },
-                    onNavigateToPlant = { plant ->
-                        navController.navigate("plantDetailsScreen/${plant.name}/view")
-                    }
+    @Composable
+    fun LocationAlertBanner(alert: WeatherAlert) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(alert.color.copy(alpha = 0.15f), RoundedCornerShape(12.dp))
+                .border(1.dp, alert.color.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                .padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.Warning,
+                contentDescription = null,
+                tint = alert.color,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(Modifier.width(12.dp))
+            Column(modifier = Modifier.padding(vertical = 6.dp)) {
+                Text(
+                    text = alert.event.uppercase(),
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 13.sp,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    letterSpacing = 0.5.sp
+                )
+                Text(
+                    text = alert.description,
+                    fontSize = 13.sp,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    lineHeight = 18.sp
                 )
             }
         }
     }
-    if (uiState.showInfoDialog) {
-        OnboardingDialog(
-            onDismiss = { landingPageViewModel.dismissInfoDialog() },
-            onFinish = {
-                landingPageViewModel.dismissInfoDialog()
-                navController.navigate("myPlaces")
-            }
-        )
-    }
-}
-
-
-@Composable
-fun LocationAlertBanner(alert: WeatherAlert) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(alert.color.copy(alpha = 0.15f), RoundedCornerShape(12.dp))
-            .border(1.dp, alert.color.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
-            .padding(horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = Icons.Default.Warning,
-            contentDescription = null,
-            tint = alert.color,
-            modifier = Modifier.size(24.dp)
-        )
-        Spacer(Modifier.width(12.dp))
-        Column (modifier = Modifier.padding(vertical = 6.dp)) {
-            Text(
-                text = alert.event.uppercase(),
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 13.sp,
-                color = MaterialTheme.colorScheme.onBackground,
-                letterSpacing = 0.5.sp
-            )
-            Text(
-                text = alert.description,
-                fontSize = 13.sp,
-                color = MaterialTheme.colorScheme.onBackground,
-                lineHeight = 18.sp
-            )
-        }
-    }
-}
