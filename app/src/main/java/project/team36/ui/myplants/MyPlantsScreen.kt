@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import project.team36.ui.map.LocationsViewModel
+import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.plant.PlantCard
 import project.team36.ui.navigation.BottomNavBar
 
@@ -32,11 +32,11 @@ import project.team36.ui.navigation.BottomNavBar
 @Composable
 fun MyPlantsScreen(
     navController: NavController,
-    locationsViewModel: LocationsViewModel,
+    savedPlacesViewModel: SavedPlacesViewModel,
     myPlantsViewModel: MyPlantsViewModel,
 ) {
 
-    val selectedLocation by locationsViewModel.selectedLocation.collectAsStateWithLifecycle()
+    val selectedLocation by savedPlacesViewModel.selectedLocation.collectAsStateWithLifecycle()
 
     //hent planter for valgt sted
     val plants by myPlantsViewModel.plants.collectAsStateWithLifecycle()
@@ -117,7 +117,7 @@ fun MyPlantsScreen(
                                         onClick = {
                                             selectedLocation?.let { myPlantsViewModel.deleteLocation(it) }
                                             navController.navigate("myPlaces")
-                                            locationsViewModel.updateSelectedLocationName("Ingen hage valgt")
+                                            savedPlacesViewModel.updateSelectedLocationName("Ingen hage valgt")
                                             showDeleteDialog = false
                                         }
                                     ) { Text("Slett") }
@@ -156,7 +156,7 @@ fun MyPlantsScreen(
                                             selectedLocation?.let {
                                                 myPlantsViewModel.renameLocation(it, newLocationName)
                                             }
-                                            locationsViewModel.updateSelectedLocationName(newLocationName)
+                                            savedPlacesViewModel.updateSelectedLocationName(newLocationName)
                                             showRenameDialog = false
                                         },
                                         enabled = newLocationName.isNotBlank()
@@ -181,7 +181,7 @@ fun MyPlantsScreen(
             )
         },
 
-        bottomBar = { BottomNavBar(navController = navController, locationsViewModel)},
+        bottomBar = { BottomNavBar(navController = navController, savedPlacesViewModel)},
 
         // Finn ut hvordan sende informasjon om hvor du kommer fra
         floatingActionButton = {

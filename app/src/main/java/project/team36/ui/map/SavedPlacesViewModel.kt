@@ -16,7 +16,7 @@ import project.team36.model.location.SavedLocation
 
 //Flyttet savedPlaces til en egen viewmodel, så flere skjermer har tilgang til lagrede steder
 
-class LocationsViewModel(
+class SavedPlacesViewModel(
     repository: LocationRepository
 ) : ViewModel() {
 
@@ -55,13 +55,13 @@ class LocationsViewModel(
     }
 }
 
-class LocationsViewModelFactory(
+class SavedPlacesViewModelFactory(
     private val repository: LocationRepository
 ) : ViewModelProvider.Factory {
     override fun <T: ViewModel> create (modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(LocationsViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(SavedPlacesViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return LocationsViewModel(repository) as T
+            return SavedPlacesViewModel(repository) as T
         }
         throw IllegalArgumentException("Unknown VievModel class")
     }

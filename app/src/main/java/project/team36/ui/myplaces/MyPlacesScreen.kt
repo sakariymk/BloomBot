@@ -52,29 +52,29 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import project.team36.model.location.SavedLocation
-import project.team36.ui.map.LocationsViewModel
+import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.navigation.BottomNavBar
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MyPlacesScreen (
-    locationsViewModel: LocationsViewModel,
+    savedPlacesViewModel: SavedPlacesViewModel,
     onLocationCardClick: (SavedLocation) -> Unit,
     onAddPlaceClick: () -> Unit,
     navController: NavController,
 
 ) {
-    val savedLocations by locationsViewModel.savedLocations.collectAsState()
-    val showMaxLocationsDialog by locationsViewModel.showMaxLocationsDialog.collectAsState()
+    val savedLocations by savedPlacesViewModel.savedLocations.collectAsState()
+    val showMaxLocationsDialog by savedPlacesViewModel.showMaxLocationsDialog.collectAsState()
 
     if (showMaxLocationsDialog) {
         AlertDialog(
-            onDismissRequest = { locationsViewModel.dismissMaxLocationsDialog() },
+            onDismissRequest = { savedPlacesViewModel.dismissMaxLocationsDialog() },
             containerColor = MaterialTheme.colorScheme.surface,
             title = { Text("Maks antall hager nådd") },
             text = { Text("Du kan maksimum ha 5 lagrede hager. Slett en hage for å legge til en ny.") },
             confirmButton = {
-                TextButton(onClick = { locationsViewModel.dismissMaxLocationsDialog() }) {
+                TextButton(onClick = { savedPlacesViewModel.dismissMaxLocationsDialog() }) {
                     Text("OK")
                 }
             }
@@ -103,7 +103,7 @@ fun MyPlacesScreen (
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = {
-                    if (locationsViewModel.onAddLocationClicked()) {
+                    if (savedPlacesViewModel.onAddLocationClicked()) {
                         onAddPlaceClick()
                     }
                 },
@@ -114,7 +114,7 @@ fun MyPlacesScreen (
                 shape = RoundedCornerShape(50)
             )
         },
-            bottomBar = { BottomNavBar(navController = navController, locationsViewModel)}
+            bottomBar = { BottomNavBar(navController = navController, savedPlacesViewModel)}
 
     ) { innerPadding ->
         Box(
@@ -135,7 +135,7 @@ fun MyPlacesScreen (
                             LocationCard(
                                 location = location,
                                 onClick = {
-                                    locationsViewModel.selectLocation(location)
+                                    savedPlacesViewModel.selectLocation(location)
                                     onLocationCardClick(location)
                                 }
                             )

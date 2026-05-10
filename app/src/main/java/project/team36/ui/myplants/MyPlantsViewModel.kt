@@ -16,7 +16,7 @@ import project.team36.data.klima.frost.FrostRepository
 import project.team36.data.local.LocationRepository
 import project.team36.model.location.SavedLocation
 import project.team36.model.location.SavedPlant
-import project.team36.ui.map.LocationsViewModel
+import project.team36.ui.map.SavedPlacesViewModel
 import java.time.Instant
 import java.time.LocalDate
 import java.util.concurrent.TimeUnit
@@ -25,14 +25,14 @@ import kotlin.collections.filter
 
 class MyPlantsViewModel(
     private val repository: LocationRepository,
-    locationsViewModel: LocationsViewModel,
+    savedPlacesViewModel: SavedPlacesViewModel,
     private val frostRepository: FrostRepository
 ) : ViewModel() {
 
     private val _precipitationPerDay = MutableStateFlow<Map<String, Double>>(emptyMap())
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val plants = locationsViewModel.selectedLocation
+    val plants = savedPlacesViewModel.selectedLocation
         .flatMapLatest { location ->
             repository.getPlantsForLocation(location?.id ?: -1)
         }
@@ -164,13 +164,13 @@ class MyPlantsViewModel(
 
 class MyPlantsViewModelFactory(
     private val repository: LocationRepository,
-    private val locationsViewModel: LocationsViewModel,
+    private val savedPlacesViewModel: SavedPlacesViewModel,
     private val frostRepository: FrostRepository
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MyPlantsViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return MyPlantsViewModel(repository, locationsViewModel, frostRepository) as T
+            return MyPlantsViewModel(repository, savedPlacesViewModel, frostRepository) as T
         }
         throw IllegalArgumentException("Ukjent ViewModel klasse")
     }
