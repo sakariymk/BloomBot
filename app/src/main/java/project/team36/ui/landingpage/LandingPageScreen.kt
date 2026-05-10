@@ -115,7 +115,7 @@ fun LandingPageScreen(
                     IconButton(onClick = { landingPageViewModel.showInfoDialog() }) {
                         Icon(
                             imageVector = Icons.Default.Info,
-                            contentDescription = "Info",
+                            contentDescription = "Guide",
                             tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
@@ -225,14 +225,15 @@ fun LandingPageScreen(
                             onClick = { landingPageViewModel.fetchAiAdvice(selectedLocation) },
                             modifier = Modifier
                                 .fillMaxWidth() //kan endres til wrapContentWidth(), blir ganske fint da
-                                .height(64.dp),
+                                .height(64.dp)
+                                .padding(horizontal = 6.dp, vertical = 6.dp),
                             enabled = !uiState.isAiLoading && !uiState.isFutureAiLoading,
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.primary,
                                 disabledContainerColor = Color(0xFF4CAF50),
                                 disabledContentColor = Color.White
                             ),
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(16.dp)
                         ) {
                             if (uiState.isAiLoading) {
                                 CircularProgressIndicator(
@@ -364,7 +365,7 @@ fun LandingPageScreen(
                 .fillMaxWidth()
                 .background(alert.color.copy(alpha = 0.15f), RoundedCornerShape(12.dp))
                 .border(1.dp, alert.color.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 6.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(

@@ -1,6 +1,7 @@
 package project.team36.ui.landingpage
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,9 +20,11 @@ fun WeatherCard(
     Card(
         modifier = modifier
             .padding(horizontal = 6.dp, vertical = 6.dp)
-            .height(100.dp),
+            .height(100.dp)
+            .fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(16.dp)
     ) {
         when {
             isLoading -> {
@@ -76,18 +79,4 @@ fun WeatherCard(
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun WeatherCardPreview() {
-    WeatherCard(
-        weatherUiState = WeatherUiState(
-            temperature = "12.5°C",
-            precipitation = "🌧 0.0 mm",
-            description = "Delvis skyet",
-            iconName = "partlycloudy_day"
-        ),
-        isLoading = false
-    )
 }
