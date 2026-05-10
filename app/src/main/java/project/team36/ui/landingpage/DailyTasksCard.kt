@@ -1,10 +1,9 @@
 package project.team36.ui.landingpage
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,7 +24,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,11 +41,12 @@ import androidx.compose.ui.unit.sp
 import project.team36.R
 import project.team36.model.location.SavedLocation
 import project.team36.model.location.SavedPlant
+import project.team36.ui.plant.InfoSection
 import kotlin.collections.isNotEmpty
 
 
 @Composable
-fun DailyTasksCard (
+fun DailyTasksCard(
     plantsByLocation: Map<SavedLocation, List<Pair<SavedPlant, String>>>,
     onMarkAsWatered: (SavedPlant) -> Unit,
     onNavigateToPlant: (SavedPlant) -> Unit,
@@ -128,40 +127,38 @@ fun WateringPlantCard(
     var expanded by rememberSaveable { mutableStateOf(false) }
     val imageId = if (plant.imageRes != 0) plant.imageRes else R.drawable.defaultplant
 
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .animateContentSize()
-            .padding(8.dp)
+            .padding(horizontal = 6.dp, vertical = 4.dp)
+            .clickable { expanded = !expanded }
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             Image(
                 painter = painterResource(id = imageId),
                 contentDescription = plant.name,
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(56.dp)
                     .clip(RoundedCornerShape(10.dp)),
                 contentScale = ContentScale.Crop
             )
-
             Spacer(modifier = Modifier.width(12.dp))
-
             Column(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
                     text = plant.name,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 20.sp,
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
-
-            //"må vannes" chip, hardkodet
+            Spacer(modifier = Modifier.width(8.dp))
+            //"må vannes" chip
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
@@ -174,9 +171,7 @@ fun WateringPlantCard(
                     tint = MaterialTheme.colorScheme.onError,
                     modifier = Modifier.size(14.dp)
                 )
-
                 Spacer(modifier = Modifier.width(4.dp))
-
                 Text(
                     text = "Må vannes",
                     fontSize = 13.sp,
@@ -184,86 +179,53 @@ fun WateringPlantCard(
                     color = MaterialTheme.colorScheme.onError
                 )
             }
-
-
         }
-
-        if (expanded) {
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 12.dp),
-                color = MaterialTheme.colorScheme.outline
-            )
-        }
-
         //innhold når kortet er expanded
         AnimatedVisibility(visible = expanded) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding( top = 8.dp, bottom = 8.dp),
+                    .padding(top = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-                ) {
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(
-                            modifier = Modifier.weight(1f),
-                            verticalArrangement = Arrangement.spacedBy(2.dp)
-                        ) {
-                            Text(
-                                text = "Vanningsbehov",
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontSize = 13.sp
-                            )
-                            Text(
-                                text = wateringText,
-                                fontSize = 13.sp,
-                                color = MaterialTheme.colorScheme.onSurface,
-                            )
-                        }
-
-                        Button(
-                            onClick = onMarkAsWatered,
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                            shape = RoundedCornerShape(50)
-                        ) {
-                            Text("Jeg har vannet", color = MaterialTheme.colorScheme.onPrimary, fontSize = 12.sp)
-                        }
-                    }
-                }
-
-                OutlinedButton(
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 12.dp),
+                    color = MaterialTheme.colorScheme.outline
+                )
+                InfoSection(
+                    title = "Vanningsbehov",
+                    subtitle = wateringText,
+                    buttonText = "Jeg har vannet",
+                    buttonColor = MaterialTheme.colorScheme.primary,
+                    onButtonClick = onMarkAsWatered
+                )
+                Button(
                     onClick = onNavigateToPlant,
-                    shape = RoundedCornerShape(50),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
-                    border = BorderStroke(1.dp, color = MaterialTheme.colorScheme.outline)
+                    modifier = Modifier
+                        .align(Alignment.Start)
+                        .padding(start = 14.dp, top = 8.dp),
+                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary)
                 ) {
-                    Text("Gå til plante",color = MaterialTheme.colorScheme.onSecondary, fontSize = 13.sp)
+                    Text(
+                        "Gå til plante",
+                        color = MaterialTheme.colorScheme.onSecondary,
+                        fontSize = 13.sp
+                    )
                 }
             }
         }
 
         //pil for å expande kortet
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
+        IconButton(
+            onClick = { expanded = !expanded },
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .size(24.dp)
         ) {
-            IconButton(onClick = { expanded = !expanded }) {
-                Icon(
-                    imageVector = if (expanded)
-                        Icons.Default.ExpandLess
-                    else
-                        Icons.Default.ExpandMore,
-                    contentDescription = "Utvid"
-                )
-            }
+            Icon(
+                imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                contentDescription = if (expanded) "Lukk" else "Åpne"
+            )
         }
     }
 }
