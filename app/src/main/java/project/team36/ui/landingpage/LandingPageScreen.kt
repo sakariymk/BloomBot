@@ -210,8 +210,6 @@ fun LandingPageScreen(
                     }
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Text(text = "Værvarsel", style = MaterialTheme.typography.labelLarge)
-
                     WeatherCard(
                         weatherUiState = uiState.locationForecasts[selectedLocation.id],
                         isLoading = uiState.isWeatherLoading,
@@ -226,7 +224,7 @@ fun LandingPageScreen(
                         Button(
                             onClick = { landingPageViewModel.fetchAiAdvice(selectedLocation) },
                             modifier = Modifier
-                                .fillMaxWidth()
+                                .fillMaxWidth() //kan endres til wrapContentWidth(), blir ganske fint da
                                 .height(64.dp),
                             enabled = !uiState.isAiLoading && !uiState.isFutureAiLoading,
                             colors = ButtonDefaults.buttonColors(
