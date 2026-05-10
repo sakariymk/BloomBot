@@ -40,28 +40,57 @@ private fun weatherSymbolToDescription(symbol: String): String {
     return when (symbol) {
         "clearsky", "clearsky_day", "clearsky_night", "clearsky_polartwilight" -> "Klarvær"
         "fair", "fair_day", "fair_night", "fair_polartwilight" -> "Lettskyet"
-        "partlycloudy", "partlycloudy_day", "partlycloudy_night" -> "Delvis skyet"
+        "partlycloudy", "partlycloudy_day", "partlycloudy_night", "partlycloudy_polartwilight" -> "Delvis skyet"
         "cloudy" -> "Overskyet"
         "fog" -> "Tåke"
+
         "rain" -> "Regn"
-        "heavyrain" -> "Kraftig regn"
+        "rainandthunder" -> "Regn og torden"
+        "rainshowers_day", "rainshowers_night", "rainshowers_polartwilight" -> "Regnbyger"
+        "rainshowersandthunder_day", "rainshowersandthunder_night", "rainshowersandthunder_polartwilight" -> "Regnbyger med torden"
+
         "lightrain" -> "Lett regn"
-        "snow" -> "Snø"
-        "sleet", "heavysleet" -> "Sludd"
-        "thunder" -> "Torden"
+        "lightrainandthunder" -> "Lett regn og torden"
+        "lightrainshowers_day", "lightrainshowers_night", "lightrainshowers_polartwilight" -> "Lette regnbyger"
+        "lightrainshowersandthunder_day", "lightrainshowersandthunder_night", "lightrainshowersandthunder_polartwilight" -> "Lette regnbyger med torden"
+
+        "heavyrain" -> "Kraftig regn"
         "heavyrainandthunder" -> "Kraftig regn og torden"
+        "heavyrainshowers", "heavyrainshowers_day", "heavyrainshowers_night", "heavyrainshowers_polartwilight" -> "Kraftige regnbyger"
+        "heavyrainshowersandthunder_day", "heavyrainshowersandthunder_night", "heavyrainshowersandthunder_polartwilight" -> "Kraftige regnbyger med torden"
 
-        "sleetshowers_day" -> "Sluddbyger"
+        "sleet" -> "Sludd"
+        "sleetandthunder" -> "Sludd og torden"
+        "sleetshowers_day", "sleetshowers_night", "sleetshowers_polartwilight" -> "Sluddbyger"
+        "sleetshowersandthunder_day", "sleetshowersandthunder_night", "sleetshowersandthunder_polartwilight" -> "Sluddbyger med torden"
 
-        "heavyrainshowers_day",
-        "heavyrainshowers",
-        "heavyrainshowers_night",
-        "heavyrainshowers_polartwilight" -> "Kraftige regnbyger"
+        "lightsleet" -> "Lett sludd"
+        "lightsleetandthunder" -> "Lett sludd og torden"
+        "lightsleetshowers_day", "lightsleetshowers_night", "lightsleetshowers_polartwilight" -> "Lette sluddbyger"
+        "lightssleetshowersandthunder_day", "lightssleetshowersandthunder_night", "lightssleetshowersandthunder_polartwilight" -> "Lette sluddbyger med torden"
 
-        "heavysleetandthunder",
-        "heavyrainshowersandthunder_night",
-        "heavyrainshowersandthunder_day",
-        "heavyrainshowersandthunder_polartwilight" -> "Tordenbyger"
+        "heavysleet" -> "Kraftig sludd"
+        "heavysleetandthunder" -> "Kraftig sludd og torden"
+        "heavysleetshowers_day", "heavysleetshowers_night", "heavysleetshowers_polartwilight" -> "Kraftige sluddbyger"
+        "heavysleetshowersandthunder_day", "heavysleetshowersandthunder_night", "heavysleetshowersandthunder_polartwilight" -> "Kraftige sluddbyger med torden"
+
+        "snow" -> "Snø"
+        "snowandthunder" -> "Snø og torden"
+        "snowshowers_day", "snowshowers_night", "snowshowers_polartwilight" -> "Snøbyger"
+        "snowshowersandthunder_day", "snowshowersandthunder_night", "snowshowersandthunder_polartwilight" -> "Snøbyger med torden"
+
+        "lightsnow" -> "Lett snø"
+        "lightsnowandthunder" -> "Lett snø og torden"
+        "lightsnowshowers_day", "lightsnowshowers_night", "lightsnowshowers_polartwilight" -> "Lette snøbyger"
+        "lightssnowshowersandthunder_day", "lightssnowshowersandthunder_night", "lightssnowshowersandthunder_polartwilight" -> "Lette snøbyger med torden"
+
+        "heavysnow" -> "Kraftig snø"
+        "heavysnowandthunder" -> "Kraftig snø og torden"
+        "heavysnowshowers_day", "heavysnowshowers_night", "heavysnowshowers_polartwilight" -> "Kraftige snøbyger"
+        "heavysnowshowersandthunder_day", "heavysnowshowersandthunder_night", "heavysnowshowersandthunder_polartwilight" -> "Kraftige snøbyger med torden"
+
+        "thunder" -> "Torden"
+
         else -> symbol
     }
 }

@@ -1,7 +1,5 @@
 package project.team36.data.plant
 
-import kotlinx.coroutines.flow.first
-import project.team36.data.local.LocationRepository
 import project.team36.model.location.SavedLocation
 import project.team36.model.location.SavedPlant
 import project.team36.model.plant.PlantInfo
@@ -20,10 +18,7 @@ class PlantRepository(
 
 
     fun recommendPlants(location: SavedLocation, savedPlants: List<SavedPlant>): List<PlantInfo> {
-        if (cachedPlants.isEmpty()) {
-            cachedPlants = plantDataSource.fetchPlants()
-        }
-
+        if (cachedPlants.isEmpty()) cachedPlants = plantDataSource.fetchPlants()
         val savedPlantNames = savedPlants.map { it.name }.toSet()
 
         return cachedPlants.filter {
@@ -32,9 +27,7 @@ class PlantRepository(
     }
 
     fun notRecommendedPlants(location: SavedLocation, savedPlants: List<SavedPlant>): List<PlantInfo> {
-        if (cachedPlants.isEmpty()) {
-            cachedPlants = plantDataSource.fetchPlants()
-        }
+        if (cachedPlants.isEmpty()) cachedPlants = plantDataSource.fetchPlants()
         val savedPlantNames = savedPlants.map { it.name }.toSet()
 
         return cachedPlants.filter {
