@@ -29,14 +29,14 @@ fun SavePlantDialog(
     onConfirm: (SavedLocation) -> Unit,
     onDismiss: () -> Unit
 ) {
-    var selectedLocation by remember() { mutableStateOf<SavedLocation?>(null) } //endret fra rememberSaveable, grunnen til kræsj av app ved testing
+    var selectedLocation by remember { mutableStateOf<SavedLocation?>(null) } //endret fra rememberSaveable, grunnen til kræsj av app ved testing
 
     AlertDialog(
         onDismiss,
         title = { Text("Hvor vil du lagre ${plant.name.replaceFirstChar { it.lowercase() }}?") },
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
-            Column() {
+            Column {
                 if (savedLocations.isEmpty()) {
                     Text("Du har ingen lagrede hager enda. Legg til en hage på kartet først.")
                 }

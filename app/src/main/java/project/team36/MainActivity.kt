@@ -35,8 +35,8 @@ import project.team36.ui.findplants.FindPlantsViewModelFactory
 import project.team36.ui.landingpage.LandingPageViewModel
 import project.team36.ui.landingpage.LandingPageViewModelFactory
 import project.team36.ui.map.MapViewModelFactory
-import project.team36.ui.map.SavedPlacesViewModel
-import project.team36.ui.map.SavedPlacesViewModelFactory
+import project.team36.ui.map.LocationsViewModel
+import project.team36.ui.map.LocationsViewModelFactory
 import project.team36.ui.myplants.MyPlantsViewModel
 import project.team36.ui.plant.PlantDetailsViewModel
 import project.team36.ui.plant.PlantDetailsViewModelFactory
@@ -139,8 +139,8 @@ class MainActivity : ComponentActivity() {
                 val landingPageViewModel: LandingPageViewModel = viewModel(
                     factory = LandingPageViewModelFactory(metWeatherRepository, hybridAiRepository)
                 )
-                val savedPlacesViewModel: SavedPlacesViewModel = viewModel(
-                    factory = SavedPlacesViewModelFactory(locationRepository)
+                val locationsViewModel: LocationsViewModel = viewModel(
+                    factory = LocationsViewModelFactory(locationRepository)
                 )
                 val findPlantsViewModel: FindPlantsViewModel = viewModel(
                     factory = FindPlantsViewModelFactory(
@@ -151,7 +151,7 @@ class MainActivity : ComponentActivity() {
                 val myPlantsViewModel: MyPlantsViewModel = viewModel(
                     factory = MyPlantsViewModelFactory(
                         locationRepository,
-                        savedPlacesViewModel,
+                        locationsViewModel,
                         frostRepository
                     )
                 )
@@ -167,7 +167,7 @@ class MainActivity : ComponentActivity() {
                     mapViewModelFactory = mapViewModelFactory,
                     findPlantsViewModel = findPlantsViewModel,
                     myPlantsViewModel = myPlantsViewModel,
-                    savedPlacesViewModel = savedPlacesViewModel,
+                    locationsViewModel = locationsViewModel,
                     plantDetailsViewModel = plantDetailsViewModel,
                     landingPageViewModel = landingPageViewModel
                 )
