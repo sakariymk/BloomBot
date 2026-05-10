@@ -49,7 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import project.team36.ui.map.SavedPlacesViewModel
+import project.team36.ui.map.LocationsViewModel
 import project.team36.ui.plant.SimplePlantCard
 import project.team36.ui.navigation.BottomNavBar
 
@@ -58,17 +58,18 @@ import project.team36.ui.navigation.BottomNavBar
 fun FindPlantsScreen(
     findPlantsViewModel: FindPlantsViewModel,
     navController: NavController,
-    savedPlacesViewModel: SavedPlacesViewModel,
+    locationsViewModel: LocationsViewModel,
     locationName: String
 ) {
 
     val plants by findPlantsViewModel.plants.collectAsState()
     val notRecommendedPlants by findPlantsViewModel.notRecommendedPlants.collectAsState()
     val pendingPlant by findPlantsViewModel.pendingPlant.collectAsState()
-    val savedLocations by savedPlacesViewModel.savedLocations.collectAsState()
-    val selectedLocation by savedPlacesViewModel.selectedLocation.collectAsState()
-    val showSwitchLocationDialog = rememberSaveable { mutableStateOf(false) }
-    var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
+    val savedLocations by locationsViewModel.savedLocations.collectAsState()
+    val selectedLocation by locationsViewModel.selectedLocation.collectAsState()
+    val showSwitchLocationDialog = remember { mutableStateOf(false) }
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
+
     val tabs = listOf("Anbefalte planter", "Andre planter")
 
     //Laster inn anbefalte planter, eller tømmer view om det ikke er noen steder lagret eller ingen hage valgt
@@ -99,7 +100,7 @@ fun FindPlantsScreen(
                 windowInsets = WindowInsets(0) //gjør at appen ikke legger til mye mellomrom på toppen av skjermen
             )
         },
-        bottomBar = { BottomNavBar(navController = navController, savedPlacesViewModel) }
+        bottomBar = { BottomNavBar(navController = navController, locationsViewModel) }
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -242,7 +243,7 @@ fun FindPlantsScreen(
             savedLocations = savedLocations,
             currentLocationName = locationName,
             onConfirm = { location ->
-                savedPlacesViewModel.selectLocation(location)
+                locationsViewModel.selectLocation(location)
                 navController.navigate("findPlants/${location.name}")
             },
             onDismiss = { showSwitchLocationDialog.value = false },

@@ -8,7 +8,7 @@ import project.team36.data.local.LocationRepository
 import project.team36.model.location.SavedPlant
 import project.team36.model.plant.LightType
 import project.team36.model.plant.SoilType
-import project.team36.ui.map.SavedPlacesViewModel
+import project.team36.ui.map.LocationsViewModel
 import project.team36.ui.myplants.MyPlantsViewModel
 import io.mockk.every
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,13 +22,13 @@ import java.util.concurrent.TimeUnit
 class MyPlantsViewModelTest {
 
     val fakeLocationRepo : LocationRepository = mockk<LocationRepository>(relaxed = true)
-    val fakeSavedPlacesViewModel = mockk<SavedPlacesViewModel>(relaxed = true)
+    val fakeLocationsViewModel = mockk<LocationsViewModel>(relaxed = true)
     val fakeFrostRepo : FrostRepository = mockk<FrostRepository>(relaxed = true)
 
     @Test
     fun testDaysUntilWatering () {
 
-        val viewModel = MyPlantsViewModel(fakeLocationRepo, fakeSavedPlacesViewModel,fakeFrostRepo)
+        val viewModel = MyPlantsViewModel(fakeLocationRepo, fakeLocationsViewModel,fakeFrostRepo)
 
         val now = System.currentTimeMillis()
         val daysAgo = 2L
@@ -49,10 +49,10 @@ class MyPlantsViewModelTest {
         val plant = opprettTestPlante()
 
         // every-lambdaene sørger for at man ikke får feil i kall til LocationRepository
-        every { fakeSavedPlacesViewModel.selectedLocation } returns MutableStateFlow(null) // returnerer alltid null
+        every { fakeLocationsViewModel.selectedLocation } returns MutableStateFlow(null) // returnerer alltid null
         every { fakeLocationRepo.getPlantsForLocation(any()) } returns flowOf(listOf(plant)) //mocker at SavedPlants-objektet ligger i databasen for en hvilken som helst locationId
 
-        val myPlantsViewModel = MyPlantsViewModel(fakeLocationRepo, fakeSavedPlacesViewModel, fakeFrostRepo)
+        val myPlantsViewModel = MyPlantsViewModel(fakeLocationRepo, fakeLocationsViewModel, fakeFrostRepo)
 
         myPlantsViewModel.plants.filter { it.isNotEmpty() }.first() //venter til testplanten er lastet inn i viewmodel
         myPlantsViewModel.removePlantByName("Pelargonia")

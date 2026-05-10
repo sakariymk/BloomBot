@@ -14,14 +14,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import project.team36.R
-import project.team36.ui.map.SavedPlacesViewModel
+import project.team36.ui.map.LocationsViewModel
 
 @Composable
-fun BottomNavBar(navController: NavController, savedPlacesViewModel : SavedPlacesViewModel) {
+fun BottomNavBar(navController: NavController, locationsViewModel : LocationsViewModel) {
     val currentRoute by navController.currentBackStackEntryAsState()
     val activeRoute = currentRoute?.destination?.route
 
-    val selectedLocation by savedPlacesViewModel.selectedLocation.collectAsState()
+    val selectedLocation by locationsViewModel.selectedLocation.collectAsState()
     val locationName = selectedLocation?.name ?: ""
 
 
