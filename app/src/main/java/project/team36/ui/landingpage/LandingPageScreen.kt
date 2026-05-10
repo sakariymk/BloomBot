@@ -151,7 +151,7 @@ fun LandingPageScreen(
                         val alerts = uiState.locationAlerts[location.id] ?: emptyList()
                         val hasAlert = alerts.isNotEmpty()
                         val alertColor = alerts.firstOrNull()?.color
-                            ?: Color.Red // får å hente ut selve fargen til alerte og display samme farge på weather-kortet
+                            ?: Color.Red
                         val isSelected = selectedTabIndex == index
                         Tab(
                             selected = selectedTabIndex == index,
