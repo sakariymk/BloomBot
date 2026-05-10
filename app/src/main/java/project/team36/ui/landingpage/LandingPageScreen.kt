@@ -46,6 +46,8 @@ import project.team36.ui.navigation.BottomNavBar
 import androidx.compose.material3.*
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -226,15 +228,24 @@ fun LandingPageScreen(
                         Button(
                             onClick = { landingPageViewModel.fetchAiAdvice(selectedLocation) },
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .height(64.dp),
+                                .fillMaxWidth(0.75f)
+                                .height(52.dp)
+                                .background(
+                                    brush = Brush.horizontalGradient(
+                                        colors = listOf(
+                                            Color(0xFF89CFF0),
+                                            Color(0xFFB57BEE),
+                                            Color(0xFFFF85C2)
+                                        )
+                                    ),
+                                    shape = CircleShape
+                                ),
                             enabled = !uiState.isAiLoading && !uiState.isFutureAiLoading,
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary,
-                                disabledContainerColor = Color(0xFF4CAF50),
-                                disabledContentColor = Color.White
+                                containerColor = Color.Transparent,
+                                disabledContainerColor = Color.Transparent,
                             ),
-                            shape = RoundedCornerShape(12.dp)
+                            shape = CircleShape
                         ) {
                             if (uiState.isAiLoading) {
                                 CircularProgressIndicator(
@@ -246,7 +257,8 @@ fun LandingPageScreen(
                                 Image(
                                     painter = painterResource(id = R.drawable.lightbulb),
                                     contentDescription = null,
-                                    modifier = Modifier.size(30.dp)
+                                    modifier = Modifier.size(30.dp),
+                                    colorFilter = ColorFilter.tint(Color.White)
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
