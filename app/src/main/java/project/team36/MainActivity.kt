@@ -131,6 +131,8 @@ class MainActivity : ComponentActivity() {
                             message = "Ingen internettforbindelse",
                             duration = SnackbarDuration.Indefinite
                         )
+                    } else {
+                        snackbarHostState.currentSnackbarData?.dismiss()
                     }
                 }
 
