@@ -71,11 +71,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 fun MapScreen(
     modifier: Modifier = Modifier,
     viewModel: MapViewModel = viewModel(),
-    locationsViewModel: LocationsViewModel,
+    savedPlacesViewModel: SavedPlacesViewModel,
     navController: NavController,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val savedLocations by locationsViewModel.savedLocations.collectAsStateWithLifecycle()
+    val savedLocations by savedPlacesViewModel.savedLocations.collectAsStateWithLifecycle()
     val mapViewportState = viewModel.mapViewportState
     val context = LocalContext.current
 
@@ -122,7 +122,7 @@ fun MapScreen(
             )
         },
         bottomBar = {
-            BottomNavBar(navController = navController, locationsViewModel)
+            BottomNavBar(navController = navController, savedPlacesViewModel)
         }
     ) { innerPadding ->
         Box(modifier = modifier

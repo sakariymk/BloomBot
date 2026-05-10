@@ -40,7 +40,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
-import project.team36.ui.map.LocationsViewModel
+import project.team36.ui.map.SavedPlacesViewModel
 import project.team36.ui.navigation.BottomNavBar
 import androidx.compose.material3.*
 import androidx.compose.material.icons.filled.Info
@@ -54,16 +54,15 @@ import project.team36.data.mcp.WeatherAlert
 @Composable
 fun LandingPageScreen(
     navController: NavController,
-    locationsViewModel: LocationsViewModel,
+    savedPlacesViewModel: SavedPlacesViewModel,
     landingPageViewModel: LandingPageViewModel,
     myPlantsViewModel: MyPlantsViewModel
 ) {
     val tabButtonColor = MaterialTheme.colorScheme.primary
 
     val uiState by landingPageViewModel.uiState.collectAsStateWithLifecycle()
-    val savedLocations by locationsViewModel.savedLocations.collectAsStateWithLifecycle()
-    var selectedTabIndex by remember { mutableIntStateOf(0) }
-
+    val savedLocations by savedPlacesViewModel.savedLocations.collectAsStateWithLifecycle()
+    var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
 
     // for onboarding
     val context = LocalContext.current
@@ -92,8 +91,8 @@ fun LandingPageScreen(
     LaunchedEffect(savedLocations) {
         if (savedLocations.isEmpty()) return@LaunchedEffect
         landingPageViewModel.loadDataForLocations(savedLocations)
-        if (locationsViewModel.selectedLocation.value == null) {
-            locationsViewModel.selectLocation(savedLocations[0])
+        if (savedPlacesViewModel.selectedLocation.value == null) {
+            savedPlacesViewModel.selectLocation(savedLocations[0])
         }
     }
 
@@ -121,7 +120,7 @@ fun LandingPageScreen(
                 windowInsets = WindowInsets(0) //gjør at appen ikke legger til mye mellomrom på toppen av skjermen
             )
         },
-        bottomBar = { BottomNavBar(navController = navController, locationsViewModel) }
+        bottomBar = { BottomNavBar(navController = navController, savedPlacesViewModel) }
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -151,7 +150,7 @@ fun LandingPageScreen(
                         val isSelected = selectedTabIndex == index
                         Tab(
                             selected = selectedTabIndex == index,
-                            onClick = { selectedTabIndex = index; locationsViewModel.selectLocation(location) },
+                            onClick = { selectedTabIndex = index; savedPlacesViewModel.selectLocation(location) },
                             modifier = Modifier
                                 .padding(end = 8.dp)
                                 .height(40.dp)
