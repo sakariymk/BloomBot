@@ -11,7 +11,7 @@ import project.team36.ui.findplants.FindPlantsScreen
 import project.team36.ui.findplants.FindPlantsViewModel
 import project.team36.ui.map.MapScreen
 import project.team36.ui.map.MapViewModel
-import project.team36.ui.map.SavedPlacesViewModel
+import project.team36.ui.map.LocationsViewModel
 import project.team36.ui.myplants.MyPlantsScreen
 import project.team36.ui.myplants.MyPlantsViewModel
 import project.team36.ui.plant.PlantDetailsScreen
@@ -38,7 +38,7 @@ fun AppNavHost(
     mapViewModelFactory: MapViewModelFactory,
     findPlantsViewModel: FindPlantsViewModel,
     myPlantsViewModel: MyPlantsViewModel,
-    savedPlacesViewModel: SavedPlacesViewModel,
+    locationsViewModel: LocationsViewModel,
     plantDetailsViewModel: PlantDetailsViewModel,
     landingPageViewModel: LandingPageViewModel,
 ) {
@@ -66,13 +66,13 @@ fun AppNavHost(
                     modifier = modifier,
                     viewModel = mapViewModel,
                     navController = navController,
-                    savedPlacesViewModel = savedPlacesViewModel
+                    locationsViewModel = locationsViewModel
                 )
             }
             composable ("myPlants"){
                 MyPlantsScreen(
                     navController = navController,
-                    savedPlacesViewModel = savedPlacesViewModel,
+                    locationsViewModel = locationsViewModel,
                     myPlantsViewModel = myPlantsViewModel,
                 )
             }
@@ -81,14 +81,14 @@ fun AppNavHost(
                 FindPlantsScreen(
                     findPlantsViewModel = findPlantsViewModel,
                     navController = navController,
-                    savedPlacesViewModel = savedPlacesViewModel,
+                    locationsViewModel = locationsViewModel,
                     locationName = locationName
                 )
             }
             composable("landingpage") {
                 LandingPageScreen(
                     navController = navController,
-                    savedPlacesViewModel = savedPlacesViewModel,
+                    locationsViewModel = locationsViewModel,
                     landingPageViewModel = landingPageViewModel,
                     myPlantsViewModel = myPlantsViewModel
                 )
@@ -96,7 +96,7 @@ fun AppNavHost(
             composable ("plantDetailsScreen/{plantName}/{action}") { backStackEntry ->
                 val plantName = backStackEntry.arguments?.getString("plantName") ?: return@composable
                 val action = backStackEntry.arguments?.getString("action") ?: ""
-                val savedLocations = savedPlacesViewModel.savedLocations.collectAsState()
+                val savedLocations = locationsViewModel.savedLocations.collectAsState()
                 val pendingPlant = findPlantsViewModel.pendingPlant.collectAsState()
 
                 LaunchedEffect(plantName) {
@@ -125,7 +125,7 @@ fun AppNavHost(
                         savedLocations = savedLocations.value,
                         onConfirm = { location ->
                             findPlantsViewModel.confirmAddPlant(plant, location)
-                            savedPlacesViewModel.selectLocation(location)
+                            locationsViewModel.selectLocation(location)
                             navController.navigate("myPlants")
                         },
                         onDismiss = { findPlantsViewModel.dismissAddPlant() }
@@ -135,7 +135,7 @@ fun AppNavHost(
             composable("myPlaces") {
                 MyPlacesScreen(
                     navController = navController,
-                    savedPlacesViewModel = savedPlacesViewModel,
+                    locationsViewModel = locationsViewModel,
                     onLocationCardClick = { navController.navigate("myPlants") },
                     onAddPlaceClick = { navController.navigate("map") },
                 )
