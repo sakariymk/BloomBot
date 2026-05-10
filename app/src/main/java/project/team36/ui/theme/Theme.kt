@@ -1,6 +1,7 @@
 package project.team36.ui.theme
 
 import android.os.Build
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -16,12 +17,15 @@ private val DarkColorScheme = darkColorScheme(
     onPrimary = onPrimaryDark,
     secondary = secondaryDark,
     onSecondary = onSecondaryDark,
+    tertiary = tertiaryDark,
+    onTertiary = onTertiaryDark,
     error = errorDark,
     onError = onErrorDark,
     background = backgroundDark,
     onBackground = onBackgroundDark,
     surface = surfaceDark,
     onSurface = onSurfaceDark,
+    surfaceVariant = surfaceVariantDark,
     outline = outlineDark,
     primaryContainer = primaryContainerDark,
     onPrimaryContainer = onPrimaryContainerDark
@@ -32,12 +36,15 @@ private val LightColorScheme = lightColorScheme(
     onPrimary = onPrimaryLight,
     secondary = secondaryLight,
     onSecondary = onSecondaryLight,
+    tertiary = tertiaryLight,
+    onTertiary = onTertiaryLight,
     error = errorLight,
     onError = onErrorLight,
     background = backgroundLight,
     onBackground = onBackgroundLight,
     surface = surfaceLight,
     onSurface = onSurfaceLight,
+    surfaceVariant = surfaceVariantLight,
     outline = outlineLight,
     primaryContainer = primaryContainerLight,
     onPrimaryContainer = onPrimaryContainerLight
@@ -45,8 +52,7 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun Team36Theme(
-    darkTheme: Boolean = false,
-    // Dynamic color is available on Android 12+
+    darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {

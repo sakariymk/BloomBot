@@ -2,7 +2,6 @@ package project.team36.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -16,7 +15,6 @@ import project.team36.ui.myplants.MyPlantsScreen
 import project.team36.ui.myplants.MyPlantsViewModel
 import project.team36.ui.plant.PlantDetailsScreen
 import project.team36.ui.plant.PlantDetailsViewModel
-import project.team36.ui.findplants.SavePlantDialog
 import project.team36.ui.myplaces.MyPlacesScreen
 import project.team36.ui.landingpage.LandingPageScreen
 import project.team36.ui.landingpage.LandingPageViewModel
@@ -26,8 +24,10 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Snackbar
 import androidx.compose.foundation.layout.height
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import project.team36.ui.findplants.SavePlantDialog
 import project.team36.ui.map.MapViewModelFactory
 
 @Composable
@@ -118,7 +118,6 @@ fun AppNavHost(
                         { myPlantsViewModel.removePlantByName(plantName) }
                     } else null
                 )
-
                 pendingPlant.value?.let { plant ->
                     SavePlantDialog(
                         plant = plant,
@@ -131,6 +130,7 @@ fun AppNavHost(
                         onDismiss = { findPlantsViewModel.dismissAddPlant() }
                     )
                 }
+
             }
             composable("myPlaces") {
                 MyPlacesScreen(

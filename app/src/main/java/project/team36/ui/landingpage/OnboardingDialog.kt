@@ -70,7 +70,7 @@ fun OnboardingDialog(
     Dialog(onDismissRequest = onDismiss) {
         Card(
             shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = backgroundLight)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
@@ -122,7 +122,7 @@ fun OnboardingDialog(
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.onSurface
                     )
 
                     // Beskrivelse
@@ -147,7 +147,7 @@ fun OnboardingDialog(
                                 shape = RoundedCornerShape(12.dp),
                                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                             ) {
-                                Text("Tilbake", color = MaterialTheme.colorScheme.onSurface)
+                                Text("Tilbake", color = MaterialTheme.colorScheme.onBackground)
                             }
                         }
                         Button(
@@ -155,13 +155,13 @@ fun OnboardingDialog(
                             modifier = Modifier.weight(2.5f),
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary
+                                containerColor = if (isLastStep) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary //Color(0xFFB8D9B0)
                             ),
 
                         ) {
                             Text(
                                 text = if (isLastStep) "Kom i gang!" else "Neste",
-                                color = Color.White,
+                                color = if (isLastStep) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondary,
                                 fontWeight = FontWeight.Bold
                             )
                         }

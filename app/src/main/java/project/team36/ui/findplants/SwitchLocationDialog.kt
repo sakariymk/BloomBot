@@ -75,7 +75,9 @@ fun SwitchLocationDialog (
                 OutlinedButton(
                     colors = ButtonDefaults.outlinedButtonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                        disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+                        disabledContentColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f)
                     ),
                     onClick = { selectedLocation?.let { onConfirm(it) } },
                     enabled = selectedLocation != null

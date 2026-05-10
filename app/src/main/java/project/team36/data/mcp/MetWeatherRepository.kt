@@ -3,6 +3,9 @@ package project.team36.data.mcp
 import android.util.Log
 import androidx.compose.ui.graphics.Color
 import org.json.JSONObject
+import project.team36.ui.theme.AlertOrange
+import project.team36.ui.theme.AlertRed
+import project.team36.ui.theme.AlertYellow
 
 data class WeatherForecast(
     val temperature: Double,
@@ -123,9 +126,9 @@ data class WeatherAlert(
 ) {
     val color: Color
         get() = when {
-            awarenessLevel.contains("Red", ignoreCase = true) -> Color(0xFFFF5252)
-            awarenessLevel.contains("Orange", ignoreCase = true) -> Color(0xFFFFAB40)
-            else -> Color(0xFFFFD740) // Gul
+            awarenessLevel.contains("Red", ignoreCase = true) -> AlertRed
+            awarenessLevel.contains("Orange", ignoreCase = true) -> AlertOrange
+            else -> AlertYellow // Gul
         }
 
     // Sjekker om varselet er kritisk for planter (vet ikke om vi trenger det, men kan høre med team)

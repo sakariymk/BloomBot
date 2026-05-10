@@ -44,6 +44,7 @@ import project.team36.ui.map.LocationsViewModel
 import project.team36.ui.navigation.BottomNavBar
 import androidx.compose.material3.*
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.edit
 import project.team36.ui.myplants.MyPlantsViewModel
@@ -62,6 +63,7 @@ fun LandingPageScreen(
     val uiState by landingPageViewModel.uiState.collectAsStateWithLifecycle()
     val savedLocations by locationsViewModel.savedLocations.collectAsStateWithLifecycle()
     var selectedTabIndex by remember { mutableIntStateOf(0) }
+
 
     // for onboarding
     val context = LocalContext.current
@@ -154,19 +156,19 @@ fun LandingPageScreen(
                                 .padding(end = 8.dp)
                                 .height(40.dp)
                                 .background(
-                                    color = if (isSelected) tabButtonColor else MaterialTheme.colorScheme.secondary,
+                                    color = if (isSelected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.tertiary,
                                     shape = CircleShape
                                 )
                                 .border(
                                     width = 1.dp,
-                                    color = tabButtonColor,
+                                    color = MaterialTheme.colorScheme.outline,
                                     shape = CircleShape
                                 ),
                             text = {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
                                         text = location.name ?: "Hage",
-                                        color = if (isSelected) MaterialTheme.colorScheme.secondary else tabButtonColor,
+                                        color = if (isSelected) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onTertiary,
                                         style = MaterialTheme.typography.bodyMedium,
                                         fontWeight = FontWeight.Medium
                                     )
