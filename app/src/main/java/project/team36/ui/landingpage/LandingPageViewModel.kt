@@ -12,7 +12,7 @@ import project.team36.data.mcp.WeatherAlert
 import project.team36.data.mcp.WeatherForecast
 import project.team36.model.location.SavedLocation
 import kotlin.jvm.java
-import project.team36.data.ai.HybridAiRepository
+import project.team36.data.mcp.HybridAiRepository
 import project.team36.model.ai.AiRecommendationResponse
 
 
@@ -156,10 +156,12 @@ class LandingPageViewModel(
                 alertsMap[location.id] = relevantAlerts
 
                 // Hent værvarsel
-                val forecast = runCatching {
-                    weatherRepository.getParsedForecast(lat, lon)
+                val rawForecast = runCatching {
+                    weatherRepository.getForecast(lat, lon)
                 }.getOrNull()
-                forecastsMap[location.id] = forecast?.toUiState()
+                forecastsMap[location.id] = rawForecast
+                    ?.let { weatherRepository.getParsedForecast(it) }
+                    ?.toUiState()
             }
 
             _uiState.value = _uiState.value.copy(
