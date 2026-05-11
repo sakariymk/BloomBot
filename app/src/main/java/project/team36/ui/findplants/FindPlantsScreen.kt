@@ -52,6 +52,12 @@ import project.team36.ui.map.LocationsViewModel
 import project.team36.ui.plant.SimplePlantCard
 import project.team36.ui.navigation.BottomNavBar
 
+/*
+Skjerm som viser anbefalte og ikke anbefalte planter basert på herdighetssone på valgt lokasjon
+Bruker kan bytte valgt lokasjon for å få nye anbefalinger til planter. Det er også mulig å legge til planter
+som ikke er anbefalt.
+Når bruker trykker på plante, åpnes PlantDetailsScreen, derfra kan de legge til plante i sin hage.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FindPlantsScreen(
@@ -63,7 +69,6 @@ fun FindPlantsScreen(
 
     val plants by findPlantsViewModel.plants.collectAsState()
     val notRecommendedPlants by findPlantsViewModel.notRecommendedPlants.collectAsState()
-    val pendingPlant by findPlantsViewModel.pendingPlant.collectAsState()
     val savedLocations by locationsViewModel.savedLocations.collectAsState()
     val selectedLocation by locationsViewModel.selectedLocation.collectAsState()
     val showSwitchLocationDialog = rememberSaveable { mutableStateOf(false) }
@@ -71,7 +76,7 @@ fun FindPlantsScreen(
     val tabs = listOf("Anbefalte planter", "Andre planter")
 
     //Laster inn anbefalte planter, eller tømmer view om det ikke er noen steder lagret eller ingen hage valgt
-    // SelectedLocation settes allerede fra landingpage
+    // SelectedLocation settes allerede fra landingpage, så listen genereres for sist viste hage
     LaunchedEffect(selectedLocation, savedLocations) {
         if (savedLocations.isEmpty() || selectedLocation == null) {
             findPlantsViewModel.clearPlants()
@@ -176,6 +181,7 @@ fun FindPlantsScreen(
                                 )
                             }
                         }
+                        //Viser planter som passer eller ikke passer
                         items(displayedPlants) { plant ->
                             SimplePlantCard(
                                 plant = plant,
@@ -214,7 +220,7 @@ fun FindPlantsScreen(
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
-
+                // Knapp for å endre hage og få anbefalinger for ny hage
                 ExtendedFloatingActionButton(
                     onClick = { showSwitchLocationDialog.value = true },
                     icon = { Icon(Icons.Default.SwapHoriz, contentDescription = "Bytt hage") },
@@ -225,15 +231,6 @@ fun FindPlantsScreen(
                 )
             }
         }
-    }
-
-    pendingPlant?.let { plant ->
-        SavePlantDialog(
-            plant = plant,
-            savedLocations = savedLocations,
-            onConfirm = { location -> findPlantsViewModel.confirmAddPlant(plant, location) },
-            onDismiss = { findPlantsViewModel.dismissAddPlant() }
-        )
     }
 
     if (showSwitchLocationDialog.value) {

@@ -16,8 +16,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -49,7 +47,6 @@ import kotlin.collections.isNotEmpty
 fun DailyTasksCard(
     plantsByLocation: Map<SavedLocation, List<Pair<SavedPlant, String>>>,
     onMarkAsWatered: (SavedPlant) -> Unit,
-    onNavigateToPlant: (SavedPlant) -> Unit,
 ) {
     val hasAnyPlants = plantsByLocation.values.any { it.isNotEmpty() }
 
@@ -108,7 +105,6 @@ fun DailyTasksCard(
                                         plant = plant,
                                         wateringText = wateringText,
                                         onMarkAsWatered = { onMarkAsWatered(plant) },
-                                        onNavigateToPlant = { onNavigateToPlant(plant) },
                                     )
                                 }
                             }
@@ -126,7 +122,6 @@ fun WateringPlantCard(
     plant: SavedPlant,
     wateringText: String,
     onMarkAsWatered: () -> Unit,
-    onNavigateToPlant: () -> Unit,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     val imageId = if (plant.imageRes != 0) plant.imageRes else R.drawable.defaultplant
@@ -204,19 +199,6 @@ fun WateringPlantCard(
                     buttonColor = MaterialTheme.colorScheme.primary,
                     onButtonClick = onMarkAsWatered
                 )
-                Button(
-                    onClick = onNavigateToPlant,
-                    modifier = Modifier
-                        .align(Alignment.Start)
-                        .padding(start = 14.dp, top = 8.dp),
-                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary)
-                ) {
-                    Text(
-                        "Gå til plante",
-                        color = MaterialTheme.colorScheme.onSecondary,
-                        fontSize = 13.sp
-                    )
-                }
             }
         }
 

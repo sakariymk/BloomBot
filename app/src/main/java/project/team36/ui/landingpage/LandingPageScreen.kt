@@ -352,10 +352,7 @@ fun LandingPageScreen(
                     //liste med dagens oppgaver, hvilke planter som skal vannes for dagen
                     DailyTasksCard(
                         plantsByLocation = plantsByLocation,
-                        onMarkAsWatered = { myPlantsViewModel.markAsWatered(it) },
-                        onNavigateToPlant = { plant ->
-                            navController.navigate("plantDetailsScreen/${plant.name}/view")
-                        }
+                        onMarkAsWatered = { myPlantsViewModel.markAsWatered(it) }
                     )
                 }
             }

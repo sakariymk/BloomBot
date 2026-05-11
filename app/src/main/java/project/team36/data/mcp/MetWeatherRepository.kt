@@ -15,23 +15,32 @@ data class WeatherForecast(
 )
 
 class MetWeatherRepository (private val mcpClient: MetMcpClient) {
-    //TODO: lage ulike metoder og dataklasser(?) for å hente info direkte fra MCP
-
-    //For værvarsel på location
-    suspend fun getParsedForecast(lat: Double, lon: Double): WeatherForecast?{
+    //For værvarsel på location for å kunne bruke det til værvarsel
+    suspend fun getParsedForecast(lat: Double, lon: Double): WeatherForecast? {
         return try {
             val text = mcpClient.getForecast(lat, lon)
 
-            return WeatherForecast(
-                temperature = Regex("Temperature: ([\\d.]+) °C").find(text)
+            /*  Splitte responsen i blokker per time.
+                ?= Lookahead, ser på mønsteret
+                ## matcher overskriften
+                Resten matcher stor forbokstav og to små bokstaver for ukedag i responsen.
+            */
+            val blocks = text.split(Regex("(?=## [A-Z][a-z]{2} [A-Z][a-z]{2})"))
+                .filter { it.contains("Weather symbol:") }
+
+            // Velg blokken for første time
+            val targetBlock = blocks.firstOrNull() ?: return null
+
+            //Pattern matching på resten av forecasten, henter det som er i blokkene spesifisert for videre bruk.
+            WeatherForecast(
+                temperature = Regex("Temperature: ([\\d.]+) °C").find(targetBlock)
                     ?.groupValues?.get(1)?.toDouble() ?: 0.0,
-                windSpeed = Regex("Wind: ([\\d.]+) m/s").find(text)
+                windSpeed = Regex("Wind: ([\\d.]+) m/s").find(targetBlock)
                     ?.groupValues?.get(1)?.toDouble() ?: 0.0,
-                weatherSymbol = Regex("Weather symbol: (\\S+)").find(text)
+                weatherSymbol = Regex("Weather symbol: ([a-z_]+)").find(targetBlock)
                     ?.groupValues?.get(1)
-                    ?.substringBeforeLast("\\n\\n##")
                     ?: "",
-                precipitation = Regex("Precipitation: ([\\d.]+) mm").find(text)
+                precipitation = Regex("Precipitation: ([\\d.]+) mm").find(targetBlock)
                     ?.groupValues?.get(1)?.toDouble() ?: 0.0
             )
         } catch (e: Exception) {
@@ -43,7 +52,7 @@ class MetWeatherRepository (private val mcpClient: MetMcpClient) {
     suspend fun getAllAlerts(): List<WeatherAlert> {
         mcpClient.connect()
         val rawText = mcpClient.getAlerts()
-        Log.d("MET_ALERTS_RAW", rawText)
+
         if (rawText.isBlank() || rawText.startsWith("Kunne ikke")) return emptyList()
         val jsonText = try {
             JSONObject(rawText).getString("alerts")
@@ -130,11 +139,4 @@ data class WeatherAlert(
             awarenessLevel.contains("Orange", ignoreCase = true) -> AlertOrange
             else -> AlertYellow // Gul
         }
-
-    // Sjekker om varselet er kritisk for planter (vet ikke om vi trenger det, men kan høre med team)
-    fun isDangerousForPlant(isFrostResistant: Boolean): Boolean {
-        val dangerousKeywords = listOf("snø", "frost", "is", "lavtrykk", "storm", "kulde")
-        val isWeatherDangerous = dangerousKeywords.any { event.lowercase().contains(it) }
-        return isWeatherDangerous && !isFrostResistant
-    }
 }
