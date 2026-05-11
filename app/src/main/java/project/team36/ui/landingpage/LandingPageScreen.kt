@@ -352,7 +352,7 @@ fun LandingPageScreen(
                         plantsByLocation = plantsByLocation,
                         onMarkAsWatered = { myPlantsViewModel.markAsWatered(it) },
                         onNavigateToPlant = { plant ->
-                            navController.navigate("plantDetailsScreen/${plant.name}/view")
+                            navController.navigate("plantDetailsScreen/${plant.name}/delete")
                         }
                     )
                 }
