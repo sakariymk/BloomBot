@@ -228,8 +228,7 @@ fun LandingPageScreen(
                         Button(
                             onClick = { landingPageViewModel.fetchAiAdvice(selectedLocation) },
                             modifier = Modifier
-                                .fillMaxWidth(0.75f)
-                                .height(52.dp)
+                                .wrapContentWidth()
                                 .background(
                                     brush = Brush.horizontalGradient(
                                         colors = listOf(
