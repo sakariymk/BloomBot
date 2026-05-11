@@ -90,7 +90,7 @@ class MainActivity : ComponentActivity() {
             .build()
         val claudeApi = claudeRetrofit.create(ClaudeApi::class.java)
 
-        val claudeKey = "***FJERNET***"
+        val claudeKey = getString(R.string.claude_api_key) //nøkkelen ligger i egen xml fil
 
         val mcpClient = MetMcpClient()
 
