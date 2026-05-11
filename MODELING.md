@@ -24,7 +24,8 @@ sequenceDiagram
     LocationRepository->>Database: insert(savedPlant)
     Database-->>LocationRepository: OK
     PlantDetailsScreen->>MyPlantsScreen: navigate(myPlants)
-
+```
+```mermaid
 ---
 title: Bloombot - get AI advice for selected garden
 ---
