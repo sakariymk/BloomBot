@@ -91,9 +91,9 @@ fun LandingPageScreen(
 
     LaunchedEffect(Unit) { locationPermission.launchPermissionRequest() }
 
-    // 1. Avslutter LaunchedEffect-blokken tidlig dersom det er ingen lagrede steder
-    // 2. Henter data for lagrede steder
-    // 3. Setter selectedLocation til første tab når siden lastes inn, så anbefalte planter kan displaye for denne hagen med en gang
+    //Avslutter LaunchedEffect-blokken tidlig dersom det er ingen lagrede steder
+    //Henter data for lagrede steder
+    //Setter selectedLocation til første tab når siden lastes inn, så anbefalte planter kan displaye for denne hagen med en gang
     LaunchedEffect(savedLocations) {
         if (savedLocations.isEmpty()) return@LaunchedEffect
         landingPageViewModel.loadDataForLocations(savedLocations)
@@ -117,7 +117,7 @@ fun LandingPageScreen(
                     IconButton(onClick = { landingPageViewModel.showInfoDialog() }) {
                         Icon(
                             imageVector = Icons.Default.Info,
-                            contentDescription = "Info",
+                            contentDescription = "Guide",
                             tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
@@ -142,6 +142,7 @@ fun LandingPageScreen(
                     color = MaterialTheme.colorScheme.onBackground
                 )
             } else {
+                //horisontal scrollable liste med lagrede hager
                 PrimaryScrollableTabRow(
                     selectedTabIndex = selectedTabIndex,
                     edgePadding = 16.dp,
@@ -212,8 +213,6 @@ fun LandingPageScreen(
                     }
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Text(text = "Værvarsel", style = MaterialTheme.typography.labelLarge)
-
                     WeatherCard(
                         weatherUiState = uiState.locationForecasts[selectedLocation.id],
                         isLoading = uiState.isWeatherLoading,
@@ -225,6 +224,7 @@ fun LandingPageScreen(
                         modifier = Modifier.fillMaxWidth(),
                         contentAlignment = Alignment.Center
                     ) {
+                        //knapp for å hente AI-råd
                         Button(
                             onClick = { landingPageViewModel.fetchAiAdvice(selectedLocation) },
                             modifier = Modifier
@@ -269,6 +269,7 @@ fun LandingPageScreen(
                     }
 
 
+                    //AlertDialog som viser AI resultatene
                     if (uiState.aiResponse != null) {
                         AlertDialog(
                             onDismissRequest = { landingPageViewModel.dismissAiAdvice() },
@@ -346,6 +347,7 @@ fun LandingPageScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    //liste med dagens oppgaver, hvilke planter som skal vannes for dagen
                     DailyTasksCard(
                         plantsByLocation = plantsByLocation,
                         onMarkAsWatered = { myPlantsViewModel.markAsWatered(it) },
@@ -358,6 +360,7 @@ fun LandingPageScreen(
         }
     }
 
+        //onboarding dialogboks, kort intro til appen
         if (uiState.showInfoDialog) {
             OnboardingDialog(
                 onDismiss = { landingPageViewModel.dismissInfoDialog() },
@@ -369,6 +372,7 @@ fun LandingPageScreen(
         }
     }
 
+    //metAlerts banner for en lokasjon, vises om det er farevarsel for lokasjonen
     @Composable
     fun LocationAlertBanner(alert: WeatherAlert) {
         Row(
@@ -376,7 +380,7 @@ fun LandingPageScreen(
                 .fillMaxWidth()
                 .background(alert.color.copy(alpha = 0.15f), RoundedCornerShape(12.dp))
                 .border(1.dp, alert.color.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 6.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(

@@ -36,6 +36,8 @@ class LocationsViewModel(
         _selectedLocation.value = location
     }
 
+
+    //endre navn på lokasjon
     fun updateSelectedLocationName(newName: String) {
         _selectedLocation.update { it?.copy(name = newName) }
     }
@@ -50,6 +52,7 @@ class LocationsViewModel(
         }
     }
 
+    //dismisse lokasjon dialogboks
     fun dismissMaxLocationsDialog() {
         _showMaxLocationsDialog.value = false
     }

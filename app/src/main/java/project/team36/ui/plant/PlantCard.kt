@@ -1,9 +1,7 @@
 package project.team36.ui.plant
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -34,8 +32,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-// Farger for kortet - se om de kan lagres i Theme
-
 @Composable
 fun PlantCard(
     plant: SavedPlant,
@@ -53,17 +49,11 @@ fun PlantCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 6.dp)
-            .animateContentSize(
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessLow
-                )
-            )
+            .padding(horizontal = 6.dp, vertical = 4.dp)
             .clickable { expanded = !expanded },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f))
     ) {
         Column(
             modifier = Modifier
@@ -132,7 +122,6 @@ fun PlantCard(
                         .padding(top = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 12.dp),
                         color = MaterialTheme.colorScheme.outline
@@ -189,16 +178,15 @@ fun PlantCard(
                     }
                 }
             }
-            // Knapp for utvidelse eller lukking av boksen
+            //pil for å expande kortet
             IconButton(
                 onClick = { expanded = !expanded },
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
-                    .size(36.dp)
+                    .size(24.dp)
             ) {
                 Icon(
-                    imageVector = if (expanded) Icons.Default.ExpandLess
-                    else Icons.Default.ExpandMore,
+                    imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
                     contentDescription = if (expanded) "Lukk" else "Åpne"
                 )
             }
@@ -207,7 +195,7 @@ fun PlantCard(
 }
 
 @Composable
-private fun InfoSection(
+fun InfoSection(
     title: String,
     subtitle: String,
     buttonText: String,
