@@ -133,23 +133,23 @@ fun WateringPlantCard(
             .padding(horizontal = 6.dp, vertical = 4.dp)
             .clickable { expanded = !expanded }
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.fillMaxWidth()
         ) {
-            //bilde av planten
-            Image(
-                painter = painterResource(id = imageId),
-                contentDescription = plant.name,
-                modifier = Modifier
-                    .size(56.dp)
-                    .clip(RoundedCornerShape(10.dp)),
-                contentScale = ContentScale.Crop
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Column(
-                modifier = Modifier.weight(1f)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                //bilde av planten
+                Image(
+                    painter = painterResource(id = imageId),
+                    contentDescription = plant.name,
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clip(RoundedCornerShape(10.dp)),
+                    contentScale = ContentScale.Crop
+                )
+                Spacer(modifier = Modifier.width(12.dp))
                 Text(
                     text = plant.name,
                     fontWeight = FontWeight.SemiBold,
@@ -157,11 +157,13 @@ fun WateringPlantCard(
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
-            Spacer(modifier = Modifier.width(8.dp))
             //"må vannes" chip
             Row(
                 verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
                 modifier = Modifier
+                    .padding(top = 6.dp)
+                    .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.error, RoundedCornerShape(50))
                     .padding(horizontal = 12.dp, vertical = 6.dp)
             ) {
