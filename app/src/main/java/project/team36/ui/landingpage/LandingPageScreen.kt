@@ -291,14 +291,6 @@ fun LandingPageScreen(
                                     modifier = Modifier.verticalScroll(rememberScrollState()),
                                     verticalArrangement = Arrangement.spacedBy(12.dp)
                                 ) {
-                                    Column {
-                                        Text(
-                                            "Været:",
-                                            fontWeight = FontWeight.Bold,
-                                            color = MaterialTheme.colorScheme.onSurface
-                                        )
-                                        Text(uiState.aiResponse!!.weatherSummary)
-                                    }
                                     if (uiState.aiResponse!!.plantAdvice.isNotEmpty()) {
                                         Column {
                                             Text(
@@ -306,6 +298,16 @@ fun LandingPageScreen(
                                                 fontWeight = FontWeight.Bold,
                                                 color = MaterialTheme.colorScheme.onSurface
                                             )
+                                            val recommendText = uiState.aiResponse!!.plantAdvice.firstOrNull()?.Recommend
+                                            if (!recommendText.isNullOrEmpty()) {
+                                                Spacer(modifier = Modifier.height(8.dp))
+                                                Text(
+                                                    text = recommendText,
+                                                    color = MaterialTheme.colorScheme.primary,
+                                                    fontWeight = FontWeight.Bold,
+                                                    modifier = Modifier.padding(bottom = 4.dp)
+                                                )
+                                            }
                                             uiState.aiResponse!!.plantAdvice.forEach { advice ->
                                                 Spacer(modifier = Modifier.height(4.dp))
                                                 Text(
