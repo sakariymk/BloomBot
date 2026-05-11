@@ -32,12 +32,10 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import project.team36.ui.findplants.SavePlantDialog
 import project.team36.ui.map.MapViewModelFactory
 
 @Composable
@@ -119,8 +117,6 @@ fun AppNavHost(
             composable ("plantDetailsScreen/{plantName}/{action}") { backStackEntry ->
                 val plantName = backStackEntry.arguments?.getString("plantName") ?: return@composable
                 val action = backStackEntry.arguments?.getString("action") ?: ""
-                val savedLocations = locationsViewModel.savedLocations.collectAsState()
-                val pendingPlant = findPlantsViewModel.pendingPlant.collectAsState()
 
                 LaunchedEffect(plantName) {
                     if (action == "add") {
@@ -135,25 +131,21 @@ fun AppNavHost(
                     plantDetailsViewModel = plantDetailsViewModel,
                     onBackClick = { navController.popBackStack() },
                     onAddPlant = if (action == "add") {
-                        { plantDetailsViewModel.plant.value?.let { findPlantsViewModel.requestAddPlant(it) } }
+                        {
+                            plantDetailsViewModel.plant.value?.let { plant ->
+                                locationsViewModel.selectedLocation.value?.let { location ->
+                                    findPlantsViewModel.confirmAddPlant(plant, location)
+                                    navController.navigate("myPlants") {
+                                        popUpTo("plantDetailsScreen/${plant.name}/add") { inclusive = true }
+                                    }
+                                }
+                            }
+                        }
                     } else null,
                     onDeletePlant = if (action == "delete") {
                         { myPlantsViewModel.removePlantByName(plantName) }
                     } else null
                 )
-                pendingPlant.value?.let { plant ->
-                    SavePlantDialog(
-                        plant = plant,
-                        savedLocations = savedLocations.value,
-                        onConfirm = { location ->
-                            findPlantsViewModel.confirmAddPlant(plant, location)
-                            locationsViewModel.selectLocation(location)
-                            navController.navigate("myPlants")
-                        },
-                        onDismiss = { findPlantsViewModel.dismissAddPlant() }
-                    )
-                }
-
             }
             composable("myPlaces") {
                 MyPlacesScreen(
