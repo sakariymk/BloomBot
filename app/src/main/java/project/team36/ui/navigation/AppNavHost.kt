@@ -134,7 +134,7 @@ fun AppNavHost(
                         {
                             plantDetailsViewModel.plant.value?.let { plant ->
                                 locationsViewModel.selectedLocation.value?.let { location ->
-                                    findPlantsViewModel.confirmAddPlant(plant, location)
+                                    findPlantsViewModel.addPlant(plant, location)
                                     navController.navigate("myPlants") {
                                         popUpTo("plantDetailsScreen/${plant.name}/add") { inclusive = true }
                                     }

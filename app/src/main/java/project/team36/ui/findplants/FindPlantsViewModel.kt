@@ -24,19 +24,12 @@ class FindPlantsViewModel (
     private val _notRecommendedPlants = MutableStateFlow<List<PlantDetails>>(emptyList())
     val notRecommendedPlants: StateFlow<List<PlantDetails>> = _notRecommendedPlants.asStateFlow()
 
-    private val _pendingPlant = MutableStateFlow<PlantDetails?>(null)
-    val pendingPlant: StateFlow<PlantDetails?> = _pendingPlant.asStateFlow()
-
     init {
         _plants.value = plantRepository.initiatePlants().map { it.toPlantDetails() }
     }
 
-    fun dismissAddPlant() {
-        _pendingPlant.value = null
-    }
-
     //når bruker har valgt plante og lokasjon legges det inn i databasen
-    fun confirmAddPlant(plant: PlantDetails, location: SavedLocation) {
+    fun addPlant(plant: PlantDetails, location: SavedLocation) {
         viewModelScope.launch {
             locationRepository.insertPlant(
                 SavedPlant(
@@ -55,7 +48,6 @@ class FindPlantsViewModel (
                     lastWateredDate = 0L
                 )
             )
-            _pendingPlant.value = null
         }
     }
     //Laste inn anbefalte og ikke anbefalte planter fra plantRepository

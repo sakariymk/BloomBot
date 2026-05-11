@@ -69,7 +69,6 @@ fun FindPlantsScreen(
 
     val plants by findPlantsViewModel.plants.collectAsState()
     val notRecommendedPlants by findPlantsViewModel.notRecommendedPlants.collectAsState()
-    val pendingPlant by findPlantsViewModel.pendingPlant.collectAsState()
     val savedLocations by locationsViewModel.savedLocations.collectAsState()
     val selectedLocation by locationsViewModel.selectedLocation.collectAsState()
     val showSwitchLocationDialog = rememberSaveable { mutableStateOf(false) }
@@ -231,15 +230,6 @@ fun FindPlantsScreen(
                     shape = RoundedCornerShape(50)
                 )
             }
-        }
-    }
-    // Logikk for å legge til planten sin og navigere til mine planter på gitt hage
-    LaunchedEffect(pendingPlant) {
-        pendingPlant?.let { plant ->
-            selectedLocation?.let { location ->
-                findPlantsViewModel.confirmAddPlant(plant, location)
-                navController.navigate("myPlants")  // <-- legg til denne
-            } ?: findPlantsViewModel.dismissAddPlant()
         }
     }
 
