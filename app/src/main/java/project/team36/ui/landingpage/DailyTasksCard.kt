@@ -49,7 +49,6 @@ import kotlin.collections.isNotEmpty
 fun DailyTasksCard(
     plantsByLocation: Map<SavedLocation, List<Pair<SavedPlant, String>>>,
     onMarkAsWatered: (SavedPlant) -> Unit,
-    onNavigateToPlant: (SavedPlant) -> Unit,
 ) {
     val hasAnyPlants = plantsByLocation.values.any { it.isNotEmpty() }
 
@@ -108,7 +107,6 @@ fun DailyTasksCard(
                                         plant = plant,
                                         wateringText = wateringText,
                                         onMarkAsWatered = { onMarkAsWatered(plant) },
-                                        onNavigateToPlant = { onNavigateToPlant(plant) },
                                     )
                                 }
                             }
@@ -126,7 +124,6 @@ fun WateringPlantCard(
     plant: SavedPlant,
     wateringText: String,
     onMarkAsWatered: () -> Unit,
-    onNavigateToPlant: () -> Unit,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
     val imageId = if (plant.imageRes != 0) plant.imageRes else R.drawable.defaultplant
@@ -204,19 +201,6 @@ fun WateringPlantCard(
                     buttonColor = MaterialTheme.colorScheme.primary,
                     onButtonClick = onMarkAsWatered
                 )
-                Button(
-                    onClick = onNavigateToPlant,
-                    modifier = Modifier
-                        .align(Alignment.Start)
-                        .padding(start = 14.dp, top = 8.dp),
-                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary)
-                ) {
-                    Text(
-                        "Gå til plante",
-                        color = MaterialTheme.colorScheme.onSecondary,
-                        fontSize = 13.sp
-                    )
-                }
             }
         }
 
