@@ -233,9 +233,8 @@ fun LandingPageScreen(
                                 .background(
                                     brush = Brush.horizontalGradient(
                                         colors = listOf(
-                                            Color(0xFF89CFF0),
-                                            Color(0xFFB57BEE),
-                                            Color(0xFFFF85C2)
+                                            Color(0xFF6DBDD7),
+                                            Color(0xFF69CE64)
                                         )
                                     ),
                                     shape = CircleShape
@@ -257,13 +256,13 @@ fun LandingPageScreen(
                                 Image(
                                     painter = painterResource(id = R.drawable.lightbulb),
                                     contentDescription = null,
-                                    modifier = Modifier.size(30.dp),
+                                    modifier = Modifier.size(20.dp),
                                     colorFilter = ColorFilter.tint(Color.White)
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     "Få råd fra Bloombot",
-                                    fontSize = 12.sp,
+                                    fontSize = 14.sp,
                                     color = MaterialTheme.colorScheme.onPrimary
                                 )
                             }
