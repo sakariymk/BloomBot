@@ -1,6 +1,5 @@
 package project.team36.data.mcp
 
-import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
 import io.ktor.client.plugins.sse.SSE
@@ -38,12 +37,9 @@ class MetMcpClient {
                 )
                 client.connect(transport)
                 isConnected = true
-                Log.d("MCP_CAPS", "Tilkoblet! Capabilities: ${client.serverCapabilities}")
-                val tools = client.listTools()
-                Log.d("MCP_TOOLS", "Verktøy: ${tools?.tools?.map { it.name }}")
+
             } catch (e: Exception) {
                 isConnected = false
-                Log.e("MCP_CAPS", "connect() feilet: ${e.message}")
                 throw Exception("Kunne ikke koble til MET MCP-server: ${e.message}")
             }
         }
@@ -62,7 +58,7 @@ class MetMcpClient {
                 )
             )
         )
-        return (result.content?.firstOrNull() as? TextContent)?.text ?: ""
+        return (result.content.firstOrNull() as? TextContent)?.text ?: ""
     }
 
     //Hente alerts som tekst
@@ -79,6 +75,6 @@ class MetMcpClient {
                 )
             )
         )
-        return (alertResult.content?.firstOrNull() as? TextContent)?.text ?: ""
+        return (alertResult.content.firstOrNull() as? TextContent)?.text ?: ""
     }
 }
