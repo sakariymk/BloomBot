@@ -14,41 +14,45 @@ data class WeatherForecast(
     val precipitation: Double
 )
 
-class MetWeatherRepository (private val mcpClient: MetMcpClient) {
-    //For værvarsel på location for å kunne bruke det til værvarsel
-    suspend fun getParsedForecast(lat: Double, lon: Double): WeatherForecast? {
+class MetWeatherRepository(private val mcpClient: MetMcpClient) {
+    //Method to get raw data from WeatherForecast-API to use for advice from AI
+    suspend fun getForecast(lat: Double, lon: Double): String? {
         return try {
-            val text = mcpClient.getForecast(lat, lon)
-
-            /*  Splitte responsen i blokker per time.
-                ?= Lookahead, ser på mønsteret
-                ## matcher overskriften
-                Resten matcher stor forbokstav og to små bokstaver for ukedag i responsen.
-            */
-            val blocks = text.split(Regex("(?=## [A-Z][a-z]{2} [A-Z][a-z]{2})"))
-                .filter { it.contains("Weather symbol:") }
-
-            // Velg blokken for første time
-            val targetBlock = blocks.firstOrNull() ?: return null
-
-            //Pattern matching på resten av forecasten, henter det som er i blokkene spesifisert for videre bruk.
-            WeatherForecast(
-                temperature = Regex("Temperature: ([\\d.]+) °C").find(targetBlock)
-                    ?.groupValues?.get(1)?.toDouble() ?: 0.0,
-                windSpeed = Regex("Wind: ([\\d.]+) m/s").find(targetBlock)
-                    ?.groupValues?.get(1)?.toDouble() ?: 0.0,
-                weatherSymbol = Regex("Weather symbol: ([a-z_]+)").find(targetBlock)
-                    ?.groupValues?.get(1)
-                    ?: "",
-                precipitation = Regex("Precipitation: ([\\d.]+) mm").find(targetBlock)
-                    ?.groupValues?.get(1)?.toDouble() ?: 0.0
-            )
+            mcpClient.getForecast(lat, lon)
         } catch (e: Exception) {
-            Log.e("WEATHER", "Failed to fetch weather: ${e.message}")
+            Log.e("LocationForecast", "Failed to fetch forecast: ${e.message}")
             null
         }
     }
 
+    //For forecast on WeatherCards on LandingPage, to show forecast for the current hour
+    fun getParsedForecast(text: String): WeatherForecast? {
+        /*  Split the response in blocks for each hour
+            ?= Lookahead, looks at the pattern without discarding the pattern
+            ## matches the title
+            The rest matches a capital letter and two regular letters for the weekday
+        */
+        val blocks = text.split(Regex("(?=## [A-Z][a-z]{2} [A-Z][a-z]{2})"))
+            .filter { it.contains("Weather symbol:") }
+
+        // Choose the block for the first hour, which is relevant for this forecast
+        val targetBlock = blocks.firstOrNull() ?: return null
+
+        //Pattern matching on the rest of the forecast, and collects what is needed.
+        return WeatherForecast(
+            temperature = Regex("Temperature: ([\\d.]+) °C").find(targetBlock)
+                ?.groupValues?.get(1)?.toDouble() ?: 0.0,
+            windSpeed = Regex("Wind: ([\\d.]+) m/s").find(targetBlock)
+                ?.groupValues?.get(1)?.toDouble() ?: 0.0,
+            weatherSymbol = Regex("Weather symbol: ([a-z_]+)").find(targetBlock)
+                ?.groupValues?.get(1)
+                ?: "",
+            precipitation = Regex("Precipitation: ([\\d.]+) mm").find(targetBlock)
+                ?.groupValues?.get(1)?.toDouble() ?: 0.0
+        )
+    }
+
+    //Getting MetAlerts
     suspend fun getAllAlerts(): List<WeatherAlert> {
         mcpClient.connect()
         val rawText = mcpClient.getAlerts()
@@ -56,7 +60,7 @@ class MetWeatherRepository (private val mcpClient: MetMcpClient) {
         if (rawText.isBlank() || rawText.startsWith("Kunne ikke")) return emptyList()
         val jsonText = try {
             JSONObject(rawText).getString("alerts")
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             rawText
         }
         return parseAlerts(jsonText)
@@ -102,7 +106,6 @@ class MetWeatherRepository (private val mcpClient: MetMcpClient) {
                             }
                     }.map { it.toList() }.toList()
                 } ?: emptyList()
-
             WeatherAlert(event, severity, cleanDescription, awarenessLevel, area, polygons)
         }
     }
@@ -113,7 +116,8 @@ class MetWeatherRepository (private val mcpClient: MetMcpClient) {
         var intersectCount = 0
         for (i in 0 until polygon.size) {
             val p1 = polygon[i]
-            val p2 = polygon[(i + 1) % polygon.size] // Dette håndterer lukking av polygonet automatisk
+            val p2 =
+                polygon[(i + 1) % polygon.size] // Dette håndterer lukking av polygonet automatisk
 
             if (((p1.first > lat) != (p2.first > lat)) &&
                 (lon < (p2.second - p1.second) * (lat - p1.first) / (p2.first - p1.first) + p1.second)

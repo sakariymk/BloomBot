@@ -7,7 +7,7 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.Mockito.mock
 import project.team36.data.ai.ClaudeApi
-import project.team36.data.ai.HybridAiRepository
+import project.team36.data.mcp.HybridAiRepository
 import project.team36.data.local.LocationRepository
 import project.team36.data.mcp.MetMcpClient
 import project.team36.model.ai.ClaudeRequest

@@ -1,14 +1,15 @@
-package project.team36.data.ai
+package project.team36.data.mcp
 
 import kotlinx.serialization.json.*
 import kotlinx.coroutines.flow.first
-import project.team36.data.mcp.MetMcpClient
 import project.team36.data.local.LocationRepository
 import project.team36.model.location.SavedLocation
 import project.team36.model.ai.*
 import kotlinx.serialization.json.Json
 import android.util.Log
+import project.team36.data.ai.ClaudeApi
 import project.team36.model.location.SavedPlant
+import java.time.LocalDate
 
 
 /**
@@ -84,7 +85,7 @@ class HybridAiRepository(
         suspend fun getPlantData (location: SavedLocation, plantDataSource: LocationRepository): List<SavedPlant> {
             val plants = try {
                 plantDataSource.getPlantsForLocation(location.id).first()
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 emptyList()
             }
             return plants
@@ -113,7 +114,7 @@ class HybridAiRepository(
         val lat = location.lat ?: 0.0
         val lon     = location.lon ?: 0.0
         val plantsText = getPlantTxt(location, plantDataSource)
-        val currentDate = java.time.LocalDate.now().toString()
+        val currentDate = LocalDate.now().toString()
         val locId = location.id
         val cached = dailyCache[locId]
 
@@ -209,14 +210,13 @@ class HybridAiRepository(
                     val rLon = inputJson?.get("longitude")?.jsonPrimitive?.double ?: lon
 
                     // Kjører funksjonen som korresponderer med verktøyet Claude ba om
-                    val resultText = when (toolName) {
+                    val resultText: String = when (toolName) {
                         TOOL_NAME_WEATHER_FORECAST -> {
-                            val weatherRepo = project.team36.data.mcp.MetWeatherRepository(mcpClient)
-                            val forecast = weatherRepo.getParsedForecast(rLat, rLon)
-                            "Værvarsel: ${forecast?.temperature}°C, ${forecast?.weatherSymbol}, Vind: ${forecast?.windSpeed} m/s, Nedbør: ${forecast?.precipitation} mm."
+                            val weatherRepo = MetWeatherRepository(mcpClient)
+                            weatherRepo.getForecast(rLat, rLon) ?: "Kunne ikke hente værvarsel."
                         }
                         TOOL_NAME_WEATHER_ALERTS -> {
-                            val weatherRepo = project.team36.data.mcp.MetWeatherRepository(mcpClient)
+                            val weatherRepo = MetWeatherRepository(mcpClient)
                             val alerts = weatherRepo.getAllAlerts()
                             if (alerts.isEmpty()) "Ingen aktive ekstremværvarsler."
                             else alerts.joinToString("\n") { "${it.event}: ${it.description}" }
