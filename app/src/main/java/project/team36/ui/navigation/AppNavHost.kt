@@ -35,15 +35,13 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import project.team36.ui.map.MapViewModelFactory
 
 @Composable
 fun AppNavHost(
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState,
     navController: NavHostController,
-    mapViewModelFactory: MapViewModelFactory,
+    mapViewModel: MapViewModel,
     findPlantsViewModel: FindPlantsViewModel,
     myPlantsViewModel: MyPlantsViewModel,
     locationsViewModel: LocationsViewModel,
@@ -82,7 +80,6 @@ fun AppNavHost(
             modifier = modifier.padding(innerPadding)
         ){
             composable("map") {
-                val mapViewModel: MapViewModel = viewModel(factory = mapViewModelFactory)
                 MapScreen(
                     modifier = modifier,
                     viewModel = mapViewModel,

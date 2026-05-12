@@ -47,7 +47,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -96,7 +95,7 @@ fun MyPlacesScreen (
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
                 ),
-                windowInsets = WindowInsets(0) //gjør at appen ikke legger til mye mellomrom på toppen av skjermen
+                windowInsets = WindowInsets(0) //removes extra space of the top of the screen
             )
         },
 
@@ -254,49 +253,5 @@ fun LocationCard (
                 tint = MaterialTheme.colorScheme.onSurface
             )
         }
-    }
-}
-
-// Preview - slett før innlevering?
-@Preview(showBackground = true)
-@Composable
-fun MyPlacesScreenPreview() {
-    val fakeLocations = listOf(
-        SavedLocation(id = 1, name = "Hjemme", lat = 59.9, lon = 10.7, address = "Gaustadalléen 2", zone = 0),
-        SavedLocation(id = 2, name = "Jobb", lat = 59.91, lon = 10.75, address = "Karl Johans gate 1", zone = 0)
-    )
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFE8F5E2))
-            .padding(16.dp)
-    ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            Text(
-                text = "Mine hager",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Normal,
-                color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(vertical = 16.dp)
-            )
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                items(fakeLocations) { location ->
-                    LocationCard(location = location, onClick = {})
-                }
-            }
-        }
-
-        ExtendedFloatingActionButton(
-            onClick = {},
-            icon = { Icon(Icons.Default.Add, contentDescription = "Ny hage") },
-            text = { Text("Nytt hage") },
-            containerColor = Color(0xFF2D5A27),
-            contentColor = Color.White,
-            shape = RoundedCornerShape(50),
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(bottom = 16.dp)
-        )
     }
 }

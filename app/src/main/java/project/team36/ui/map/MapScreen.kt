@@ -79,12 +79,12 @@ fun MapScreen(
     val context = LocalContext.current
 
 
-    //henter live lokasjon
+    //fetches live location
     val locationPermissionState = rememberPermissionState(
         Manifest.permission.ACCESS_FINE_LOCATION
     )
 
-    //hvis ingen steder er lagret enda, viser en liten velkomstdialog
+    //if no saved locations, shows a little welcome dialog
     var showLocationChoiceDialog by rememberSaveable(savedLocations.isEmpty()) {
         mutableStateOf(savedLocations.isEmpty())
     }
@@ -113,7 +113,7 @@ fun MapScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
                 ),
-                windowInsets = WindowInsets(0) //gjør at appen ikke legger til mye mellomrom på toppen av skjermen
+                windowInsets = WindowInsets(0) //so there is less empty space at the top of the screen
             )
         },
         bottomBar = {
@@ -138,7 +138,7 @@ fun MapScreen(
                             style.addSource(vectorSource(ClimateZoneConfig.SOURCE_ID) {
                                 tiles(listOf(ClimateZoneConfig.TILE_URL))
                             })
-                            //legger til klimasonekart som en usynlig overlay, gjørat man kan hente ut data om klimasone på kartet
+                            //puts the climate zone map as invisible overlay, so you can fetch data about climate zone on the map
                             style.addLayer(fillLayer(ClimateZoneConfig.LAYER_ID, ClimateZoneConfig.SOURCE_ID) {
                                 sourceLayer(ClimateZoneConfig.SOURCE_LAYER)
                                 fillOpacity(literal(0.0))
@@ -159,7 +159,7 @@ fun MapScreen(
                     }
                 }
 
-                // Viser midlertidig markør for valgt søkeresultat
+                //shows temporary marker for chosen location
                 uiState.selectedResult?.coordinate?.let { coord ->
                     val marker = rememberIconImage(
                         key = R.drawable.plant_map_marker,
@@ -170,7 +170,7 @@ fun MapScreen(
                     }
                 }
 
-                // Viser alle lagrede steder
+                //Shows the saved locations
                 savedLocations.forEach { location ->
                     val lat = location.lat ?: return@forEach
                     val lon = location.lon ?: return@forEach
@@ -207,7 +207,7 @@ fun MapScreen(
             }
 
             if (showLocationChoiceDialog) {
-                //dialogboks som popper opp første gangen man lagrer et sted (eller har 0 lagrde steder)
+                //dialogbox that pops up if you have 0 saved locations, gives some info to the user abt saving locations
                 Dialog(onDismissRequest = { showLocationChoiceDialog = false }) {
                     Card(
                         shape = RoundedCornerShape(24.dp),
@@ -248,14 +248,14 @@ fun MapScreen(
 
                             Spacer(modifier = Modifier.height(24.dp))
 
-                            //knapp for å lagre sted med live lokasjon
+                            //buton for saving a place based on live location
                             Button(
-                                //hvis man har gitt tillatelse for å bruke lokasjon, så lagres lokasjonen
+                                //if the user has given permission to use location, then location gets saved right away
                                 onClick = {
                                     if (locationPermissionState.status.isGranted) {
                                         viewModel.requestLiveLocationSave()
                                         showLocationChoiceDialog = false
-                                        //hvis man ikke har gitt lokasjonstillatelse, så trigges den på nytt når man trykker på knappen
+                                        //if user has not given permission, then it triggers the location permission box when the button is pressed
                                     } else {
                                         locationPermissionState.launchPermissionRequest()
                                     }
@@ -269,7 +269,7 @@ fun MapScreen(
 
                             Spacer(modifier = Modifier.height(8.dp))
 
-                            //knapp som lukker dialogboksen slik at brukeren får søke opp adresse
+                            //button that closes the dialogbox so the user can search up an address
                             OutlinedButton(
                                 onClick = { showLocationChoiceDialog = false },
                                 modifier = Modifier.fillMaxWidth(),
@@ -282,7 +282,7 @@ fun MapScreen(
                 }
             }
 
-            //Dialogboks som lar brukeren bekrefte om de har lyst til å lagre stedet
+            //dialogbox that asks the user to confirm saving live location
             if (uiState.showLiveLocationConfirm) {
                 AlertDialog(
                     onDismissRequest = { viewModel.dismissLiveLocationConfirm() },
@@ -296,7 +296,7 @@ fun MapScreen(
                                 containerColor = MaterialTheme.colorScheme.primary,
                                 contentColor = MaterialTheme.colorScheme.onPrimary
                             ),
-                            //når brukern lagrer stedet, blir man navigert til stedet
+                            //after saving the location, user gets navigated to saved locations
                             onClick = {
                                 viewModel.confirmSaveLiveLocation(context) { navController.navigate("myPlaces") }
                             }
@@ -321,6 +321,7 @@ fun MapScreen(
                 )
             }
 
+            //savedialog for saving location
             if (uiState.showSaveDialog) {
                 AlertDialog(
                     onDismissRequest = { viewModel.dismissSaveDialog() },
@@ -334,8 +335,8 @@ fun MapScreen(
                                 contentColor = MaterialTheme.colorScheme.onPrimary
                             ),
                             onClick = {
-                                if (!uiState.isSaving) { // ignorer klikk hvis allerede lagrer
-                                    viewModel.confirmSavePlace { navController.navigate("myPlaces") } //bruker blir navigert til stedet når man har lagra
+                                if (!uiState.isSaving) { //ignores click is already saving
+                                    viewModel.confirmSavePlace { navController.navigate("myPlaces") } //user gets navigated to savedplaces after saving location
                                 }
                             }
                         ) {
@@ -361,7 +362,7 @@ fun MapScreen(
             }
         }
 
-        //Info-kort for lagret sted
+        //infoCard about the place when clicking on the pin
         uiState.selectedSavedLocation?.let { location ->
             PlaceInfoCard(
                 location = location,

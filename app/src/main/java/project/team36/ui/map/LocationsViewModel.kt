@@ -14,17 +14,16 @@ import project.team36.data.local.LocationRepository
 import project.team36.model.location.SavedLocation
 
 
-//Flyttet savedPlaces til en egen viewmodel, så flere skjermer har tilgang til lagrede steder
 
 class LocationsViewModel(
     repository: LocationRepository
 ) : ViewModel() {
 
-    //Begynner å lytte etter locations fra Room, Flow sørger for at det blir automatisk oppdatert
+    //Listens to locations from Room, Flow ensures that it gets updated automatically
     val savedLocations: StateFlow<List<SavedLocation>> = repository.allLocations
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    //Location valgt
+    //Chosen location
     private val _selectedLocation = MutableStateFlow<SavedLocation?>(null)
     val selectedLocation: StateFlow<SavedLocation?> = _selectedLocation.asStateFlow()
 
@@ -37,13 +36,14 @@ class LocationsViewModel(
     }
 
 
-    //endre navn på lokasjon
+    //to change name of location
     fun updateSelectedLocationName(newName: String) {
         _selectedLocation.update { it?.copy(name = newName) }
     }
 
-    //Sjekke om det er mulig å legge til flere steder, grense er på 5
+    //checks if its possible to add more locations
     fun onAddLocationClicked(): Boolean {
+        //if the user already has five locations saved, it returns showmaxlocationsDialog
         return if (savedLocations.value.size >= 5) {
             _showMaxLocationsDialog.value = true
             false
@@ -52,7 +52,7 @@ class LocationsViewModel(
         }
     }
 
-    //dismisse lokasjon dialogboks
+    //dismisses the maxLocations dialogbox
     fun dismissMaxLocationsDialog() {
         _showMaxLocationsDialog.value = false
     }

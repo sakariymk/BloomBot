@@ -22,6 +22,7 @@ fun BottomNavBar(navController: NavController, locationsViewModel : LocationsVie
     val activeRoute = currentRoute?.destination?.route
 
     val selectedLocation by locationsViewModel.selectedLocation.collectAsState()
+    //passes the current location into findplants route
     val locationName = selectedLocation?.name ?: ""
 
 
@@ -35,7 +36,7 @@ fun BottomNavBar(navController: NavController, locationsViewModel : LocationsVie
 
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.primaryContainer,
-        windowInsets = WindowInsets(0) //gjør at navigasjonsbaren ikke legger til ekstra padding under
+        windowInsets = WindowInsets(0) //removes extra space under the navbar
     ) {
         NavigationBarItem(
             selected = activeRoute == "landingpage",

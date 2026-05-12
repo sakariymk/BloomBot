@@ -44,25 +44,26 @@ import project.team36.ui.theme.Team36Theme
 import androidx.compose.runtime.DisposableEffect
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.SystemBarStyle
+import project.team36.ui.map.MapViewModel
 import project.team36.ui.myplants.MyPlantsViewModelFactory
 
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //gjør statusbaren gjennomsiktig i appen
+        //makes phone's statusbar and navbar transparent
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(
                 scrim = android.graphics.Color.TRANSPARENT,
                 darkScrim = android.graphics.Color.TRANSPARENT
             ),
-            //setter fargen til telefonens navigasjonsknapper
             navigationBarStyle = SystemBarStyle.light(
                 scrim = android.graphics.Color.TRANSPARENT,
                 darkScrim = android.graphics.Color.TRANSPARENT
             )
         )
 
+        //local database and repos
         val dataSource = PlantDataSource(this)
         val db = AppDatabase.getDatabase(this)
         val locationRepository = LocationRepository(db.savedLocationDao(), db.savedPlantDao())
@@ -70,6 +71,7 @@ class MainActivity : ComponentActivity() {
         val frostRepository = FrostRepository()
 
 
+        //retrofit setup
         val contentType = "application/json".toMediaType()
         val jsonConfig = Json {
             ignoreUnknownKeys = true
@@ -90,11 +92,13 @@ class MainActivity : ComponentActivity() {
             .build()
         val claudeApi = claudeRetrofit.create(ClaudeApi::class.java)
 
-        val claudeKey = getString(R.string.claude_api_key) //nøkkelen ligger i egen xml fil
+        //API key is in a separate XML file in /values
+        val claudeKey = getString(R.string.claude_api_key)
 
+        //Met MCP setup
         val mcpClient = MetMcpClient()
 
-        //kaster exception hvis det ikke er internett tilgang, så appen ikke krasjer
+        //connects to MCp on startup, catches exception if not connected to internet so the app doesn't crash
         try {
             runBlocking { mcpClient.connect() }
         } catch (e: Exception) {
@@ -103,7 +107,6 @@ class MainActivity : ComponentActivity() {
         }
 
         val metWeatherRepository = MetWeatherRepository(mcpClient)
-
         val hybridAiRepository = HybridAiRepository(
             claudeApi = claudeApi,
             mcpClient = mcpClient,
@@ -124,6 +127,7 @@ class MainActivity : ComponentActivity() {
 
                 val isConnected by connectivityObserver.isConnected.collectAsState()
 
+                //shows a snackbar if not connected to internett
                 val snackbarHostState = remember { SnackbarHostState() }
                 LaunchedEffect(isConnected) {
                     if (!isConnected) {
@@ -132,10 +136,12 @@ class MainActivity : ComponentActivity() {
                             duration = SnackbarDuration.Indefinite
                         )
                     } else {
+                        //gets dismissed when connected to internet
                         snackbarHostState.currentSnackbarData?.dismiss()
                     }
                 }
 
+                //setup of viewmodels
                 val landingPageViewModel: LandingPageViewModel = viewModel(
                     factory = LandingPageViewModelFactory(metWeatherRepository, hybridAiRepository)
                 )
@@ -155,8 +161,9 @@ class MainActivity : ComponentActivity() {
                         frostRepository
                     )
                 )
-                val mapViewModelFactory = MapViewModelFactory(metWeatherRepository, locationRepository)
-
+                val mapViewModel: MapViewModel = viewModel(
+                    factory = MapViewModelFactory(metWeatherRepository, locationRepository)
+                )
                 val plantDetailsViewModel: PlantDetailsViewModel = viewModel(
                     factory = PlantDetailsViewModelFactory(plantRepository)
                 )
@@ -164,7 +171,7 @@ class MainActivity : ComponentActivity() {
                 AppNavHost(
                     navController = navController,
                     snackbarHostState = snackbarHostState,
-                    mapViewModelFactory = mapViewModelFactory,
+                    mapViewModel = mapViewModel,
                     findPlantsViewModel = findPlantsViewModel,
                     myPlantsViewModel = myPlantsViewModel,
                     locationsViewModel = locationsViewModel,

@@ -6,11 +6,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 
-//værkort som viser temperatur, vær ikon, vær beskrivelse, nedbør
+//weatherCard that displats temperature, weather icon, weather description and precipitation
 @Composable
 fun WeatherCard(
     weatherUiState: WeatherUiState?,
@@ -44,14 +43,15 @@ fun WeatherCard(
                         modifier = Modifier.weight(1f),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        //Værbeskrivelse
+                        //weather description
                         Text(
                             text = weatherUiState.description,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(bottom = 4.dp)
                         )
-                        //Vær ikonene blir henta direkte fra assets med Coil. API'et gir allerede navn for været i string, slipper mapping når man bruker assets
+                        //weather icon is loaded directly from assets using Coil.
+                        //The API returns the symbol name as a string already, so you dont have to do manual mapping (which would be needed if the icon was in drawable)
                         AsyncImage(
                             model = "file:///android_asset/${weatherUiState.iconName}.svg",
                             contentDescription = weatherUiState.description,
@@ -60,7 +60,7 @@ fun WeatherCard(
                     }
                     Spacer(modifier = Modifier.width(3.dp))
 
-                    //Tekst som viser temperatur og nedbær
+                    //Text that shows temp and precipitation
                     Column(horizontalAlignment = Alignment.End) {
                         Text(
                             text = weatherUiState.temperature,
@@ -73,7 +73,7 @@ fun WeatherCard(
                     }
                 }
             }
-            //Hvis man ikke er koblet til internett eller hvis API-kall til MET ikke fungerer
+            //fallback if not conncted to internet or if met API call fails
             else -> {
                 Text(
                     text = "Kunne ikke hente vær",
