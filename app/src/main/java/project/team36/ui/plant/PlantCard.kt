@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -73,8 +74,6 @@ fun PlantCard(
                         .clip(RoundedCornerShape(10.dp)),
                     contentScale = ContentScale.Crop
                 )
-                Spacer(modifier = Modifier.width(12.dp))
-
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = plant.name,
@@ -83,34 +82,35 @@ fun PlantCard(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
 
-                Spacer(modifier = Modifier.width(8.dp))
-
-                //Chip for vannestatus
-                if (needsWater) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .background(
-                                color = MaterialTheme.colorScheme.error,
-                                RoundedCornerShape(50)
-                            )
-                            .padding(horizontal = 12.dp, vertical = 6.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.wateringcan),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onError,
-                            modifier = Modifier.size(14.dp)
+            // Chip for vannestatus
+            if (needsWater) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            color = MaterialTheme.colorScheme.error,
+                            RoundedCornerShape(50)
                         )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "Må vannes",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onError
-                        )
-                    }
+                        .padding(horizontal = 12.dp, vertical = 6.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.wateringcan),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onError,
+                        modifier = Modifier.size(14.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "Må vannes",
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onError
+                    )
                 }
             }
 
@@ -202,33 +202,29 @@ fun InfoSection(
     buttonColor: Color,
     onButtonClick: () -> Unit
 ) {
-    Row(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(color = MaterialTheme.colorScheme.surface,RoundedCornerShape(12.dp))
             .padding(horizontal = 14.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onBackground
+        Text(
+            text = title,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onBackground
             )
-            Text(
-                text = subtitle,
-                fontSize = 13.sp,
-                color = MaterialTheme.colorScheme.onBackground,
-
-            )
-        }
-        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = subtitle,
+            fontSize = 13.sp,
+            color = MaterialTheme.colorScheme.onBackground
+        )
         Button(
             onClick = onButtonClick,
             colors = ButtonDefaults.buttonColors(buttonColor),
             shape = RoundedCornerShape(50),
-            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 7.dp),
+            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 10.dp),
         ) {
             Text(
                 text = buttonText,
