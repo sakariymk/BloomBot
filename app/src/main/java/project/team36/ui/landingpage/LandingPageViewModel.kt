@@ -36,7 +36,7 @@ data class LandingPageUiState(
     val showInfoDialog: Boolean = false
 )
 
-//oversetter værsymboler fra Met til vær beskrivelser som vises på værkort
+//maps weather symbols from met to weather descriptions in norwegian
 private fun weatherSymbolToDescription(symbol: String): String {
     return when (symbol) {
         "clearsky", "clearsky_day", "clearsky_night", "clearsky_polartwilight" -> "Klarvær"
@@ -92,11 +92,11 @@ private fun weatherSymbolToDescription(symbol: String): String {
 
         "thunder" -> "Torden"
 
-        else -> symbol
+        else -> symbol //fallback, just shows the raw symbol text
     }
 }
 
-//værvarsel som vises på værkort, temperatut og nedbør
+//converts weatherforecast to strings that can easily be used in weathercard
 private fun WeatherForecast.toUiState() = WeatherUiState(
     temperature = "${temperature}°C",
     precipitation = "🌧 $precipitation mm",
@@ -113,6 +113,7 @@ class LandingPageViewModel(
     private val _uiState = MutableStateFlow(LandingPageUiState())
     val uiState: StateFlow<LandingPageUiState> = _uiState.asStateFlow()
 
+    //fetches ai advice for given location
     fun fetchAiAdvice(location: SavedLocation) {
         _uiState.value = _uiState.value.copy(isAiLoading = true, aiResponse = null)
         viewModelScope.launch {
@@ -133,21 +134,24 @@ class LandingPageViewModel(
         _uiState.value = _uiState.value.copy(showInfoDialog = false)
     }
 
+    //fetches weather forecasts and Metalerts for all saved locations (using couroutine)
     fun loadDataForLocations(locations: List<SavedLocation>) {
+        //uses courotine so all weather data can be fetched at the same time
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isWeatherLoading = true, isAlertsLoading = true)
 
-            // Henter alle varsler
+            //fetches all alerts once so it can be reused for all of the saved locations
             val allAlerts = runCatching { weatherRepository.getAllAlerts() }.getOrDefault(emptyList())
 
             val alertsMap = mutableMapOf<Long, List<WeatherAlert>>()
             val forecastsMap = mutableMapOf<Long, WeatherUiState?>()
 
+            //goes through each saved location and fetches data for it
             locations.forEach { location ->
                 val lat = location.lat ?: 0.0
                 val lon = location.lon ?: 0.0
 
-                // Filtrer varsler som treffer akkurat denne lokasjonen
+                //filters those alerts that are relevant for this locations coordinates
                 val relevantAlerts = allAlerts.filter { alert ->
                     alert.polygons.any { polygon ->
                         weatherRepository.isPointInPolygon(lat, lon, polygon)
@@ -155,7 +159,7 @@ class LandingPageViewModel(
                 }
                 alertsMap[location.id] = relevantAlerts
 
-                // Hent værvarsel
+                //gets and parses weather forecast
                 val rawForecast = runCatching {
                     weatherRepository.getForecast(lat, lon)
                 }.getOrNull()

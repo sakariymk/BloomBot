@@ -38,10 +38,11 @@ fun MyPlantsScreen(
 
     val selectedLocation by locationsViewModel.selectedLocation.collectAsStateWithLifecycle()
 
-    //hent planter for valgt sted
+    //fetches plants for a savedlocation
     val plants by myPlantsViewModel.plants.collectAsStateWithLifecycle()
 
 
+    //reloads rain data whenever selected location changes
     LaunchedEffect(selectedLocation) {
         selectedLocation?.let {
             val lat = it.lat ?: return@let
@@ -71,7 +72,7 @@ fun MyPlantsScreen(
                     }
                 },
                 actions = {
-
+                    //ui state for edit dropdown
                     var expanded by rememberSaveable { mutableStateOf(false) }
                     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
                     var showRenameDialog by rememberSaveable { mutableStateOf(false) }
@@ -106,6 +107,7 @@ fun MyPlantsScreen(
                                 }
                             )
                         }
+                        //delete confirmation dialogbox
                         if (showDeleteDialog) {
                             AlertDialog(
                                 title = { Text("Ønsker du å slette hagen?") },
@@ -133,6 +135,7 @@ fun MyPlantsScreen(
                                 containerColor = MaterialTheme.colorScheme.surface
                             )
                         }
+                        //renamedialogbox
                         if (showRenameDialog) {
                             AlertDialog(
                                 title = { Text("Bytt navn på hagen") },
@@ -177,13 +180,12 @@ fun MyPlantsScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
                 ),
-                windowInsets = WindowInsets(0) //gjør at appen ikke legger til mye mellomrom på toppen av skjermen
+                windowInsets = WindowInsets(0) //removes exra space at the top of the screen
             )
         },
 
         bottomBar = { BottomNavBar(navController = navController, locationsViewModel)},
 
-        // Finn ut hvordan sende informasjon om hvor du kommer fra
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "Ingen hage valgt"}") },
@@ -203,6 +205,7 @@ fun MyPlantsScreen(
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            //if garden has no plants yet, shows emptyplantcard
             if (plants.isEmpty()) {
                 item {
                     EmptyPlantCard(

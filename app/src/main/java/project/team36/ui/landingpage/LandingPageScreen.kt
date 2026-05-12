@@ -69,13 +69,13 @@ fun LandingPageScreen(
     val savedLocations by locationsViewModel.savedLocations.collectAsStateWithLifecycle()
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
 
-    // for onboarding
+    //tracks whether the user has seen the onboarding info or not
     val context = LocalContext.current
     val prefs = remember {
         context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
     }
 
-    // Vis automatisk første gang
+    //shows onboarding dialog automatically on first launch
     LaunchedEffect(Unit) {
         if (!prefs.getBoolean("has_seen_intro", false)) {
             landingPageViewModel.showInfoDialog()
@@ -85,16 +85,19 @@ fun LandingPageScreen(
 
     val locationPermission = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
 
+    //loads again which plants need watering when the list of savedlocations changes
     val plantsByLocation by remember(savedLocations) {
         myPlantsViewModel.getPlantsNeedingWaterByLocation(savedLocations)
     }.collectAsStateWithLifecycle(initialValue = emptyMap())
 
+    //requests location permission
     LaunchedEffect(Unit) { locationPermission.launchPermissionRequest() }
 
-    //Avslutter LaunchedEffect-blokken tidlig dersom det er ingen lagrede steder
-    //Henter data for lagrede steder
-    //Setter selectedLocation til første tab når siden lastes inn, så anbefalte planter kan displaye for denne hagen med en gang
+    //cancels launchedEffect block early if there are no saved locations
+    //fetches data for saved locations
+    //sets selectedLocation to first tab when the screen loads in, so recommended plants can display for this garden right away
     LaunchedEffect(savedLocations) {
+        //nothing to load if there are no saved locations
         if (savedLocations.isEmpty()) return@LaunchedEffect
         landingPageViewModel.loadDataForLocations(savedLocations)
         if (locationsViewModel.selectedLocation.value == null) {
@@ -123,7 +126,7 @@ fun LandingPageScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
-                windowInsets = WindowInsets(0)
+                windowInsets = WindowInsets(0) //removes extra space on top of the screen (because of toppappbar)
             )
         },
         bottomBar = { BottomNavBar(navController = navController, locationsViewModel) }
@@ -142,7 +145,7 @@ fun LandingPageScreen(
                     color = MaterialTheme.colorScheme.onBackground
                 )
             } else {
-                //horisontal scrollable liste med lagrede hager
+                //horizontally scrollable tab row, for saved locations
                 PrimaryScrollableTabRow(
                     selectedTabIndex = selectedTabIndex,
                     edgePadding = 16.dp,
@@ -153,6 +156,7 @@ fun LandingPageScreen(
                     savedLocations.forEachIndexed { index, location ->
                         val alerts = uiState.locationAlerts[location.id] ?: emptyList()
                         val hasAlert = alerts.isNotEmpty()
+                        //uses the alerts own color, fallback to red
                         val alertColor = alerts.firstOrNull()?.color
                             ?: Color.Red
                         val isSelected = selectedTabIndex == index
@@ -179,6 +183,7 @@ fun LandingPageScreen(
                                         style = MaterialTheme.typography.bodyMedium,
                                         fontWeight = FontWeight.Medium
                                     )
+                                    //if the location has an alert, shows a warning icon on the tab
                                     if (hasAlert) {
                                         Spacer(Modifier.width(4.dp))
                                         Icon(
@@ -202,6 +207,7 @@ fun LandingPageScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    //weatherAlerts banner for selected location
                     if (alertsForSelectedLocation.isNotEmpty()) {
                         Spacer(modifier = Modifier.height(12.dp))
                         Column {
@@ -224,7 +230,7 @@ fun LandingPageScreen(
                         modifier = Modifier.fillMaxWidth(),
                         contentAlignment = Alignment.Center
                     ) {
-                        //knapp for å hente AI-råd
+                        //ai-advice button
                         Button(
                             onClick = { landingPageViewModel.fetchAiAdvice(selectedLocation) },
                             modifier = Modifier
@@ -238,6 +244,7 @@ fun LandingPageScreen(
                                     ),
                                     shape = CircleShape
                                 ),
+                            //is disabled when a request is in progress
                             enabled = !uiState.isAiLoading && !uiState.isFutureAiLoading,
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color.Transparent,
@@ -269,7 +276,7 @@ fun LandingPageScreen(
                     }
 
 
-                    //AlertDialog som viser AI resultatene
+                    //dialogbox that displays the ai advice response
                     if (uiState.aiResponse != null) {
                         AlertDialog(
                             onDismissRequest = { landingPageViewModel.dismissAiAdvice() },
@@ -349,7 +356,7 @@ fun LandingPageScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    //liste med dagens oppgaver, hvilke planter som skal vannes for dagen
+                    //list of plants that need watering today, grouped by location
                     DailyTasksCard(
                         plantsByLocation = plantsByLocation,
                         onMarkAsWatered = { myPlantsViewModel.markAsWatered(it) }
@@ -359,7 +366,8 @@ fun LandingPageScreen(
         }
     }
 
-        //onboarding dialogboks, kort intro til appen
+        //onboarding dialog, shown on first launch or when info button is clicked
+        //short intro for the app
         if (uiState.showInfoDialog) {
             OnboardingDialog(
                 onDismiss = { landingPageViewModel.dismissInfoDialog() },
@@ -371,7 +379,7 @@ fun LandingPageScreen(
         }
     }
 
-    //metAlerts banner for en lokasjon, vises om det er farevarsel for lokasjonen
+    //metAlerts banner for selected location, shows when there is an active alert for that location
     @Composable
     fun LocationAlertBanner(alert: WeatherAlert) {
         Row(

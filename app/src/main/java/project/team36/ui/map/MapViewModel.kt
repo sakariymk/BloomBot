@@ -62,7 +62,7 @@ class MapViewModel(
     private val savedLocationsRepository: LocationRepository
 ) : ViewModel() {
 
-    //startkart sentrert over Norge
+    //startmap centered on Norway
     val mapViewportState = MapViewportState().apply {
         setCameraOptions {
             zoom(4.3)
@@ -74,9 +74,9 @@ class MapViewModel(
 
     private val _uiState = MutableStateFlow(MapUiState())
     val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()
-    private var hasInitializedCamera = false //for at kameraet skal ikke zoome sykt mye rundt når man beveger på seg
+    private var hasInitializedCamera = false //so the camera doesn't zoom around a lot when user is moving around
 
-    //hindrer at farevarsler hentes på nytt hver gang brukeren beveher seg
+    //prevents alerts from getting fetched every time the user moves
     private var hasLoadedAlerts = false
     private val searchEngine = SearchEngine.createSearchEngine(
         ApiType.SEARCH_BOX,
@@ -87,11 +87,11 @@ class MapViewModel(
     fun updateUserPosition(lat: Double, lon: Double) {
         _uiState.value = _uiState.value.copy(userLat = lat, userLon = lon)
         if (!hasLoadedAlerts) {
-            //henter farevarsler første gangen
+            //fetches alerts the first time
             hasLoadedAlerts = true
             fetchAlerts(lat, lon)
         } else {
-            //når varsler er alerede henta, så filtrerer man de som gjelder brukerens nye posisjon
+            //when alerts are already fetched, then it filters through the alerts that applies to the users new position
             val currentAlerts = _uiState.value.weatherAlerts.filter { alert ->
                 alert.polygons.any { polygon -> weatherRepository.isPointInPolygon(lat, lon, polygon) }
             }
@@ -105,7 +105,7 @@ class MapViewModel(
         }
     }
 
-    //når brukeren ønsker å lagre sted på live lokasjon, og trigger boks for å lagre lokasjon
+    //when the user wants to save place based on live location, and it triggers dialogbox to confirm save
     fun requestLiveLocationSave() {
         val lat = _uiState.value.userLat
         val lon = _uiState.value.userLon
@@ -117,34 +117,35 @@ class MapViewModel(
     }
 
 
-    //henter adresse ut fra koordinater, brukes når man skal lagre et sted basert på live lokasjon
+    //fetches addresses based on coordinates, is used for saving based on live location
+    //helper function for confirmSaveLiveLocation
     suspend fun getAddress(lat: Double, lon: Double, context: Context): String? {
         return suspendCancellableCoroutine { continuation ->
             val geocoder = Geocoder(context, Locale.getDefault())
-            //bruker android studio sitt innebygde geocoder for å hente adresse basert på koordinater
+            //uses android studio's own geocoder class to get address based on coordinates (this requires min API 33, that's why our app is min 33)
             geocoder.getFromLocation(lat, lon, 1) { results ->
                 continuation.resume(results.firstOrNull()?.getAddressLine(0))
             }
         }
     }
 
-    //trigges når brukeren bekrefter at de vil lagre på livelokasjon
+    //triggers when the user confirms that they want to save place based on live location
     fun confirmSaveLiveLocation(context: Context, onSaved: () -> Unit) {
         val lat = _uiState.value.userLat ?: return
         val lon = _uiState.value.userLon ?: return
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSaving = true)
-            //kaller på getAddress for å hente adresse fra koordinater
+            //calls getAddress to get address from coordinates
             val address = getAddress(lat, lon, context)
 
-            // Bytt fra followPuck til fast kameraposisjon for å kunne hente klimasone
+            //Switches from followPuck to static camera position to fetch climate zone
             mapViewportState.flyTo(
                 cameraOptions {
                     center(Point.fromLngLat(lon, lat))
                     zoom(14.0)
                 }
             )
-            //Delay for å rekke å laste inn klimasone
+            //delay to give time for the climate zone to be loaded in
             delay(700)
             val zone = getClimateZone(lng = lon, lat = lat)
 
@@ -154,7 +155,7 @@ class MapViewModel(
                     lat = lat,
                     lon = lon,
                     address = address,
-                    zone = zone ?: 0 //fallback til sone 0 hvis klimasone ikke ble funnet
+                    zone = zone ?: 0 //fallback to zone 0 if failed to get correct climate zone
                 )
             )
             _uiState.value = _uiState.value.copy(isSaving = false, showLiveLocationConfirm = false)
@@ -174,12 +175,13 @@ class MapViewModel(
         }
     }
 
-    //henter farevarsler for et sted
+    //fetches all weather alerts and filters them based on given coordinate
     fun fetchAlerts(userLat: Double, userLon: Double) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isAlertLoading = true)
             try {
                 val allAlerts = weatherRepository.getAllAlerts()
+                //filters alerts to only the polygons that contains the users location
                 val local = allAlerts.filter { alert ->
                     alert.polygons.any { polygon -> weatherRepository.isPointInPolygon(userLat, userLon, polygon) }
                 }
@@ -189,28 +191,28 @@ class MapViewModel(
                     isAlertLoading = false
                 )
             } catch (e: Exception) {
-                Log.e("ALERTS", "Feil ved henting av varsler: ${e.message}")
+                Log.e("ALERTS", "Error when fetching alerts: ${e.message}")
                 _uiState.value = _uiState.value.copy(isAlertLoading = false)
             }
         }
     }
 
-    //til søkebar, suggestions til steder endrer seg mens brukeren taster inn bokstaver
+    //for the searchBar, search suggestions changes as the user is typing
     fun onSearchQueryChanged(query: String) {
         _uiState.value = _uiState.value.copy(searchQuery = query)
 
-        //begynner å vise sekeresultater når brukeren har tasta inn 2 bokstaver
+        //starts showing searchResults when the user has typed 2 letters
         if (query.length >= 2) {
             searchEngine.search(
                 query,
-                SearchOptions(limit = 6), //limiter til 6 forslag i listen
+                SearchOptions(limit = 6), //limits suggestions to avoid overwhelming the user
                 object : SearchSuggestionsCallback {
                     override fun onSuggestions(
                         suggestions: List<SearchSuggestion>,
                         responseInfo: ResponseInfo
                     ) {
                         _uiState.value = _uiState.value.copy(suggestions = suggestions)
-                        //viser forslagene
+                        //for debugging, logs suggestions name and description
                         suggestions.forEachIndexed { index, suggestion ->
                             Log.d(
                                 "Suggestion[$index]", """
@@ -227,11 +229,13 @@ class MapViewModel(
                 }
             )
         } else {
-            //tømmer forslag når søkefeltet er nesten tomt
+            //clears suggestions when the searchBar is almost empty
             _uiState.value = _uiState.value.copy(suggestions = emptyList())
         }
     }
 
+
+    //when the user clicks on a suggestion while searching, triggers savedialogbox
     fun handleSuggestionSelection(
         suggestion: SearchSuggestion,
         mapViewportState: MapViewportState,
@@ -242,13 +246,15 @@ class MapViewModel(
                 result: SearchResult,
                 responseInfo: ResponseInfo,
             ) {
+                //updates the state with selected results and triggers the save dialogbox
                 _uiState.value = _uiState.value.copy(
                     selectedResult = result,
                     showSaveDialog = true,
                     searchQuery = result.name,
-                    suggestions = emptyList()
+                    suggestions = emptyList() //dismisses the suggestions after selecting
                 )
 
+                //moves the camera to the selected location on the map
                 val camera = cameraOptions {
                     center(result.coordinate)
                     zoom(14.0)
@@ -259,6 +265,7 @@ class MapViewModel(
                 mapViewportState.flyTo(camera, animationOptions)
             }
 
+            //unused callbacks, required by mapbox (gives error otherwise)
             override fun onResults(suggestion: SearchSuggestion, results: List<SearchResult>, responseInfo: ResponseInfo) {}
             override fun onError(e: Exception) {}
             override fun onSuggestions(suggestions: List<SearchSuggestion>, responseInfo: ResponseInfo) {}
@@ -271,22 +278,23 @@ class MapViewModel(
         mapboxMap = map
     }
 
+    //fetches climate zone for given coordinate
     suspend fun getClimateZone(
         lng: Double,
         lat: Double
     ): Int? = suspendCancellableCoroutine { continuation ->
         val map = mapboxMap ?: run {
-            //hvis kart ikke er klart ennå, så returneres det null fremfor å krasje
+            //if the map is not ready yet, returns null instead of crashing
             continuation.resume(null)
             return@suspendCancellableCoroutine
         }
 
-        //konverterer fra koordinater til piksler, queryrenderedFeatures krever det
+        //converts coordinates to screen pixels, queryrenderedFeatures requires it
         val pointOnScreen = map.pixelForCoordinate(
             Point.fromLngLat(lng, lat)
         )
 
-        //finner hvilken klimesone pikselposisjonen er i
+        //uses the rendered layer at the pixel position to find climate zone
         map.queryRenderedFeatures(
             RenderedQueryGeometry(pointOnScreen),
             RenderedQueryOptions(listOf(LAYER_ID), null)
@@ -301,13 +309,13 @@ class MapViewModel(
         }
     }
 
-    //trigges når brukeren bekrefter å lagre lokasjon
+    //triggered when the users confirms saving a location
     fun confirmSavePlace(onSaved: () -> Unit) {
         val result = _uiState.value.selectedResult ?: return
-        val name = _uiState.value.placeNameInput.ifEmpty { result.name } //bruker stedsnavn som fallback
+        val name = _uiState.value.placeNameInput.ifEmpty { result.name } //fallback to the place name if user left input empty
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSaving = true)
-            // Delay som trengs for å gi features med klimasoner skal rekke å laste inn
+            //delay to wait for climate zone features to finish rendering before saving location
             delay(700)
             val zone = getClimateZone(
                 lng = result.coordinate.longitude(),
@@ -315,16 +323,17 @@ class MapViewModel(
             )
 
             //legger inn lokasjonen til repository med koordinater, navn, og addresse
+            //saves location in the repository with coordinates, name, address and climate zone
             savedLocationsRepository.insertLocation(
                 SavedLocation(
                     name = name,
                     lat = result.coordinate.latitude(),
                     lon = result.coordinate.longitude(),
                     address = result.fullAddress,
-                    zone = zone ?: 0
+                    zone = zone ?: 0 //defaults to 0 if climate zone failed to load
                 )
             )
-            //lukker savedialog
+            //closes the save dialog
             _uiState.value = _uiState.value.copy(isSaving = false)
             dismissSaveDialog()
             onSaved()

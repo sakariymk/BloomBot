@@ -57,7 +57,7 @@ fun SearchBar(
         shape = RoundedCornerShape(8.dp)
     )
 
-    //viser liste med forslag
+    //shows list with suggestions
     if (suggestions.isNotEmpty()) {
         Surface(
             color = MaterialTheme.colorScheme.surface,
@@ -75,10 +75,10 @@ fun SearchBar(
                     .padding(16.dp)
                     .verticalScroll(scrollState)
             ) {
-                //fjerner kategorier, overflødig info, vi ønsker å kun ha adresse og steder
+                //removes categories, shows only addresses and names for places
                 val filteredSuggestions = suggestions.filter { it.type !is SearchSuggestionType.Category }
 
-                //viser adresse hvis tilgjengelig, hvis ikke så fallback til region
+                //uses full address if available, if not then fallback to region
                 filteredSuggestions.forEachIndexed { index, suggestion ->
                     val addressText = suggestion.fullAddress
                         ?: listOfNotNull(
@@ -89,7 +89,7 @@ fun SearchBar(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                keyboardController?.hide() //skjuler adresse når brukeren klikker på et stedsforslag
+                                keyboardController?.hide() //hides keyboard when a suggestion is selected
                                 onSuggestionClicked(suggestion)
                             }
                             .padding(vertical = 12.dp, horizontal = 8.dp),
@@ -118,7 +118,7 @@ fun SearchBar(
                             )
                         }
                     }
-                    //skille linje mellom hvert forslag
+                    //divider between suggestions
                     if (index < filteredSuggestions.lastIndex) {
                         HorizontalDivider(color = MaterialTheme.colorScheme.outline)
                     }

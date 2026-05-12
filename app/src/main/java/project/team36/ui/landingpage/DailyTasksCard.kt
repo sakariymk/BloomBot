@@ -43,11 +43,13 @@ import project.team36.ui.plant.InfoSection
 import kotlin.collections.isNotEmpty
 
 
+//card with all the plants that need watering today and are grouped by location
 @Composable
 fun DailyTasksCard(
     plantsByLocation: Map<SavedLocation, List<Pair<SavedPlant, String>>>,
     onMarkAsWatered: (SavedPlant) -> Unit,
 ) {
+    //true if there's a location that has a plant that needs watering
     val hasAnyPlants = plantsByLocation.values.any { it.isNotEmpty() }
 
     Column {
@@ -67,7 +69,7 @@ fun DailyTasksCard(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
         ) {
 
-            //hvis det ikke er noen planter som trengs å vannes
+            //if there's no plants that need watering today
             if (!hasAnyPlants) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -81,7 +83,7 @@ fun DailyTasksCard(
                     )
                 }
             } else {
-                //går gjennom alle lokasjoner og planter som trengs å vannes
+                //goes through all location and plants that need watering, skips location with no plants needing water
                 plantsByLocation.forEach { (location, plantsWithText) ->
                     if (plantsWithText.isNotEmpty()) {
                         Text(
@@ -116,7 +118,7 @@ fun DailyTasksCard(
     }
 }
 
-//kort for hver plante som må vannes
+//expandable card for a single plant that needs watering
 @Composable
 fun WateringPlantCard(
     plant: SavedPlant,
@@ -124,6 +126,7 @@ fun WateringPlantCard(
     onMarkAsWatered: () -> Unit,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
+    //fallback to default image (defaultplant)
     val imageId = if (plant.imageRes != 0) plant.imageRes else R.drawable.defaultplant
 
 
@@ -140,7 +143,7 @@ fun WateringPlantCard(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                //bilde av planten
+                //picture of the plant
                 Image(
                     painter = painterResource(id = imageId),
                     contentDescription = plant.name,
@@ -157,7 +160,7 @@ fun WateringPlantCard(
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
-            //"må vannes" chip
+            //"needs watering" status chip
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
@@ -182,7 +185,7 @@ fun WateringPlantCard(
                 )
             }
         }
-        //innhold når kortet er expanded
+        //expanded content, shows watering details and "mark as watered" button
         AnimatedVisibility(visible = expanded) {
             Column(
                 modifier = Modifier
@@ -204,7 +207,7 @@ fun WateringPlantCard(
             }
         }
 
-        //pil for å expande kortet
+        //arrow that show that the card can be expanded/collapsed
         IconButton(
             onClick = { expanded = !expanded },
             modifier = Modifier
