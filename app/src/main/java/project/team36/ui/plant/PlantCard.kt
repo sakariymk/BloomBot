@@ -12,18 +12,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
@@ -33,6 +32,9 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+/*
+Plantcard that displays information on the saved plant from database, and gives functionality to water and fertilize.
+ */
 @Composable
 fun PlantCard(
     plant: SavedPlant,
@@ -43,7 +45,7 @@ fun PlantCard(
     onMarkAsFertilized: () -> Unit,
     onNavigateToDetails: () -> Unit,
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by rememberSaveable { mutableStateOf(false) }
 
     val imageId = if (plant.imageRes != 0) plant.imageRes else R.drawable.defaultplant
 
@@ -61,7 +63,7 @@ fun PlantCard(
                 .fillMaxWidth()
                 .padding(12.dp),
         ) {
-            // Header som alltid er synlig
+            // Header that is always visible
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -74,6 +76,7 @@ fun PlantCard(
                         .clip(RoundedCornerShape(10.dp)),
                     contentScale = ContentScale.Crop
                 )
+                Spacer(modifier = Modifier.width(6.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = plant.name,
@@ -85,7 +88,7 @@ fun PlantCard(
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Chip for vannestatus
+            // Chip for watering status
             if (needsWater) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -126,7 +129,7 @@ fun PlantCard(
                         modifier = Modifier.padding(vertical = 12.dp),
                         color = MaterialTheme.colorScheme.outline
                     )
-                    //Teller ned på vanningsdager siden sist vanning, eller siden det sist regnet 5 mm
+                    // Counts down from date when it was last watered either manually or with rain
                     InfoSection(
                         title = "Vanningsbehov",
                         subtitle = when (daysUntilWatering) {
@@ -139,7 +142,7 @@ fun PlantCard(
                         onButtonClick = onMarkAsWatered
                     )
 
-                    //Gjødsling av planten, oppdaterer dato for sist gjødsel gitt for sporing
+                    // Fertilizing, displaying last date for tracking
                     InfoSection(
                         title = "Gjødsel",
                         subtitle = if (plant.lastFertilizationDate == 0L) {
@@ -151,7 +154,7 @@ fun PlantCard(
                         buttonColor = MaterialTheme.colorScheme.primary,
                         onButtonClick = onMarkAsFertilized
                     )
-                    // Knapp for å navigere til detaljskjerm for plante med en slett-knapp
+                    // Button to navigate to details screen for more information on the plant
                     Button(
                         onClick = onNavigateToDetails,
                         modifier = Modifier
@@ -178,7 +181,7 @@ fun PlantCard(
                     }
                 }
             }
-            //pil for å expande kortet
+            // Button for expansion of the card
             IconButton(
                 onClick = { expanded = !expanded },
                 modifier = Modifier
@@ -193,7 +196,7 @@ fun PlantCard(
         }
     }
 }
-
+//Infosection for displaying information about the plant with same format for each section
 @Composable
 fun InfoSection(
     title: String,
@@ -205,8 +208,8 @@ fun InfoSection(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = MaterialTheme.colorScheme.surface,RoundedCornerShape(12.dp))
-            .padding(horizontal = 14.dp, vertical = 10.dp),
+            .background(color = MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp))
+            .padding(horizontal = 14.dp),
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
         Text(
@@ -214,28 +217,36 @@ fun InfoSection(
             fontSize = 14.sp,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onBackground
-            )
-        Text(
-            text = subtitle,
-            fontSize = 13.sp,
-            color = MaterialTheme.colorScheme.onBackground
         )
-        Button(
-            onClick = onButtonClick,
-            colors = ButtonDefaults.buttonColors(buttonColor),
-            shape = RoundedCornerShape(50),
-            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 10.dp),
+        //FlowRow to accommodate larger fonts so the button is placed on a new line when display is scaled up
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                text = buttonText,
+                text = subtitle,
                 fontSize = 13.sp,
-                color = MaterialTheme.colorScheme.onPrimary
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.align(Alignment.CenterVertically)
             )
+            Button(
+                onClick = onButtonClick,
+                colors = ButtonDefaults.buttonColors(buttonColor),
+                shape = RoundedCornerShape(50),
+                contentPadding = PaddingValues(horizontal = 14.dp, vertical = 7.dp),
+            ) {
+                Text(
+                    text = buttonText,
+                    fontSize = 13.sp,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            }
         }
     }
 }
 
-//Hjelpefunksjon for å definere displayformatet på dato fra database
+// Helping function to translate the date saved in database to a better displayable text
 fun Long.toDisplayDate(): String {
     if (this == 0L) return "Ikke gjødslet enda"
     val sdf = SimpleDateFormat("dd.MMMM yyyy", Locale.forLanguageTag("no"))
