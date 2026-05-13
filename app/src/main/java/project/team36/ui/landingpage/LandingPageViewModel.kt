@@ -32,7 +32,6 @@ data class LandingPageUiState(
     val isAlertsLoading : Boolean = false,
     val aiResponse: AiRecommendationResponse? = null,
     val isAiLoading: Boolean = false,
-    val isFutureAiLoading: Boolean = false,
     val showInfoDialog: Boolean = false
 )
 
