@@ -86,6 +86,13 @@ fun LandingPageScreen(
         }
     }
 
+    //Updates the UI based on internet connection automatically, in case the user reconnects and can access the information again.
+    LaunchedEffect(isConnected) {
+        if (isConnected and savedLocations.isNotEmpty()) {
+            landingPageViewModel.loadDataForLocations(savedLocations)
+        }
+    }
+
     val locationPermission = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
 
     //loads again which plants need watering when the list of savedlocations changes
@@ -368,6 +375,7 @@ fun LandingPageScreen(
                             }
                         )
                     }
+                    // AlertDialog for if there is no internet connection.
                     if (showNoNetworkDialog) {
                         AlertDialog(
                             onDismissRequest = { showNoNetworkDialog = false },

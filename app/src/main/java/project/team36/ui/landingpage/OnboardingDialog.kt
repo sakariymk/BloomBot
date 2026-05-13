@@ -34,12 +34,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import project.team36.R
-import project.team36.ui.theme.Team36Theme
 
 //Dialog som vises første gangen appen kjøres, og er tilgjengelig via toppappbar på landingpage senere.
 //Gir en rask introduksjon til appen, og sender bruker til Mine Steder, der hen blir oppfordret til å legge til første hage.
@@ -168,16 +166,5 @@ fun OnboardingDialog(
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun OnboardingDialogPreview() {
-    Team36Theme {
-        OnboardingDialog(
-            onDismiss = {},
-            onFinish = {}
-        )
     }
 }
