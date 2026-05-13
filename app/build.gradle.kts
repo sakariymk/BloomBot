@@ -44,75 +44,72 @@ android {
 }
 
 dependencies {
-    //Navigations
-    implementation("androidx.navigation:navigation-compose:2.9.8")
+    //Navigation
+    implementation(libs.androidx.navigation.compose)
     //MapBox
-    implementation("com.mapbox.maps:android:11.19.0")
-    implementation("com.mapbox.extension:maps-compose:11.19.0")
-    implementation("com.mapbox.search:mapbox-search-android:2.14.0-beta.1")
+    implementation(libs.mapbox.maps)
+    implementation(libs.mapbox.extension.compose)
+    implementation(libs.mapbox.search)
     //ViewModel
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.10.0")
-    implementation("com.google.accompanist:accompanist-permissions:0.37.3")
-
-    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
-    // OkHttp for nettverk og Server-Sent Events (SSE)
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("com.squareup.okhttp3:okhttp-sse:4.12.0")
-    // Coroutines for asynkrone kall
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    //Permissions
+    implementation(libs.accompanist.permissions)
+    //Serialization
+    implementation(libs.kotlinx.serialization.json)
+    // OkHttp for network and Server-Sent Events (SSE)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.sse)
+    // Coroutines for async calls
+    implementation(libs.kotlinx.coroutines.android)
     //retrofit
-    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.serialization.converter)
     //Icons
-    implementation("androidx.compose.material:material-icons-extended")
-    // Ktor og SDK-klient
-    implementation("io.modelcontextprotocol:kotlin-sdk-client:0.9.0")
-    implementation(platform("io.ktor:ktor-bom:3.4.1"))         // styrer alle versjoner automatisk
-    implementation("io.ktor:ktor-client-android")
-    implementation("io.ktor:ktor-client-content-negotiation")
-    implementation("io.ktor:ktor-serialization-kotlinx-json")
-    implementation("io.ktor:ktor-client-cio:3.4.3")
+    implementation(libs.compose.material.icons.extended)
+    // Ktor and SDK-client
+    implementation(libs.mcp.kotlin.sdk)
+    implementation(platform(libs.ktor.bom))
+    implementation(libs.ktor.client.android)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+    //Coil, for pictures
+    implementation(libs.coil.compose)
+    implementation(libs.coil.svg)
 
-    // Mockito for vanlige enhetstester (Unit tests i test-mappen)
-    testImplementation("org.mockito:mockito-core:5.11.0")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
-
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
+    //Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.foundation)
-    implementation(libs.androidx.foundation)
-    implementation(libs.androidx.junit.ktx)
+    debugImplementation(libs.androidx.compose.ui.tooling)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    //Material3
+    implementation(libs.material)
+
+    //Android
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
+
+    //Room database
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+
+    //For tests
     testImplementation(libs.junit)
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-    testImplementation("io.mockk:mockk:1.13.12")
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.junit.jupiter)
+    testImplementation(libs.mockk)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-    debugImplementation(libs.androidx.compose.ui.tooling)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
-    implementation("androidx.core:core-ktx:1.x.x")
-    implementation("io.coil-kt.coil3:coil-compose:3.4.0")
-    implementation("io.coil-kt.coil3:coil-svg:3.4.0")
-    implementation(libs.androidx.activity.compose)
-    implementation("androidx.compose.material3:material3:1.4.0")
-    implementation("com.google.android.material:material:1.13.0")
-    implementation("androidx.compose.runtime:runtime:1.11.0")
-
-    //Room database
-    implementation("androidx.room:room-runtime:2.8.4")
-    ksp("androidx.room:room-compiler:2.8.4")
-    implementation("androidx.room:room-ktx:2.8.4")
-
-    //Til enhetstester
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
-    testImplementation("io.mockk:mockk:1.14.9")
 }
