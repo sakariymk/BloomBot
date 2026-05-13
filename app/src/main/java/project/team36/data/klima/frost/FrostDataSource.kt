@@ -2,7 +2,6 @@ package project.team36.data.klima.frost
 
 import io.ktor.client.*
 import io.ktor.client.call.*
-import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -12,7 +11,7 @@ import project.team36.model.frost.ObservationResponse
 import project.team36.model.frost.SourceResponse
 import project.team36.model.frost.Source
 
-val client = HttpClient(CIO) {
+val client = HttpClient(io.ktor.client.engine.android.Android) {
     install(ContentNegotiation) {
         json(Json {
             ignoreUnknownKeys = true //
