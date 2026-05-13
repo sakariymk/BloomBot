@@ -10,10 +10,11 @@ import project.team36.data.mcp.MetWeatherRepository
 
 class TestMetWeatherRepository() {
 
-    //lager falsk mcp klient
+    //mocking a mcp client
     private val mockClient = mockk<MetMcpClient>()
     private val weatherRepository = MetWeatherRepository(mockClient)
 
+    //test polygon
     val polygon = listOf(
         Pair(59.0, 9.0),
         Pair(45.0, 15.0),
@@ -22,12 +23,14 @@ class TestMetWeatherRepository() {
     )
 
 
+    //tests that a point is inside polygon
     @Test
     fun testPointInsidePolygon() {
         val result = weatherRepository.isPointInPolygon(60.0, 10.0, polygon)
         assertTrue("Point (60.0, 10.0) should be inside polygon", result)
     }
 
+    //tests that a point is outside polygon
     @Test
     fun testPointOutsidePolygon() {
         val result = weatherRepository.isPointInPolygon(64.0, 9.0, polygon)
