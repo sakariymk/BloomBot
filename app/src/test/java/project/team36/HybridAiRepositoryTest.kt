@@ -29,18 +29,13 @@ class HybridAiRepositoryTest {
     fun testGetPlantRecommendations_ParsesJsonCorrectly(): Unit = runBlocking {
         println("Starter test av JSON-parsing i HybridAiRepository...")
 
-        // Vi oppretter falske versjoner (mocks) av databasen og MCP-klienten ved hjelp av Mockito.
-        // Dette gjør vi fordi en ren JUnit-test ikke har tilgang til en ekte Android-enhet for å kjøre Room-databasen.
         val mockMcpClient = mock(MetMcpClient::class.java)
         val mockLocationRepo = mock(LocationRepository::class.java)
 
-        // Vi bygger en "falsk" ClaudeApi (et anonymt objekt) som later som den er Anthropic sin server.
         val fakeClaudeApi = object : ClaudeApi {
             override suspend fun sendMessage(apiKey: String, request: ClaudeRequest): ClaudeResponse {
-                // Dette er den fiktive JSON-strengen vi later som AI-en genererte og sendte til oss.
                 val fakeJson = """
                     {
-                      "weatherSummary": "15°C og sol. Perfekt hagevær!",
                       "plantAdvice": [
                         { "plantName": "Rose", "advice": "Husk å vanne rikelig i dag." }
                       ],
@@ -48,8 +43,6 @@ class HybridAiRepositoryTest {
                     }
                 """.trimIndent()
 
-                // Vi pakker JSON-strengen inn i en ClaudeResponse med stop_reason = "end_turn".
-                // Dette forteller repositoryet vårt at AI-en er ferdig med å tenke og ikke trenger flere verktøy.
                 return ClaudeResponse(
                     content = listOf(ContentBlock(type = "text", text = fakeJson)),
                     stop_reason = "end_turn"
@@ -77,31 +70,26 @@ class HybridAiRepositoryTest {
         // Hvis vi kom så langt, printer vi ut verdiene for å bekrefte at dataene ble lagt på riktig plass.
         response?.let {
             println("--- Test results ---")
-            println("Vær: ${it.weatherSummary}")
             println("Første planteråd: ${it.plantAdvice[0].plantName} - ${it.plantAdvice[0].advice}")
             println("---------------------")
 
-            // Vi kjører strenge tester for å sikre at dataklassene våre fikk nøyaktig de verdiene vi forventet fra JSON-strengen.
-            assertEquals("15°C og sol. Perfekt hagevær!", it.weatherSummary)
             assertEquals(1, it.plantAdvice.size)
             assertEquals("Rose", it.plantAdvice[0].plantName)
             assertEquals("Husk å vanne rikelig i dag.", it.plantAdvice[0].advice)
             assertEquals(2, it.generalTasks.size)
+            assertEquals("Rak løv", it.generalTasks[0])
+            assertEquals("Sjekk for ugress", it.generalTasks[1])
         }
     }
     @Test
     fun testClaudeHallucination_InvalidJsonReturnsNull(): Unit = runBlocking {
         println("Starter test av AI-hallusinasjon (ugyldig JSON)...")
 
-        // Vi oppretter de samme falske databasene og klientene
         val mockMcpClient = mock(MetMcpClient::class.java)
         val mockLocationRepo = mock(LocationRepository::class.java)
 
-        // Vi bygger en ClaudeApi som med vilje ignorerer systemprompten vår
-        // og returnerer vanlig samtale-tekst i stedet for et strukturert JSON-objekt.
         val hallucinatingClaudeApi = object : ClaudeApi {
             override suspend fun sendMessage(apiKey: String, request: ClaudeRequest): ClaudeResponse {
-                // Ren tekst uten JSON-struktur (mangler krøllparanteser, lister osv.)
                 val badJson = "Hei! Det er en nydelig dag ute. Et godt tips er å vanne rosene dine i dag."
 
                 return ClaudeResponse(
