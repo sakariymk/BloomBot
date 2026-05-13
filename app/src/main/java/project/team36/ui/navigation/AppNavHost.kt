@@ -47,6 +47,7 @@ fun AppNavHost(
     locationsViewModel: LocationsViewModel,
     plantDetailsViewModel: PlantDetailsViewModel,
     landingPageViewModel: LandingPageViewModel,
+    isConnected: Boolean
 ) {
     Scaffold(
         snackbarHost = {
@@ -108,7 +109,8 @@ fun AppNavHost(
                     navController = navController,
                     locationsViewModel = locationsViewModel,
                     landingPageViewModel = landingPageViewModel,
-                    myPlantsViewModel = myPlantsViewModel
+                    myPlantsViewModel = myPlantsViewModel,
+                    isConnected = isConnected
                 )
             }
             composable ("plantDetailsScreen/{plantName}/{action}") { backStackEntry ->

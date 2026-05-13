@@ -176,7 +176,8 @@ class MainActivity : ComponentActivity() {
                     myPlantsViewModel = myPlantsViewModel,
                     locationsViewModel = locationsViewModel,
                     plantDetailsViewModel = plantDetailsViewModel,
-                    landingPageViewModel = landingPageViewModel
+                    landingPageViewModel = landingPageViewModel,
+                    isConnected = isConnected
                 )
             }
         }

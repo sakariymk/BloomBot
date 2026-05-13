@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -141,7 +142,7 @@ fun OnboardingDialog(
                         if (currentStep > 0) {
                             OutlinedButton(
                                 onClick = { currentStep-- },
-                                modifier = Modifier.weight(1.5f),
+                                modifier = Modifier.wrapContentWidth(),
                                 shape = RoundedCornerShape(12.dp),
                                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                             ) {
@@ -150,7 +151,7 @@ fun OnboardingDialog(
                         }
                         Button(
                             onClick = { if (isLastStep) onFinish() else currentStep++ },
-                            modifier = Modifier.weight(2.5f),
+                            modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = if (isLastStep) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary //Color(0xFFB8D9B0)

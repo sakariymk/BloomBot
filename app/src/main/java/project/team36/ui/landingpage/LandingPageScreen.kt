@@ -45,6 +45,7 @@ import project.team36.ui.map.LocationsViewModel
 import project.team36.ui.navigation.BottomNavBar
 import androidx.compose.material3.*
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.ColorFilter
@@ -62,12 +63,14 @@ fun LandingPageScreen(
     navController: NavController,
     locationsViewModel: LocationsViewModel,
     landingPageViewModel: LandingPageViewModel,
-    myPlantsViewModel: MyPlantsViewModel
+    myPlantsViewModel: MyPlantsViewModel,
+    isConnected: Boolean
 ) {
 
     val uiState by landingPageViewModel.uiState.collectAsStateWithLifecycle()
     val savedLocations by locationsViewModel.savedLocations.collectAsStateWithLifecycle()
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
+    var showNoNetworkDialog by remember { mutableStateOf(false) }
 
     //tracks whether the user has seen the onboarding info or not
     val context = LocalContext.current
@@ -162,7 +165,10 @@ fun LandingPageScreen(
                         val isSelected = selectedTabIndex == index
                         Tab(
                             selected = selectedTabIndex == index,
-                            onClick = { selectedTabIndex = index; locationsViewModel.selectLocation(location) },
+                            onClick = {
+                                selectedTabIndex = index; locationsViewModel.selectLocation(
+                                location
+                            ) },
                             modifier = Modifier
                                 .padding(end = 8.dp)
                                 .height(40.dp)
@@ -232,7 +238,13 @@ fun LandingPageScreen(
                     ) {
                         //ai-advice button
                         Button(
-                            onClick = { landingPageViewModel.fetchAiAdvice(selectedLocation) },
+                            onClick = {
+                                if (isConnected) {
+                                    landingPageViewModel.fetchAiAdvice(selectedLocation)
+                                } else {
+                                    showNoNetworkDialog = true
+                                }
+                            },
                             modifier = Modifier
                                 .wrapContentWidth()
                                 .background(
@@ -245,7 +257,7 @@ fun LandingPageScreen(
                                     shape = CircleShape
                                 ),
                             //is disabled when a request is in progress
-                            enabled = !uiState.isAiLoading && !uiState.isFutureAiLoading,
+                            enabled = !uiState.isAiLoading,
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color.Transparent,
                                 disabledContainerColor = Color.Transparent,
@@ -276,7 +288,7 @@ fun LandingPageScreen(
                     }
 
 
-                    //dialogbox that displays the ai advice response
+                    //dialogbox that displays the ai-advice response
                     if (uiState.aiResponse != null) {
                         AlertDialog(
                             onDismissRequest = { landingPageViewModel.dismissAiAdvice() },
@@ -290,7 +302,7 @@ fun LandingPageScreen(
                                         contentScale = ContentScale.Fit
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text("Bloombot sier:", fontWeight = FontWeight.Bold)
+                                    Text("Bloombot sier:", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                                 }
                             },
                             text = {
@@ -305,12 +317,13 @@ fun LandingPageScreen(
                                                 fontWeight = FontWeight.Bold,
                                                 color = MaterialTheme.colorScheme.onSurface
                                             )
-                                            val recommendText = uiState.aiResponse!!.plantAdvice.firstOrNull()?.Recommend
+                                            val recommendText =
+                                                uiState.aiResponse!!.plantAdvice.firstOrNull()?.Recommend
                                             if (!recommendText.isNullOrEmpty()) {
                                                 Spacer(modifier = Modifier.height(8.dp))
                                                 Text(
                                                     text = recommendText,
-                                                    color = MaterialTheme.colorScheme.primary,
+                                                    color = MaterialTheme.colorScheme.onSurface,
                                                     fontWeight = FontWeight.Bold,
                                                     modifier = Modifier.padding(bottom = 4.dp)
                                                 )
@@ -319,7 +332,8 @@ fun LandingPageScreen(
                                                 Spacer(modifier = Modifier.height(4.dp))
                                                 Text(
                                                     "• ${advice.plantName}",
-                                                    fontWeight = FontWeight.SemiBold
+                                                    fontWeight = FontWeight.SemiBold,
+                                                    color = MaterialTheme.colorScheme.onSurface
                                                 )
                                                 Text(
                                                     advice.advice,
@@ -339,7 +353,8 @@ fun LandingPageScreen(
                                             uiState.aiResponse!!.generalTasks.forEach { task ->
                                                 Text(
                                                     "- $task",
-                                                    modifier = Modifier.padding(start = 4.dp)
+                                                    modifier = Modifier.padding(start = 4.dp),
+                                                    color = MaterialTheme.colorScheme.onSurface
                                                 )
                                             }
                                         }
@@ -348,6 +363,45 @@ fun LandingPageScreen(
                             },
                             confirmButton = {
                                 TextButton(onClick = { landingPageViewModel.dismissAiAdvice() }) {
+                                    Text("Lukk", color = MaterialTheme.colorScheme.onSurface)
+                                }
+                            }
+                        )
+                    }
+                    if (showNoNetworkDialog) {
+                        AlertDialog(
+                            onDismissRequest = { showNoNetworkDialog = false },
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            title = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.bloombot_yap),
+                                        contentDescription = "Bloombot",
+                                        modifier = Modifier.size(48.dp),
+                                        contentScale = ContentScale.Fit
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Bloombot sier:", fontWeight = FontWeight.Bold)
+                                }
+                            },
+                            text = {
+                                Column(
+                                    modifier = Modifier.verticalScroll(rememberScrollState()),
+                                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
+
+                                    Column {
+                                        Text(
+                                            "Bloombot trenger tilgang til internett for å kunne gi deg tips om hagen. Vennligst sjekk tilkoblingen din.",
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
+
+                                }
+                            },
+                            confirmButton = {
+                                TextButton(onClick = { showNoNetworkDialog = false }) {
                                     Text("Lukk", color = MaterialTheme.colorScheme.onSurface)
                                 }
                             }
@@ -366,51 +420,51 @@ fun LandingPageScreen(
         }
     }
 
-        //onboarding dialog, shown on first launch or when info button is clicked
-        //short intro for the app
-        if (uiState.showInfoDialog) {
-            OnboardingDialog(
-                onDismiss = { landingPageViewModel.dismissInfoDialog() },
-                onFinish = {
-                    landingPageViewModel.dismissInfoDialog()
-                    navController.navigate("myPlaces")
-                }
-            )
-        }
-    }
-
-    //metAlerts banner for selected location, shows when there is an active alert for that location
-    @Composable
-    fun LocationAlertBanner(alert: WeatherAlert) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(alert.color.copy(alpha = 0.15f), RoundedCornerShape(12.dp))
-                .border(1.dp, alert.color.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
-                .padding(horizontal = 6.dp, vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Default.Warning,
-                contentDescription = null,
-                tint = alert.color,
-                modifier = Modifier.size(24.dp)
-            )
-            Spacer(Modifier.width(12.dp))
-            Column(modifier = Modifier.padding(vertical = 6.dp)) {
-                Text(
-                    text = alert.event.uppercase(),
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 13.sp,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    letterSpacing = 0.5.sp
-                )
-                Text(
-                    text = alert.description,
-                    fontSize = 13.sp,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    lineHeight = 18.sp
-                )
+    //onboarding dialog, shown on first launch or when info button is clicked
+    //short intro for the app
+    if (uiState.showInfoDialog) {
+        OnboardingDialog(
+            onDismiss = { landingPageViewModel.dismissInfoDialog() },
+            onFinish = {
+                landingPageViewModel.dismissInfoDialog()
+                navController.navigate("myPlaces")
             }
+        )
+    }
+}
+
+//metAlerts banner for selected location, shows when there is an active alert for that location
+@Composable
+fun LocationAlertBanner(alert: WeatherAlert) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(alert.color.copy(alpha = 0.15f), RoundedCornerShape(12.dp))
+            .border(1.dp, alert.color.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+            .padding(horizontal = 6.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Default.Warning,
+            contentDescription = null,
+            tint = alert.color,
+            modifier = Modifier.size(24.dp)
+        )
+        Spacer(Modifier.width(12.dp))
+        Column(modifier = Modifier.padding(vertical = 6.dp)) {
+            Text(
+                text = alert.event.uppercase(),
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 13.sp,
+                color = MaterialTheme.colorScheme.onBackground,
+                letterSpacing = 0.5.sp
+            )
+            Text(
+                text = alert.description,
+                fontSize = 13.sp,
+                color = MaterialTheme.colorScheme.onBackground,
+                lineHeight = 18.sp
+            )
         }
     }
+}
