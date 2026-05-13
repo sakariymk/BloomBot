@@ -1,4 +1,4 @@
-package project.team36.data.plant
+package project.team36
 
 import io.mockk.every
 import io.mockk.mockk
@@ -7,6 +7,8 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import project.team36.data.plant.PlantDataSource
+import project.team36.data.plant.PlantRepository
 import project.team36.model.location.SavedLocation
 import project.team36.model.location.SavedPlant
 import project.team36.model.plant.LightType
@@ -47,12 +49,12 @@ class PlantRepositoryTest {
         description = ""
     )
 
-    private fun testLocation(zone: Int) = SavedLocation(
+    private fun testLocation() = SavedLocation(
         name = "TestHage",
         lat = 60.0,
         lon = 10.0,
         address = "Gateveien",
-        zone = zone
+        zone = 4
     )
 
     @Before
@@ -74,7 +76,7 @@ class PlantRepositoryTest {
 
     @Test
     fun testPlantsSuitableForZone() {
-        val result = plantRepository.recommendPlants(testLocation(zone = 4), emptyList())
+        val result = plantRepository.recommendPlants(testLocation(), emptyList())
 
         assertTrue("Rose (climateZone 4) skal anbefales for sone 4", result.any { it.name == "Rose" })
         assertTrue("Tulipan (climateZone 6) skal anbefales for sone 4", result.any { it.name == "Tulipan" })
@@ -84,14 +86,14 @@ class PlantRepositoryTest {
     @Test
     fun testAlreadySavedPlants() {
         val savedPlants = listOf(testSavedPlant("Rose"))
-        val result = plantRepository.recommendPlants(testLocation(zone = 4), savedPlants)
+        val result = plantRepository.recommendPlants(testLocation(), savedPlants)
 
         assertFalse("Rose er allerede lagret og skal ekskluderes", result.any { it.name == "Rose" })
     }
 
     @Test
     fun testPlantsTooWarmForZone() {
-        val result = plantRepository.notRecommendedPlants(testLocation(zone = 4), emptyList())
+        val result = plantRepository.notRecommendedPlants(testLocation(), emptyList())
 
         assertTrue("Palme (climateZone 2) skal være i andre planter for sone 4", result.any { it.name == "Palme" })
         assertFalse("Rose (climateZone 4) skal ikke være i andre planter", result.any { it.name == "Rose" })
@@ -101,7 +103,7 @@ class PlantRepositoryTest {
     @Test
     fun testExcludesAlreadySavedPlantsNotRecommend() {
         val savedPlants = listOf(testSavedPlant("Palme"))
-        val result = plantRepository.notRecommendedPlants(testLocation(zone = 4), savedPlants)
+        val result = plantRepository.notRecommendedPlants(testLocation(), savedPlants)
 
         assertFalse("Palme er allerede lagret og skal ekskluderes", result.any { it.name == "Palme" })
     }
