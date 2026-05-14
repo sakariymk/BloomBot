@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import project.team36.R
 
-// SimplePlantCard brukes som plantekort i findPlants
+// SimplePlantCard is used as a plant card in findplants
 
 @Composable
 fun SimplePlantCard (

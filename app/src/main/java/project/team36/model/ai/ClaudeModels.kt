@@ -37,15 +37,15 @@ data class ClaudeMessage(
 data class ContentBlock(
     val type: String,
 
-    @EncodeDefault(EncodeDefault.Mode.NEVER) val text: String? = null,           // Brukes når typen er "text"
-    @EncodeDefault(EncodeDefault.Mode.NEVER) val id: String? = null,             // Brukes når typen er "tool_use" (unik ID for kallet)
-    @EncodeDefault(EncodeDefault.Mode.NEVER) val name: String? = null,           // Brukes når typen er "tool_use" (navnet på verktøyet)
-    @EncodeDefault(EncodeDefault.Mode.NEVER) val input: JsonElement? = null,     // Brukes når typen er "tool_use" (parametrene AI-en sender inn, f.eks. lat/lon)
-    @EncodeDefault(EncodeDefault.Mode.NEVER) val tool_use_id: String? = null,    // Brukes når typen er "tool_result" (refererer tilbake til ID-en AI-en genererte)
-    @EncodeDefault(EncodeDefault.Mode.NEVER) val content: String? = null         // Brukes når typen er "tool_result" (selve værdataen vi sender tilbake)
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val text: String? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val id: String? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val name: String? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val input: JsonElement? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val tool_use_id: String? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val content: String? = null
 )
 
-// Definerer verktøybruk
+// Defines tool-use
 @Serializable
 data class ClaudeTool(
     val name: String,
@@ -61,7 +61,7 @@ data class ToolInputSchema(
     val required: List<String>
 )
 
-// Describes perametres for a tool
+// Describes parameters for a tool
 @Serializable
 data class PropertyDefinition(
     val type: String,

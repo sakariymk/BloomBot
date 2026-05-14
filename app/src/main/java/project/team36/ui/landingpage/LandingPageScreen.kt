@@ -86,7 +86,7 @@ fun LandingPageScreen(
         }
     }
 
-    //Updates the UI based on internet connection automatically, in case the user reconnects and can access the information again.
+    //Updates the UI based on internet connection automatically
     LaunchedEffect(isConnected) {
         if (isConnected and savedLocations.isNotEmpty()) {
             landingPageViewModel.loadDataForLocations(savedLocations)
@@ -105,7 +105,8 @@ fun LandingPageScreen(
 
     //cancels launchedEffect block early if there are no saved locations
     //fetches data for saved locations
-    //sets selectedLocation to first tab when the screen loads in, so recommended plants can display for this garden right away
+    //sets selectedLocation to first tab when the screen loads in,
+    // so recommended plants can display for this garden right away
     LaunchedEffect(savedLocations) {
         //nothing to load if there are no saved locations
         if (savedLocations.isEmpty()) return@LaunchedEffect
@@ -135,8 +136,9 @@ fun LandingPageScreen(
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
-                windowInsets = WindowInsets(0) //removes extra space on top of the screen (because of toppappbar)
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background),
+                windowInsets = WindowInsets(0) //removes extra space on top of the screen
             )
         },
         bottomBar = { BottomNavBar(navController = navController, locationsViewModel) }
@@ -180,7 +182,8 @@ fun LandingPageScreen(
                                 .padding(end = 8.dp)
                                 .height(40.dp)
                                 .background(
-                                    color = if (isSelected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.tertiary,
+                                    color = if (isSelected) MaterialTheme.colorScheme.secondary
+                                    else MaterialTheme.colorScheme.tertiary,
                                     shape = CircleShape
                                 )
                                 .border(
@@ -192,7 +195,8 @@ fun LandingPageScreen(
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
                                         text = location.name ?: "Hage",
-                                        color = if (isSelected) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onTertiary,
+                                        color = if (isSelected) MaterialTheme.colorScheme.onSecondary
+                                        else MaterialTheme.colorScheme.onTertiary,
                                         style = MaterialTheme.typography.bodyMedium,
                                         fontWeight = FontWeight.Medium
                                     )
@@ -309,7 +313,8 @@ fun LandingPageScreen(
                                         contentScale = ContentScale.Fit
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
-                                    Text("Bloombot sier:", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                                    Text("Bloombot sier:", fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.primary)
                                 }
                             },
                             text = {

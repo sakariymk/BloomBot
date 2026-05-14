@@ -17,12 +17,15 @@ class PlantDetailsViewModel (
     private val _plant = MutableStateFlow<PlantDetails?>(null)
     val plant : StateFlow<PlantDetails?> = _plant.asStateFlow()
 
+
+    // Loads an unowned plant from the repository (used when browsing/adding a new plant)
     fun loadPlant(plantName: String) {
         _plant.value = plantRepository.initiatePlants()
             .find { it.name == plantName }
             ?.toPlantDetails()
     }
 
+    // Loads an already-saved plant from the current list (used when viewing an existing plant)
     fun loadSavedPlant(plantName: String, plants: List<SavedPlant>) {
         _plant.value = plants
             .find{ it.name == plantName }
