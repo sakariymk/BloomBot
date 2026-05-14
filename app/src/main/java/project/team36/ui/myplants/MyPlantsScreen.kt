@@ -188,7 +188,9 @@ fun MyPlantsScreen(
 
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "Ingen hage valgt"}") },
+                onClick = {
+                    navController.navigate("findPlants/${selectedLocation?.name 
+                        ?: "Ingen hage valgt"}") },
                 icon = { Icon(Icons.Default.Add, contentDescription = "Ny hage") },
                 text = { Text("Ny plante") },
                 containerColor = MaterialTheme.colorScheme.primary,
@@ -209,7 +211,9 @@ fun MyPlantsScreen(
             if (plants.isEmpty()) {
                 item {
                     EmptyPlantCard(
-                        onClick = { navController.navigate("findPlants/${selectedLocation?.name ?: "Ingen hage valgt"}")}
+                        onClick = {
+                            navController.navigate("findPlants/${selectedLocation?.name 
+                            ?: "Ingen hage valgt"}")}
                     )
                 }
             } else {
@@ -221,13 +225,16 @@ fun MyPlantsScreen(
                         daysSinceFertilizing = myPlantsViewModel.daysSinceFertilizing(plant),
                         onMarkAsWatered = { myPlantsViewModel.markAsWatered(plant) },
                         onMarkAsFertilized = { myPlantsViewModel.markAsFertilized(plant) },
-                        onNavigateToDetails = { navController.navigate("plantDetailsScreen/${plant.name}/delete") }
+                        onNavigateToDetails = {
+                            navController.navigate("plantDetailsScreen/${plant.name}/delete") }
                     )
                 }
             }
         }
     }
 }
+
+// Empty card that shows up when no plants are added to garden
 
 @Composable
 fun EmptyPlantCard(

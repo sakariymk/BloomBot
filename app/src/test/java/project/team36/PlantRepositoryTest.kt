@@ -20,6 +20,7 @@ class PlantRepositoryTest {
     private val mockDataSource = mockk<PlantDataSource>(relaxed = true)
     private lateinit var plantRepository: PlantRepository
 
+    // 2 reusable fake plants one is a plant object and the other is tied to a location
     private fun testPlant(name: String, climateZone: Int) = PlantInfo(
         name = name,
         climateZone = climateZone,
@@ -49,6 +50,7 @@ class PlantRepositoryTest {
         description = ""
     )
 
+    // reusable fake location
     private fun testLocation() = SavedLocation(
         name = "TestHage",
         lat = 60.0,
@@ -57,6 +59,7 @@ class PlantRepositoryTest {
         zone = 4
     )
 
+    // Sets up a plant list spanning zones 2, 4, and 6 to test zone filtering logic
     @Before
     fun setup() {
         val plants = listOf(
@@ -74,6 +77,7 @@ class PlantRepositoryTest {
         assertEquals(3, result.size)
     }
 
+    // Plants with a climate zone >= location zone should be recommended
     @Test
     fun testPlantsSuitableForZone() {
         val result = plantRepository.recommendPlants(testLocation(), emptyList())
@@ -83,6 +87,7 @@ class PlantRepositoryTest {
         assertFalse("Palme (climateZone 2) skal ikke anbefales for sone 4", result.any { it.name == "Palme" })
     }
 
+    // Already saved plants should be excluded from recommendations even if zone-compatible
     @Test
     fun testAlreadySavedPlants() {
         val savedPlants = listOf(testSavedPlant("Rose"))
@@ -91,6 +96,7 @@ class PlantRepositoryTest {
         assertFalse("Rose er allerede lagret og skal ekskluderes", result.any { it.name == "Rose" })
     }
 
+    // Plants with a climate zone below the location zone should appear in notRecommended
     @Test
     fun testPlantsTooWarmForZone() {
         val result = plantRepository.notRecommendedPlants(testLocation(), emptyList())
@@ -100,6 +106,7 @@ class PlantRepositoryTest {
         assertFalse("Tulipan (climateZone 6) skal ikke være i andre planter", result.any { it.name == "Tulipan" })
     }
 
+    // Already saved plants should be excluded from notRecommended as well
     @Test
     fun testExcludesAlreadySavedPlantsNotRecommend() {
         val savedPlants = listOf(testSavedPlant("Palme"))

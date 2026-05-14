@@ -1,4 +1,5 @@
 package project.team36.data.klima.frost
+
 import project.team36.model.frost.WeatherData
 
 class FrostRepository {

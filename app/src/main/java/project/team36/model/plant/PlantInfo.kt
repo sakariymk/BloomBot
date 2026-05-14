@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 enum class SoilType { SOIL, CHALK, CLAY, LOAM, SAND }
 enum class LightType { SHADE, PARTIAL, FULL }
 
-
+// Model for how plant objects are saved
 @Serializable
 data class PlantInfo(
     val name: String,
@@ -21,6 +21,7 @@ data class PlantInfo(
     val description: String,
     )
 
+// Translates enum class types to displayable norwegian names
 val SoilType.displayName: String
     get() = when (this) {
         SoilType.SOIL -> "Jord"

@@ -21,7 +21,7 @@ val client = HttpClient(io.ktor.client.engine.android.Android) {
 }
 
 suspend fun getNearestStation(lat: Double, lon: Double, clientId: String): Source? {
-    val url = "https://frost.met.no/sources/v0.jsonld"
+    val url = "https://https://in2000-frostproxy.ifi.uio.no/frost.met.no/sources/v0.jsonld"
 
     return try {
         val response = client.get(url) {
@@ -122,7 +122,6 @@ suspend fun getDurationSunShine(stationId : String, clientId : String, date : St
         null
     }
 }
-//Funksjon for å hjelpe tracke nedbør siden sist bruk for vanningsstatus på planter.
 suspend fun getPrecipitationSinceLastUsed(
     lat: Double,
     lon: Double,

@@ -113,7 +113,7 @@ fun MapScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
                 ),
-                windowInsets = WindowInsets(0) //so there is less empty space at the top of the screen
+                windowInsets = WindowInsets(0) // less empty space at top of screen
             )
         },
         bottomBar = {
@@ -138,8 +138,9 @@ fun MapScreen(
                             style.addSource(vectorSource(ClimateZoneConfig.SOURCE_ID) {
                                 tiles(listOf(ClimateZoneConfig.TILE_URL))
                             })
-                            //puts the climate zone map as invisible overlay, so you can fetch data about climate zone on the map
-                            style.addLayer(fillLayer(ClimateZoneConfig.LAYER_ID, ClimateZoneConfig.SOURCE_ID) {
+                            // puts the climate zone map as invisible overlay
+                            style.addLayer(fillLayer(ClimateZoneConfig.LAYER_ID,
+                                ClimateZoneConfig.SOURCE_ID) {
                                 sourceLayer(ClimateZoneConfig.SOURCE_LAYER)
                                 fillOpacity(literal(0.0))
                             })
@@ -152,7 +153,8 @@ fun MapScreen(
                                 puckBearingEnabled = false
                             }
                             mapView.location.addOnIndicatorPositionChangedListener { point ->
-                                viewModel.updateUserPosition(point.latitude(), point.longitude())
+                                viewModel.updateUserPosition(point.latitude(),
+                                    point.longitude())
                             }
                             viewModel.onLocationReady()
                         }
@@ -199,15 +201,17 @@ fun MapScreen(
                     query = uiState.searchQuery,
                     onQueryChanged = { viewModel.onSearchQueryChanged(it) },
                     suggestions = uiState.suggestions,
-                    onSuggestionClicked = { viewModel.handleSuggestionSelection(it, mapViewportState) },
+                    onSuggestionClicked = {
+                        viewModel.handleSuggestionSelection(it,
+                        mapViewportState) },
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .wrapContentHeight()
                 )
             }
 
+            //dialogbox that pops up if you have 0 saved locations, gives info abt saving locations
             if (showLocationChoiceDialog) {
-                //dialogbox that pops up if you have 0 saved locations, gives some info to the user abt saving locations
                 Dialog(onDismissRequest = { showLocationChoiceDialog = false }) {
                     Card(
                         shape = RoundedCornerShape(24.dp),
@@ -250,12 +254,11 @@ fun MapScreen(
 
                             //buton for saving a place based on live location
                             Button(
-                                //if the user has given permission to use location, then location gets saved right away
+                                //if the user has given permission, then location gets saved right away
                                 onClick = {
                                     if (locationPermissionState.status.isGranted) {
                                         viewModel.requestLiveLocationSave()
                                         showLocationChoiceDialog = false
-                                        //if user has not given permission, then it triggers the location permission box when the button is pressed
                                     } else {
                                         locationPermissionState.launchPermissionRequest()
                                     }
@@ -264,7 +267,10 @@ fun MapScreen(
                                 shape = RoundedCornerShape(50.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3))
                             ) {
-                                Text("Bruk min posisjon nå", color = Color.White, modifier = Modifier.padding(vertical = 4.dp))
+                                Text(
+                                    "Bruk min posisjon nå",
+                                    color = Color.White,
+                                    modifier = Modifier.padding(vertical = 4.dp))
                             }
 
                             Spacer(modifier = Modifier.height(8.dp))
@@ -275,7 +281,10 @@ fun MapScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(50.dp)
                             ) {
-                                Text("Søk etter en adresse", color = Color.DarkGray, modifier = Modifier.padding(vertical = 4.dp))
+                                Text(
+                                    "Søk etter en adresse",
+                                    color = Color.DarkGray,
+                                    modifier = Modifier.padding(vertical = 4.dp))
                             }
                         }
                     }
@@ -298,7 +307,9 @@ fun MapScreen(
                             ),
                             //after saving the location, user gets navigated to saved locations
                             onClick = {
-                                viewModel.confirmSaveLiveLocation(context) { navController.navigate("myPlaces") }
+                                viewModel.confirmSaveLiveLocation(context) {
+                                    navController.navigate("myPlaces")
+                                }
                             }
                         ) {
                             if (uiState.isSaving) {
@@ -336,7 +347,10 @@ fun MapScreen(
                             ),
                             onClick = {
                                 if (!uiState.isSaving) { //ignores click is already saving
-                                    viewModel.confirmSavePlace { navController.navigate("myPlaces") } //user gets navigated to savedplaces after saving location
+                                    //user gets navigated to savedplaces after saving location
+                                    viewModel.confirmSavePlace {
+                                        navController.navigate("myPlaces")
+                                    }
                                 }
                             }
                         ) {
@@ -354,7 +368,8 @@ fun MapScreen(
                     },
                     dismissButton = {
                         OutlinedButton(
-                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+                            border = BorderStroke(1.dp,
+                                MaterialTheme.colorScheme.primary),
                             onClick = { viewModel.dismissSaveDialog() }
                         ) { Text("Nei") }
                     }

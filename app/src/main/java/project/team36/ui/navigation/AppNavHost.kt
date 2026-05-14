@@ -117,6 +117,7 @@ fun AppNavHost(
                 val plantName = backStackEntry.arguments?.getString("plantName") ?: return@composable
                 val action = backStackEntry.arguments?.getString("action") ?: ""
 
+                // Parses the action parameter to determine whether to load a new or saved plant
                 LaunchedEffect(plantName) {
                     if (action == "add") {
                         plantDetailsViewModel.loadPlant(plantName)

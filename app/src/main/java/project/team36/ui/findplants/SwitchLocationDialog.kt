@@ -21,6 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import project.team36.model.location.SavedLocation
 
+
+// Dialogbox to change garden
 @Composable
 fun SwitchLocationDialog (
     savedLocations: List<SavedLocation>,
@@ -38,7 +40,7 @@ fun SwitchLocationDialog (
         text = {
             Column {
                 if (savedLocations.isEmpty()) {
-                    Text("Du har ingen lagrede hager enda. Legg til en ny hage for å komme i gang!") // kanskje ordne CTA til kartet her? TODO: send til mine planter herfra
+                    Text("Du har ingen lagrede hager enda. Legg til en ny hage for å komme i gang!")
                 } else {
                     savedLocations.forEach { location ->
                         Row(

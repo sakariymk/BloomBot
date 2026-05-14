@@ -15,16 +15,10 @@ import project.team36.model.ai.ClaudeResponse
 import project.team36.model.ai.ContentBlock
 import project.team36.model.location.SavedLocation
 
-/**
- * Formål og funksjon:
- * Dette er en enhetstest (Unit Test) for HybridAiRepository. Formålet her er å teste
- * logikken vår, spesielt at JSON-parsingen fungerer nøyaktig som den skal.
- * * Relevante filer:
- * - HybridAiRepository: Selve klassen vi tester funksjonaliteten til.
- * - AiRecommendationModels: Dataklassene vi sjekker at JSON-teksten oversettes til.
- */
+
 class HybridAiRepositoryTest {
 
+    // Verifies that a well-formed JSON response from Claude is correctly parsed into a recommendation object
     @Test
     fun testGetPlantRecommendations_ParsesJsonCorrectly(): Unit = runBlocking {
         println("Starter test av JSON-parsing i HybridAiRepository...")
@@ -50,7 +44,6 @@ class HybridAiRepositoryTest {
             }
         }
 
-        // Vi initialiserer selve repositoryet vi vil teste, og mater inn de falske byggeklossene våre.
         val repository = HybridAiRepository(
             claudeApi = fakeClaudeApi,
             mcpClient = mockMcpClient,
@@ -58,16 +51,10 @@ class HybridAiRepositoryTest {
             claudeApiKey = "test-key"
         )
 
-        // Vi oppretter en fiktiv lokasjon som kreves som parameter for å kjøre funksjonen vi tester.
         val testLocation = SavedLocation(id = 1L, name = "Testhagen", lat = 59.9, lon = 10.7, address = "", zone = 1)
-
-        // Vi kjører den faktiske logikken i HybridAiRepository for å se hva den returnerer.
         val response = repository.getPlantRecommendations(testLocation)
-
-        // Vi sjekker at vi faktisk fikk tilbake et objekt (altså at JSON-parsingen IKKE krasjet og returnerte null).
         assertNotNull("JSON-parsingen feilet, returnerte null!", response)
 
-        // Hvis vi kom så langt, printer vi ut verdiene for å bekrefte at dataene ble lagt på riktig plass.
         response?.let {
             println("--- Test results ---")
             println("Første planteråd: ${it.plantAdvice[0].plantName} - ${it.plantAdvice[0].advice}")
@@ -81,6 +68,8 @@ class HybridAiRepositoryTest {
             assertEquals("Sjekk for ugress", it.generalTasks[1])
         }
     }
+
+    // Verifies that the repository returns null when Claude responds with plain text instead of valid JSON
     @Test
     fun testClaudeHallucination_InvalidJsonReturnsNull(): Unit = runBlocking {
         println("Starter test av AI-hallusinasjon (ugyldig JSON)...")
@@ -99,7 +88,6 @@ class HybridAiRepositoryTest {
             }
         }
 
-        // Vi initialiserer repositoryet med den "dårlige" AI-en
         val repository = HybridAiRepository(
             claudeApi = hallucinatingClaudeApi,
             mcpClient = mockMcpClient,
@@ -107,19 +95,12 @@ class HybridAiRepositoryTest {
             claudeApiKey = "test-key"
         )
 
-        // Fiktiv lokasjon for testen
         val testLocation = SavedLocation(id = 1L, name = "Krasjhagen", lat = 59.9, lon = 10.7, address = "", zone = 1)
-
-        // Vi kaller funksjonen. Parseren (jsonParser) vil prøve å lese "Hei! Det er...",
-        // innse at det ikke er gyldig JSON, kaste en exception, og try/catch-blokken
-        // skal da fange feilen og returnere null.
         val response = repository.getPlantRecommendations(testLocation)
 
-        println("--- Test results ---")
-        println("Fikk svar fra repository: $response")
-        println("---------------------")
 
-        // Sjekker at svaret faktisk ble null, og at appen vår håndterte AI-feilen elegant
+        println("Fikk svar fra repository: $response")
+
         assertNull("Repositoryet skal returnere null når AI-en svarer med ugyldig JSON format.", response)
     }
 }

@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 
-//weatherCard that displats temperature, weather icon, weather description and precipitation
+//weatherCard that displays temperature, weather icon, weather description and precipitation
 @Composable
 fun WeatherCard(
     weatherUiState: WeatherUiState?,
@@ -51,7 +51,8 @@ fun WeatherCard(
                             modifier = Modifier.padding(bottom = 4.dp)
                         )
                         //weather icon is loaded directly from assets using Coil.
-                        //The API returns the symbol name as a string already, so you dont have to do manual mapping (which would be needed if the icon was in drawable)
+                        //The API returns the symbol name as a string already,
+                        // so you don't have to do manual mapping (which would be needed if the icon was in drawable)
                         AsyncImage(
                             model = "file:///android_asset/${weatherUiState.iconName}.svg",
                             contentDescription = weatherUiState.description,

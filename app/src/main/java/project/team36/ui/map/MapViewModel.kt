@@ -266,7 +266,10 @@ class MapViewModel(
             }
 
             //unused callbacks, required by mapbox (gives error otherwise)
-            override fun onResults(suggestion: SearchSuggestion, results: List<SearchResult>, responseInfo: ResponseInfo) {}
+            override fun onResults(
+                suggestion: SearchSuggestion,
+                results: List<SearchResult>,
+                responseInfo: ResponseInfo) {}
             override fun onError(e: Exception) {}
             override fun onSuggestions(suggestions: List<SearchSuggestion>, responseInfo: ResponseInfo) {}
         })
@@ -312,7 +315,7 @@ class MapViewModel(
     //triggered when the users confirms saving a location
     fun confirmSavePlace(onSaved: () -> Unit) {
         val result = _uiState.value.selectedResult ?: return
-        val name = _uiState.value.placeNameInput.ifEmpty { result.name } //fallback to the place name if user left input empty
+        val name = _uiState.value.placeNameInput.ifEmpty { result.name } //fallback if user left input empty
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSaving = true)
             //delay to wait for climate zone features to finish rendering before saving location

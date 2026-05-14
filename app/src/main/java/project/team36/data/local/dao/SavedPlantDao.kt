@@ -19,16 +19,11 @@ interface SavedPlantDao {
     @Update
     suspend fun update(plant: SavedPlant)
 
-    //Hent alle planter for en lokasjon
+    //Gets all plants for a location
     @Query("SELECT * FROM saved_plants WHERE locationId = :locationId")
     fun getPlantsForLocation(locationId: Long): Flow<List<SavedPlant>>
 
-    //Sjekk om plante allerede finnes -- om det skullle trengs
-    @Query("SELECT * FROM saved_plants WHERE locationId = :locationId AND name = :name")
-    fun getPlantByLocationAndName(locationId: Long, name: String): SavedPlant?
-
-
+    //Retrieves all plants that have been saved to database
     @Query("SELECT * FROM saved_plants")
     fun getAllPlants(): Flow<List<SavedPlant>>
-
 }

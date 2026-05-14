@@ -43,7 +43,7 @@ class MyPlantsViewModel(
         repository.getAllPlants()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    // Sletter plante basert på navn, brukes i AppNavHost på PlantDetailsScreen
+    // Deletes a plant by name, used in AppNavHost on PlantDetailsScreen
     fun removePlantByName(plantName: String) {
         viewModelScope.launch {
             val plant = plants.value.find { it.name == plantName }
@@ -51,7 +51,7 @@ class MyPlantsViewModel(
         }
     }
 
-    //Metode for vanning og å sjekke om den trenger vann
+    // Method for watering and checking if a plant needs water
     fun markAsWatered(plant: SavedPlant) {
         viewModelScope.launch {
             repository.updatePlant(
@@ -70,7 +70,7 @@ class MyPlantsViewModel(
         )
         if (daysSince < plant.maxDaysWithoutWater) return false
 
-        //Sjekk for om det har regnet nok per dag siden sist vanning, definerer det til 5mm ila en dag som terskel
+        // Check if it has rained enough per day since last watering, threshold is 5mm
         val today = LocalDate.now()
         val relevantDays = (0 until plant.maxDaysWithoutWater).map {
             today.minusDays(it.toLong()).toString()
@@ -104,14 +104,14 @@ class MyPlantsViewModel(
         }
     }
 
-    //Slett location
+    // Delete location
     fun deleteLocation(location: SavedLocation) {
         viewModelScope.launch {
             repository.deleteLocation(location)
         }
     }
 
-    // Endre navn på location
+    // Rename location
     fun renameLocation(location: SavedLocation, newName: String) {
         viewModelScope.launch {
             repository.updateLocation(location.copy(name = newName))
@@ -144,20 +144,22 @@ class MyPlantsViewModel(
         }
     }
 
-    //henter alle planter som trenger vann for hver lokasjon
-    fun getPlantsNeedingWaterByLocation(locations: List<SavedLocation>): Flow<Map<SavedLocation, List<Pair<SavedPlant, String>>>> {
+    // Fetches all plants that need water for each location
+    fun getPlantsNeedingWaterByLocation(
+        locations: List<SavedLocation>): Flow<Map<SavedLocation,
+            List<Pair<SavedPlant, String>>>> {
         return allPlants.map { plants ->
             locations.associateWith { location ->
                 plants
                     .filter { plant ->
-                        plant.locationId == location.id && needsWater(plant) //filtrerer på de plantene som trenger vann
+                        plant.locationId == location.id && needsWater(plant) // filters for plants that need water
                     }
-                    .map { plant -> plant to getWateringText(plant) } //henter også hvor ofte en plante må vannes
+                    .map { plant -> plant to getWateringText(plant) } // also fetches how often a plant needs watering
             }
         }
     }
 
-    //For å få riktig tidsformat fra siste vanningsdato lagret for hver plante
+    // Converts the last watering date stored per plant to the correct timestamp format
     fun Long.toIso8601(): String = Instant.ofEpochMilli(this).toString()
 
 }

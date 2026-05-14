@@ -230,7 +230,7 @@ fun LocationCard (
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "\uD83C\uDFE0", // hus-emoji
+                text = "\uD83C\uDFE0", // house-emoji
                 fontSize = 36.sp,
                 modifier = Modifier.padding(end = 16.dp)
             )
