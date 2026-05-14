@@ -5,7 +5,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test
-import org.mockito.Mockito.mock
+import io.mockk.mockk
 import project.team36.data.ai.ClaudeApi
 import project.team36.data.mcp.HybridAiRepository
 import project.team36.data.local.LocationRepository
@@ -29,8 +29,8 @@ class HybridAiRepositoryTest {
     fun testGetPlantRecommendations_ParsesJsonCorrectly(): Unit = runBlocking {
         println("Starter test av JSON-parsing i HybridAiRepository...")
 
-        val mockMcpClient = mock(MetMcpClient::class.java)
-        val mockLocationRepo = mock(LocationRepository::class.java)
+        val mockMcpClient = mockk<MetMcpClient>()
+        val mockLocationRepo = mockk<LocationRepository>()
 
         val fakeClaudeApi = object : ClaudeApi {
             override suspend fun sendMessage(apiKey: String, request: ClaudeRequest): ClaudeResponse {
@@ -85,8 +85,8 @@ class HybridAiRepositoryTest {
     fun testClaudeHallucination_InvalidJsonReturnsNull(): Unit = runBlocking {
         println("Starter test av AI-hallusinasjon (ugyldig JSON)...")
 
-        val mockMcpClient = mock(MetMcpClient::class.java)
-        val mockLocationRepo = mock(LocationRepository::class.java)
+        val mockMcpClient = mockk<MetMcpClient>()
+        val mockLocationRepo = mockk<LocationRepository>()
 
         val hallucinatingClaudeApi = object : ClaudeApi {
             override suspend fun sendMessage(apiKey: String, request: ClaudeRequest): ClaudeResponse {
