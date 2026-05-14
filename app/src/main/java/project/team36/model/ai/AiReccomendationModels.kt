@@ -4,11 +4,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AiRecommendationResponse(
-    val plantAdvice: List<PlantAdvice>, // Spesifikke råd for hver plante i hagen
-    val generalTasks: List<String> // Generelle hageoppgaver
+    val plantAdvice: List<PlantAdvice>,
+    val generalTasks: List<String>
 )
 
-// Dataklasse for individuelle planteråd
+// Dataclass for advice
 @Serializable
 data class PlantAdvice(
     val Recommend: String? = null,
