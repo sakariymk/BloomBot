@@ -107,6 +107,7 @@ Plant pictures taken from [Pixabay](https://pixabay.com/). Their images are free
 - Katharina N. (2020). *Dill cucumber umbelliferae*. [Photograph]. Pixabay. https://pixabay.com/photos/dill-cucumber-umbelliferae-4741813/
 - Katharina N. (2021). *Parsley leaves plant herb*. [Photograph]. Pixabay. https://pixabay.com/photos/parsley-leaves-plant-herb-6395051/
 - LoggaWiggler. (2013). *Leek spring onion food market*. [Photograph]. Pixabay. https://pixabay.com/photos/leek-spring-onion-food-market-65277/
+- jacqueline macou Macou, J. (2015). *Sheets basil aromatic plant*. [Photograph]. Pixabay. https://pixabay.com/photos/sheets-basil-aromatic-plant-739286/
 - NARAYANAN MADESHAN. (2022). *Bell pepper fruit plant capsicum*. [Photograph]. Pixabay. https://pixabay.com/photos/bell-pepper-fruit-plant-capsicum-6936732/
 - NoName_13. (2017). *Apple red red apple*. [Photograph]. Pixabay. https://pixabay.com/photos/apple-red-red-apple-2788616/
 - Pixabay. (2018). *Rhododendron Purple Garden Blossom*. [Photograph]. Pixabay. https://pixabay.com/photos/rhododendron-purple-garden-blossom-3418387/
