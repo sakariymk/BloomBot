@@ -22,7 +22,7 @@ retrofit-serial-cvt = "1.0.0"
 ktor = "3.4.3"
 mcp-sdk = "0.12.0"
 coil = "3.4.0"
-material = "1.13.0"
+material = "1.14.0"
 room = "2.8.4"
 
 
