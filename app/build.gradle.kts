@@ -76,9 +76,6 @@ dependencies {
     //Coil, for pictures
     implementation(libs.coil.compose)
     implementation(libs.coil.svg)
-    // Mockito for unittests of frostrepository
-    testImplementation("org.mockito:mockito-core:5.11.0")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
 
     //Compose
     implementation(platform(libs.androidx.compose.bom))
@@ -110,7 +107,4 @@ dependencies {
     testImplementation(libs.mockk)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
-    testImplementation("io.mockk:mockk:1.14.9")
 }
