@@ -103,7 +103,6 @@ dependencies {
     //For tests
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.junit.jupiter)
     testImplementation(libs.mockk)
     testImplementation(libs.mockito.core)
     testImplementation(libs.mockito.kotlin)
