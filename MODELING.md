@@ -74,4 +74,4 @@ sequenceDiagram
 ```
 ## Use case diagram
 
-![use case diagram](https://github.uio.no/user-attachments/assets/c29be132-5f72-4340-ab07-f03b661534e4)
+![use_case_diagram](https://github.uio.no/user-attachments/assets/b6e98998-13a7-4bfa-8215-8a809c3db293)
