@@ -8,6 +8,7 @@ import android.net.NetworkRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
+// Checks for connectivity to data or wifi
 class ConnectivityObserver(context: Context) {
 
     private val connectivityManager =

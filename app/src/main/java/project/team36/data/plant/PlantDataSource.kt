@@ -7,6 +7,7 @@ import project.team36.model.plant.SoilType
 
 class PlantDataSource(private val context: Context) {
 
+    // Reads our CSV with all plantinfo and turns it a list of lists
     fun fetchPlants(): List<PlantInfo> {
         val plants = mutableListOf<PlantInfo>()
 
@@ -21,6 +22,8 @@ class PlantDataSource(private val context: Context) {
         return plants
     }
 
+    // Helper function for splitting lines and formating the information
+    @Suppress("DiscouragedApi")
     private fun mapToPlant(tokens: List<String>): PlantInfo {
         val rawName = tokens[0].trim()
         val normalizedName = normalizeName(rawName)
@@ -39,6 +42,7 @@ class PlantDataSource(private val context: Context) {
         )
     }
 
+    //we need support for Norwegian lettering
     private fun normalizeName(name: String): String {
         return name
             .replace("æ", "ae").replace("Æ", "ae")
