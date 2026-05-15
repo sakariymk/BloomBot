@@ -1,7 +1,5 @@
-package project.team36.data.mcp
+package project.team36.model.ai
 
-import project.team36.model.ai.ClaudeRequest
-import project.team36.model.ai.ClaudeResponse
 import retrofit2.http.Body
 import retrofit2.http.Header
 import retrofit2.http.Headers

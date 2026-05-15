@@ -4,7 +4,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import project.team36.data.mcp.ClaudeApi
+import project.team36.model.ai.ClaudeApi
 import project.team36.model.ai.ClaudeMessage
 import project.team36.model.ai.ClaudeRequest
 import project.team36.model.ai.ContentBlock
@@ -14,6 +14,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import java.util.concurrent.TimeUnit
+import kotlin.jvm.java
 
 
 class AiIntegrationTest {
@@ -49,7 +50,7 @@ class AiIntegrationTest {
 
         val testRequest = ClaudeRequest(
             model = "claude-sonnet-4-5",
-            maxTokens = 100,
+            max_tokens = 100,
             messages = listOf(
                 ClaudeMessage(
                     role = "user",
@@ -68,7 +69,7 @@ class AiIntegrationTest {
             val svarTekst = response.content.firstOrNull { it.type == "text" }?.text
 
             println("Fikk svar fra Claude: $svarTekst")
-            println("Stop reason: ${response.stopReason}")
+            println("Stop reason: ${response.stop_reason}")
 
             assertNotNull("Klarte ikke å parse tekst fra svaret.", svarTekst)
 

@@ -6,7 +6,7 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test
 import io.mockk.mockk
-import project.team36.data.mcp.ClaudeApi
+import project.team36.model.ai.ClaudeApi
 import project.team36.data.mcp.HybridAiRepository
 import project.team36.data.local.LocationRepository
 import project.team36.data.mcp.MetMcpClient
@@ -39,7 +39,7 @@ class HybridAiRepositoryTest {
 
                 return ClaudeResponse(
                     content = listOf(ContentBlock(type = "text", text = fakeJson)),
-                    stopReason = "end_turn"
+                    stop_reason = "end_turn"
                 )
             }
         }
@@ -83,7 +83,7 @@ class HybridAiRepositoryTest {
 
                 return ClaudeResponse(
                     content = listOf(ContentBlock(type = "text", text = badJson)),
-                    stopReason = "end_turn"
+                    stop_reason = "end_turn"
                 )
             }
         }

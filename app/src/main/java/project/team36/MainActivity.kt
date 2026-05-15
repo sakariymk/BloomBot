@@ -21,7 +21,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import java.util.concurrent.TimeUnit
 import project.team36.ui.findplants.FindPlantsViewModel
-import project.team36.data.mcp.ClaudeApi
+import project.team36.model.ai.ClaudeApi
 import project.team36.data.mcp.HybridAiRepository
 import project.team36.data.klima.frost.FrostRepository
 import project.team36.data.local.AppDatabase
@@ -46,6 +46,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.SystemBarStyle
 import project.team36.ui.map.MapViewModel
 import project.team36.ui.myplants.MyPlantsViewModelFactory
+import kotlin.jvm.java
 
 
 class MainActivity : ComponentActivity() {
