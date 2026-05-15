@@ -1,4 +1,4 @@
-# Team 36
+# 🌸 Team 36 - Bloombot 🌸
 
 ## 👥 Team members
 - Therese  Siil
@@ -8,9 +8,33 @@
 - Viktoria Maria Gritsenko-Hofton
 - Sverre Vilhelm Skofteland Schultz
 
+<br>
 
-## About the app
-WIP
+## 🌱 About the app
+<img width="5025" height="3350" alt="bloombot-mockup" src="https://github.uio.no/user-attachments/assets/8f6c68a6-81e4-4cf7-baa8-3e2392e7b05a" />
+
+Bloombot is a gardening app and plant diary made for hobby gardeners in Norway. The app helps you keep track of all your gardens and the individual plants within them, including logging watering and fertilizing each plant. The app uses weather data from the Meterological Institue Norway.
+
+### Features
+**Location and plant recommendations**
+- Save a garden location via live location GPS or via address search.
+- Get plant recommendations for a location based on [Norwegian hardiness zones](https://www.hageselskapet.no/praktisk/klimasonekart/106772)
+
+
+**Garden and plant managment**
+- Manage multiple saved gardens with plants
+- Log watering and fertilizing per plant
+
+**Weather forecast**
+- Get a weather forecast for each saved location with data from the MET API
+- Recieve weather alerts (MetAlerts) when there are severe conditions at a location
+
+**AI advice**
+- Tap the AI button to get personalized gardening tips for your plants at a given location
+- The AI gives your advice based on your location, your plants and live weather data from LocationForecast and MetAlerts from MET's MCP server.
+
+
+<br>
 
 ## 📦 How to run the app
 
@@ -19,12 +43,12 @@ WIP
 
 5. **Permissions** - The app needs location if the user wants to save locations based on live location. The app will ask for location permissions, so make sure that your emulator or physical device has live location enabled.
 
-6. **Run the app**  - Use Android Studio's built in emulator or use a physical Android device (minSDK 33 / Android 13). [Guide](https://developer.android.com/studio/run/emulator) - **Make sure that you have internet connection, the app requires it to search up addresses to save a location!**
+6. **Run the app**  - Use Android Studio's built in emulator or use a physical Android device (minSDK 33 / Android 13). The target SDK is 36, the latest version. [Guide](https://developer.android.com/studio/run/emulator) - **Make sure that you have internet connection, the app requires it to search up addresses to save a location!**
 
 7. **Troubleshooting:** If an error occurs, make sure that you're running the latest Android Studio version. Run **Gradle sync**, then **Build -> Clean project.**
 
 
----
+<br><br>
 
 ## 📚 Libaries
 
@@ -41,12 +65,10 @@ WIP
 - **Retrofit** - HTTP-client for REST API calls.
 
 - **Retrofit Kotlinx Serialization Converter** - Connects Retrofit to Kotlinx Serialization for automatic JSON parsing.
+
 - **OkHttp** - HTTP client that is used by retrofit
 
-
 - **OkHttp SSE** - Enables the client to listen to a continuous stream of data from the server for live updates.
-
-
 
 - **Ktor** - HTTP client to build asynchronous servers and clients in Kotlin
 
@@ -56,10 +78,8 @@ WIP
 ### 🤖 AI / MCP
 - **MCP Kotlin SDK Client** - Client for MCP, allows AI-models to communicate with MET's MCP server to fetch data
 
-
 ### 🗃️ Database
 - **Room** - Local SQLite-database for saving plants and places in the app
-
 
 ### 📱 UI 
 - **Jetpack Compose + Material3** - UI-framework.
@@ -83,12 +103,13 @@ WIP
 - **Kotlinx Coroutines Test** - For testing code that uses coroutines.
 
 
-
+&nbsp;
 ## Picture sources
 
 Weather icons taken from Norwegian Meteorological Institute GitHub repository.
-- metno. (2021). *Weather icons* [SVG icons]. GitHub. https://github.com/metno/weathericons/tree/main/weather/svg
+- metno. (2021). *Weather icons* [SVG icons]. GitHub. <https://github.com/metno/weathericons/tree/main/weather/svg>
 
+<br>
 
 Plant pictures taken from [Pixabay](https://pixabay.com/). Their images are free to use under the CC0 license, as written under their [Terms of Service](https://pixabay.com/service/terms/)
 - Alexei. (2019). *Cucumbers vegetables food healthy*. [Photograph]. Pixabay. https://pixabay.com/photos/cucumbers-vegetables-food-healthy-4698527/
