@@ -14,6 +14,18 @@ By strictly separating responsibilities into four layers (Presentation, Domain, 
   * The ViewModels (for example `LandingPageViewModel`, `MapViewModel`) act as intermediaries and handle application logic while requesting data from repositories.
   > Example: `LandingPageScreen` does not directly access weather APIs or database queries. Instead it collects state from `LandingPageViewModel` which retrieves weather data through `MetWeatherRepository`.
 
+### Unidirectional Data Flow (UDF)
+The application strictly implements **Unidirectional Data Flow (UDF)** to manage the relationship between the UI and logic. In this pattern, state flows in only one direction:
+* **State flows down:** ViewModels expose application state via `StateFlow` (e.g., `selectedLocation`). Every Composable reads this state to render the interface but never mutates it directly.
+* **Events flow up:** When a user interacts with the UI, such as selecting a location or saving a plant, the Composable triggers an "intent" function within the ViewModel.
+* **Single Source of Truth:** The ViewModel processes the intent (often updating a Repository or Database) and updates the `StateFlow`. This change automatically triggers a recomposition in Jetpack Compose. This ensures that the UI always mirrors the current data without manual synchronization, significantly reducing bugs related to inconsistent state across different screens.
+
+## API-Levels
+* **Minimum SDK: 33
+* **Target SDK: 36
+Initially, the project aimed for a lower minimum SDK such as 26, but we made the decision to raise it to 33. While a lower SDK would technically support more devices, this decision was made for the implementation of our reverse geocoding logic in the `getAdress` function. Viktoria skriver mer på dette.
+
+
 ## Architecture drawing
 ```mermaid
   graph TD
@@ -163,12 +175,10 @@ By strictly separating responsibilities into four layers (Presentation, Domain, 
     
     AiModels -.-> VMs
     ClientModels -.-> VMs
-    %% Styling
-    style MA fill:#f96,stroke:#333
-    style SL fill:#f9f,stroke:#d0d,stroke-width:2px
-    style SP fill:#f9f,stroke:#d0d,stroke-width:2px
-    style SDao fill:#bbf,stroke:#333
-    style PDao fill:#bbf,stroke:#333
-    style MetClient fill:#e1f5fe,stroke:#01579b
-
 ```
+## Maintenance and Further Development
+
+
+
+
+
