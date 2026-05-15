@@ -1,6 +1,27 @@
 # Introduction
 This document is intended for developers who will maintain or further develop the app. This will provide an overview of the project structure, the design patterns utilized and the rationale behind key structural decisions to ensure a consistent coding style.
 
+# Technical Stack
+The application is built using on Android Studio
+* Core Technologies:
+*   Language: Kotlin by utilizing coroutines and flow for asynchronous data streams
+*   UI Framework: Jetpack Compose 
+*   Local Database: Room Persistence Library which is an abstraction layer over SQLite for local storage.
+*   Networking: Ktor,Retrofit and OkHttp
+* Serialization: Kotlinx Serialization which is used for parsing JSON data from APIs and the MCP server.
+
+* Integrated Services & APIs:
+
+| Service | Purpose |
+| :--- | :--- |
+| **MET MCP Server** | Model Context Protocol server providing weather and alert tools. |
+| **Anthropic Claude API** | AI engine (Sonnet 3.5) for intelligent gardening advice. |
+| **MapBox SDK** | Map visualization and geographic search (Geocoding). |
+| **MET Frost API** | Access to historical weather observations (Precipitation). |
+| **MET Locationforecast** | Detailed real-time and predictive weather data. |
+| **MET Alerts** | Real-time weather hazard notifications (e.g., extreme weather). |
+
+
 # Architecture 
 This application is structured around a layered MVVM(Model-View-ViewModel) architecture, promoting a clean separation between the data infrastructure and the user interface.
 The design and implementation are based on reccomended [Android "best practices"](https://developer.android.com/topic/architecture/recommendations). 
@@ -198,10 +219,10 @@ Currently, the application utilizes a CSV file to store and retrieve data. While
 
 Another technical debt is that we are using`FallBackToDestructiveMigration` in our Room database. In production code this could not be used because all data is wiped from the Database when updated. The solution would be to use `AutoMigration`.
 
-## Maintenance and further development
-The application is built on Android Studio with Kotlin using Jetpack Compose. It is built around MET APIs such as LocationForcast, MetAlerts and Frost and the use of MCP-client with Claude as the AI-motor. We have used an additional API from MapBox to display the map on the app. Locationforecast and METAlerts provide real-time and predictive weather data. Frost provides historical precipitation data using dynamic time intervals `sum(precipitation_amount PT1H)`. 
+## Maintenance guide
+* Adding Images: Be aware that adding new images to the drawable folder may change resource IDs, which currently requires a database wipe due to destructive migrations.
 
-
+* Testing: Use MockK for unit testing, especially when simulating malformed JSON from the AI engine.
 
 
 
