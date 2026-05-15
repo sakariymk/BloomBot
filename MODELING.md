@@ -459,3 +459,4 @@ PlantInfo ..> LightType : uses
 PlantDetails ..> SoilType : uses
 PlantDetails ..> LightType : uses
 ```
+<img width="1859" height="8192" alt="Aktivitetsdiagram" src="https://github.uio.no/user-attachments/assets/dd330fd1-2f16-47d4-a056-2afd2766d199" />
