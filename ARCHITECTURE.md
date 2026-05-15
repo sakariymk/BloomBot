@@ -183,7 +183,13 @@ Initially, the project aimed for a lower minimum SDK such as 26, but we made the
 
 Android 17 (API level 37) is indeed out, but the release is still in beta. We decided to keep it to 36 because that is the latest stable release, as per Android's documentation: https://developer.android.com/tools/releases/platforms and https://developer.android.com/tools/releases/platform-tools (as per May 2026).
 
+### ClaudeModels.txt, line 17, 44, 53 and 76
+- Property name 'max_tokens' should not contain underscores
+- Property name 'tool_use_id' should not contain underscores
+- Property name 'input_schema' should not contain underscores
+- Property name 'stop_reason' should not contain underscores
 
+When we tried to change the properties to maxTokens, toolUseId, etc., the AI stopped returning responses. We found out that this is because Anthropic API strictly requires the variable names to have underscores, and it won't recognize the variables if it's in the typical Kotlin format with uppercase letters. These names must match the JSON keys the Anthropic API expects exactly, since kotlinx.serialization uses the Kotlin property name directly as the JSON key when serializing.
 
 ## Known Technial debt/Improvements  
 We have some technical debt such as some larger screens like LandingPageScreen currently relying on multiple ViewModels. Future developers may consider consolidating these into a single state holder to further reduce coupling. 
