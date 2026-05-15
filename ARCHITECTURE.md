@@ -2,7 +2,7 @@
 This document is intended for developers who will maintain or further develop the app. This will provide an overview of the project structure, the design patterns utilized and the rationale behind key structural decisions to ensure a consistent coding style.
 
 # Technical Stack
-The application is built using on Android Studio
+The application is built using Android Studio
 * Core Technologies:
 *   Language: Kotlin by utilizing coroutines and flow for asynchronous data streams
 *   UI Framework: Jetpack Compose 
