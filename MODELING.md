@@ -149,14 +149,6 @@ class WeatherAlert {
     Color color
     Boolean isDangerousForPlant(Boolean)
 }
-class WeatherData {
-    <<model.frost>>
-    String stationId
-    Double temperature
-    Double precipitation
-    Double sunshineHours
-}
-
 
 class WeatherUiState {
     <<ui.landingpage>>
@@ -299,7 +291,6 @@ class MetWeatherRepository {
 
 
 class FrostRepository {
-    +WeatherData getFullWeatherForLocation(Double, Double, String)
     +Map~String, Double~ getPrecipitationSinceLastUsed(Double, Double, String)
 }
 
@@ -452,7 +443,6 @@ SavedLocationDao --> SavedLocation
 %% Repository → Models
 MetWeatherRepository --> WeatherForecast
 MetWeatherRepository --> WeatherAlert
-FrostRepository --> WeatherData
 PlantDataSource --> PlantInfo
 PlantRepository --> PlantInfo
 
