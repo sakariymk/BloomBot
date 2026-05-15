@@ -8,7 +8,7 @@ import android.net.NetworkRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-// Checks for connectivity to data or wifi
+// Checks for connectivity to data or Wi-Fi and updates the status, to show error message if connection is missing
 class ConnectivityObserver(context: Context) {
 
     private val connectivityManager =

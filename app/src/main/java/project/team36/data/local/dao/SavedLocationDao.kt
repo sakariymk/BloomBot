@@ -8,6 +8,7 @@ import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import project.team36.model.location.SavedLocation
 
+// Database queries for saved locations
 @Dao
 interface SavedLocationDao {
     @Insert
@@ -16,10 +17,10 @@ interface SavedLocationDao {
     @Delete
     suspend fun delete(location: SavedLocation)
 
+    //Updates the existing plant
     @Update
     suspend fun update(location: SavedLocation)
 
-    //Gets locations that can be displayed on the map or for other use cases where that is needed
     @Query("SELECT * FROM saved_location")
     fun getAllLocations(): Flow<List<SavedLocation>>
 }

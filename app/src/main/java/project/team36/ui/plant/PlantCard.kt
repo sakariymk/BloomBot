@@ -33,7 +33,7 @@ import java.util.Date
 import java.util.Locale
 
 /*
-Plantcard that displays information on the saved plant from database, and gives functionality to water and fertilize.
+Plant card that displays information on the saved plant from database, and gives functionality to water and fertilize.
  */
 @Composable
 fun PlantCard(

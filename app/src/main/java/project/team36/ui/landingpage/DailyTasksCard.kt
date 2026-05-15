@@ -88,7 +88,7 @@ fun DailyTasksCard(
                     if (plantsWithText.isNotEmpty()) {
                         Text(
                             text = location.name ?: "Ukjent hage",
-                            style = MaterialTheme.typography.labelMedium,
+                            style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                             modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 4.dp)
                         )

@@ -19,7 +19,7 @@ private data class CachedEntry(
     val timestamp: Long
 )
 /*
-*  Repository that initilazes the conversation between METMcpClient, Sonnet 4.5 and our
+*  Repository that initializes the conversation between METMcpClient, Sonnet 4.5 and our
 *  APIs
 */
 class HybridAiRepository(

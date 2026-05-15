@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import project.team36.model.location.SavedLocation
 
 
-// Dialogbox to change garden
+// Dialog box to change garden
 @Composable
 fun SwitchLocationDialog (
     savedLocations: List<SavedLocation>,

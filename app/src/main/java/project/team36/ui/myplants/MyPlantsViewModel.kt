@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -22,7 +23,7 @@ import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 import kotlin.collections.filter
 
-
+//ViewModel to edit UI and connect with the data
 class MyPlantsViewModel(
     private val repository: LocationRepository,
     locationsViewModel: LocationsViewModel,
@@ -37,7 +38,19 @@ class MyPlantsViewModel(
             repository.getPlantsForLocation(location?.id ?: -1)
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-
+    //Automatically loads precipitation-data when plants are available, so watering status is updated
+    init {
+        viewModelScope.launch {
+            plants.first { it.isNotEmpty() }.let { plantList ->
+                if (plantList.isNotEmpty()) {
+                    val location = locationsViewModel.selectedLocation.value ?: return@launch
+                    val lat = location.lat ?: return@launch
+                    val lon = location.lon ?: return@launch
+                    loadPrecipitationForLocation(lat, lon)
+                }
+            }
+        }
+    }
 
     val allPlants: StateFlow<List<SavedPlant>> =
         repository.getAllPlants()

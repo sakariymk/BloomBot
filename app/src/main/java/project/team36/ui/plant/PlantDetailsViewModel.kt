@@ -11,6 +11,7 @@ import project.team36.model.plant.LightType
 import project.team36.model.plant.PlantInfo
 import project.team36.model.plant.SoilType
 
+//ViewModel to edit UI and connect with the data
 class PlantDetailsViewModel (
     private val plantRepository: PlantRepository,
 ) : ViewModel() {

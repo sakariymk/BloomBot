@@ -13,8 +13,7 @@ import kotlinx.coroutines.flow.update
 import project.team36.data.local.LocationRepository
 import project.team36.model.location.SavedLocation
 
-
-
+//ViewModel for locations, used by UI where location data is needed
 class LocationsViewModel(
     repository: LocationRepository
 ) : ViewModel() {

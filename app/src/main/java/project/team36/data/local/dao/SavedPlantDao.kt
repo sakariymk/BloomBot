@@ -8,6 +8,7 @@ import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import project.team36.model.location.SavedPlant
 
+//Database queries for saved plants
 @Dao
 interface SavedPlantDao {
     @Insert

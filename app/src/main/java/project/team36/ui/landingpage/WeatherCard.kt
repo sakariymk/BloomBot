@@ -74,7 +74,7 @@ fun WeatherCard(
                     }
                 }
             }
-            //fallback if not conncted to internet or if met API call fails
+            //fallback if not connected to internet or if met API call fails
             else -> {
                 Text(
                     text = "Kunne ikke hente vær",
