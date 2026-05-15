@@ -24,8 +24,7 @@ The application strictly implements **Unidirectional Data Flow (UDF)** to manage
 * **Minimum SDK: 33**
 * **Target SDK: 36**
   
-Initially, the project aimed for a lower minimum SDK such as 26, but we made the decision to raise it to 33. While a lower SDK would technically support more devices, this decision was made for the implementation of our reverse geocoding logic in the `getAdress` function. Viktoria skriver mer på dette.
-
+Initially, the project aimed for a lower minimum SDK such as 26, but we made the decision to raise it to 33. While a lower SDK would technically support more devices, this decision was made for the implementation of our reverse geocoding logic in the `getAdress` function. Geocoder.getFromLocation() is a function that requires this minimum level ([Android Developers](https://developer.android.com/reference/android/location/Geocoder)). The function is used to retrieve an address from coordinates, which is required to be able to save the coordinates from the user's live location. The target SDK is set to 36, which is higher than Google Play's requirement of API 35 for newer apps. This ensures that the app is compatible with the latest versions of Android ([Google](https://support.google.com/googleplay/android-developer/answer/11926878)).
 
 ## Architecture drawing
 ```mermaid
@@ -176,6 +175,16 @@ Initially, the project aimed for a lower minimum SDK such as 26, but we made the
     AiModels -.-> VMs
     ClientModels -.-> VMs
 ```
+<br>
+
+## Warnings in the code
+### build.gradle.kts, line 17
+  - "Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the `android.os.Build.VERSION_CODES` javadoc for details."
+
+Android 17 (API level 37) is indeed out, but the release is still in beta. We decided to keep it to 36 because that is the latest stable release, as per Android's documentation: https://developer.android.com/tools/releases/platforms and https://developer.android.com/tools/releases/platform-tools (as per May 2026).
+
+
+
 ## Known Technial debt/Improvements  
 We have some technical debt such as some larger screens like LandingPageScreen currently relying on multiple ViewModels. Future developers may consider consolidating these into a single state holder to further reduce coupling. 
 
