@@ -104,17 +104,6 @@ Bloombot is a gardening app and plant diary made for hobby gardeners in Norway. 
 
 <br>
 
-## ⚠️Warnings in the code
-
-### build.gradle.kts, line 17
-  - "Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the `android.os.Build.VERSION_CODES` javadoc for details."
-
-Android 17 (API level 37) is indeed out, but the release is still in beta. We decided to keep it to 36 because that is the latest stable release, as per Android's documentation: https://developer.android.com/tools/releases/platforms and https://developer.android.com/tools/releases/platform-tools (as per May 2026).
-
-
-
-<br>
-
 ## Sources for plant data and climate zones
 We got permission from **Det norske hageselskap** to use data about their climate zones from their website https://klimasonekart.no/
 
