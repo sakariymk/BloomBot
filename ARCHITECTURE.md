@@ -21,8 +21,9 @@ The application strictly implements **Unidirectional Data Flow (UDF)** to manage
 * **Single Source of Truth:** The ViewModel processes the intent (often updating a Repository or Database) and updates the `StateFlow`. This change automatically triggers a recomposition in Jetpack Compose. This ensures that the UI always mirrors the current data without manual synchronization, significantly reducing bugs related to inconsistent state across different screens.
 
 ## API-Levels
-* **Minimum SDK: 33
-* **Target SDK: 36
+* **Minimum SDK: 33**
+* **Target SDK: 36**
+  
 Initially, the project aimed for a lower minimum SDK such as 26, but we made the decision to raise it to 33. While a lower SDK would technically support more devices, this decision was made for the implementation of our reverse geocoding logic in the `getAdress` function. Viktoria skriver mer på dette.
 
 
@@ -114,7 +115,6 @@ Initially, the project aimed for a lower minimum SDK such as 26, but we made the
     MA --> LVM
     MA --> PDVM
     MA --> ConnObs
-    MA --> PlantDS
     %% Navigation Flow
     Nav --> LandingS
     Nav --> MapS
@@ -176,7 +176,15 @@ Initially, the project aimed for a lower minimum SDK such as 26, but we made the
     AiModels -.-> VMs
     ClientModels -.-> VMs
 ```
-## Maintenance and Further Development
+## Known Technial debt/Improvements  
+We have some technical debt such as some larger screens like LandingPageScreen currently relying on multiple ViewModels. Future developers may consider consolidating these into a single state holder to further reduce coupling. 
+
+Currently, the application utilizes a CSV file to store and retrieve data. While this approach is sufficient for a limited number of plants, this introduces some technical debt regarding scalability and performance. Reading a large CSV file into memory as a list of objects can lead to high RAM usage, potentially causing out of memory error if we decide to add a large amount of new plants. To solve this technical debt, the plant data should be migrated from the CSV format into a database. 
+
+Another technical debt is that every time we add new images for plants all app data have to be wiped out in the emulator. That is because the addition changes the structure of the data that Room expects. The database points to the wrong image ID which is saved as an Int, which will cause the app to crash. To solve this technical debt, the name of the images should get saved as a String. By doing this, the app data doesnt have to be wiped out because the name of the file remains the same even if they get new IDs internally. 
+
+## Maintenance and further development
+
 
 
 
