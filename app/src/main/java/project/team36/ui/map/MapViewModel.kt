@@ -121,11 +121,12 @@ class MapViewModel(
     //helper function for confirmSaveLiveLocation
     suspend fun getAddress(lat: Double, lon: Double, context: Context): String? {
         return suspendCancellableCoroutine { continuation ->
-            val geocoder = Geocoder(context, Locale.getDefault())
             //uses android studio's own geocoder class to get address based on coordinates (this requires min API 33, that's why our app is min 33)
-            geocoder.getFromLocation(lat, lon, 1) { results ->
-                continuation.resume(results.firstOrNull()?.getAddressLine(0))
+            val geocoder = Geocoder(context, Locale.getDefault())
+            val listener =  Geocoder.GeocodeListener { results ->
+                continuation.resume(results.firstOrNull()?.getAddressLine(0)) //gets first address result
             }
+            geocoder.getFromLocation(lat, lon, 1, listener)
         }
     }
 
