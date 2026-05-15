@@ -1,4 +1,4 @@
-package project.team36.data.ai
+package project.team36.data.mcp
 
 import project.team36.model.ai.ClaudeRequest
 import project.team36.model.ai.ClaudeResponse

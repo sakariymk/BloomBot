@@ -7,7 +7,6 @@ import project.team36.model.location.SavedLocation
 import project.team36.model.ai.*
 import kotlinx.serialization.json.Json
 import android.util.Log
-import project.team36.data.ai.ClaudeApi
 import project.team36.model.location.SavedPlant
 import java.time.LocalDate
 
@@ -48,7 +47,7 @@ class HybridAiRepository(
     private val weatherTool = ClaudeTool(
         name = TOOL_NAME_WEATHER_FORECAST,
         description = "Henter værinformasjon for i dag de kommende dagene.",
-        input_schema = ToolInputSchema(
+        inputSchema = ToolInputSchema(
             type = "object",
             properties = mapOf(
                 "latitude" to PropertyDefinition("number", "Breddegrad"),
@@ -62,7 +61,7 @@ class HybridAiRepository(
     private val alertTool = ClaudeTool(
         name = TOOL_NAME_WEATHER_ALERTS,
         description = "Henter aktive ekstremværvarsler fra Meteorologisk institutt for Norge. Bruk dette for å advare brukeren om farlige værforhold.",
-        input_schema = ToolInputSchema(
+        inputSchema = ToolInputSchema(
             type = "object",
             properties = emptyMap(),
             required = emptyList()
@@ -183,7 +182,7 @@ class HybridAiRepository(
 
             var toolLoops = 0
             // We want to let the AI loop over the tool to make sure it can give a good reply
-            while (response.stop_reason == STOP_REASON_TOOL_USE && toolLoops < MAX_TOOL_LOOPS) {
+            while (response.stopReason == STOP_REASON_TOOL_USE && toolLoops < MAX_TOOL_LOOPS) {
                 toolLoops++
 
                 conversation.add(ClaudeMessage("assistant", response.content))
@@ -220,7 +219,7 @@ class HybridAiRepository(
 
                     // Packages the reults in a format readable for the AI
                     toolResultBlocks.add(
-                        ContentBlock(type = "tool_result", tool_use_id = toolId, content = resultText)
+                        ContentBlock(type = "tool_result", toolUseId = toolId, content = resultText)
                     )
                 }
 

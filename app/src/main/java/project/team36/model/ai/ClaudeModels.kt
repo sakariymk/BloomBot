@@ -14,7 +14,7 @@ data class ClaudeRequest(
 
     val model: String,
 
-    val max_tokens: Int = 1024,
+    val maxTokens: Int = 1024,
 
     @EncodeDefault(EncodeDefault.Mode.NEVER)
     val system: String? = null,
@@ -41,7 +41,7 @@ data class ContentBlock(
     @EncodeDefault(EncodeDefault.Mode.NEVER) val id: String? = null,
     @EncodeDefault(EncodeDefault.Mode.NEVER) val name: String? = null,
     @EncodeDefault(EncodeDefault.Mode.NEVER) val input: JsonElement? = null,
-    @EncodeDefault(EncodeDefault.Mode.NEVER) val tool_use_id: String? = null,
+    @EncodeDefault(EncodeDefault.Mode.NEVER) val toolUseId: String? = null,
     @EncodeDefault(EncodeDefault.Mode.NEVER) val content: String? = null
 )
 
@@ -50,7 +50,7 @@ data class ContentBlock(
 data class ClaudeTool(
     val name: String,
     val description: String,
-    val input_schema: ToolInputSchema
+    val inputSchema: ToolInputSchema
 )
 
 // JSON schema-setup
@@ -73,5 +73,5 @@ data class PropertyDefinition(
 data class ClaudeResponse(
 
     val content: List<ContentBlock> = emptyList(),
-    val stop_reason: String? = null
+    val stopReason: String? = null
 )

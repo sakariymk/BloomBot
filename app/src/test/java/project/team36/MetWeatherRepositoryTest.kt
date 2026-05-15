@@ -8,7 +8,7 @@ import project.team36.data.mcp.MetMcpClient
 import project.team36.data.mcp.MetWeatherRepository
 
 
-class TestMetWeatherRepository() {
+class TestMetWeatherRepository {
 
     //mocking a mcp client
     private val mockClient = mockk<MetMcpClient>()
