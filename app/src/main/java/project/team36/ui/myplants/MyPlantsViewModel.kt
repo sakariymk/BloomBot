@@ -29,7 +29,7 @@ class MyPlantsViewModel(
     private val frostRepository: FrostRepository
 ) : ViewModel() {
 
-    private val _precipitationPerDay = MutableStateFlow<Map<String, Double>>(emptyMap())
+    private val _precipitationPerPlant = MutableStateFlow<Map<Long, Map<String, Double>>>(emptyMap())
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val plants = locationsViewModel.selectedLocation
@@ -75,8 +75,10 @@ class MyPlantsViewModel(
         val relevantDays = (0 until plant.maxDaysWithoutWater).map {
             today.minusDays(it.toLong()).toString()
         }
-        return relevantDays.any { day ->
-            (_precipitationPerDay.value[day] ?: 0.0) < 5.0
+        val precipitationForPlant = _precipitationPerPlant.value[plant.id] ?: emptyMap()
+
+        return !relevantDays.any { day ->
+            (precipitationForPlant[day] ?: 0.0) >= 5.0
         }
     }
 
@@ -131,16 +133,28 @@ class MyPlantsViewModel(
 
     fun loadPrecipitationForLocation(lat: Double, lon: Double) {
         viewModelScope.launch {
-            val lastWatered = plants.value
-                .minOfOrNull { it.lastWateredDate }
-                ?: return@launch
+            val result = mutableMapOf<Long, Map<String, Double>>()
 
-            val rainPerDay = frostRepository.getPrecipitationSinceLastUsed(
-                lat = lat,
-                lon = lon,
-                lastWatered = lastWatered.toIso8601()
-            )
-            _precipitationPerDay.value = rainPerDay ?: emptyMap()
+            plants.value.forEach { plant ->
+                if (plant.lastWateredDate == 0L) return@forEach
+
+                val rainPerDay = frostRepository.getPrecipitationSinceLastUsed(
+                    lat = lat,
+                    lon = lon,
+                    lastWatered = plant.lastWateredDate.toIso8601()
+                )
+                if (rainPerDay != null) {
+                    result[plant.id] = rainPerDay
+
+                    val hasRainedEnough= rainPerDay.values.any { it >= 5 }
+                    if (hasRainedEnough) {
+                        markAsWatered(plant)
+                    } else {
+                        repository.updatePlant(plant.copy(hasBeenWatered = false))
+                    }
+                }
+            }
+            _precipitationPerPlant.value = result
         }
     }
 
