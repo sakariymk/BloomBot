@@ -28,6 +28,7 @@ import project.team36.ui.map.LocationsViewModel
 import project.team36.ui.plant.PlantCard
 import project.team36.ui.navigation.BottomNavBar
 
+//Screen to display all plants per location
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyPlantsScreen(
@@ -40,7 +41,6 @@ fun MyPlantsScreen(
 
     //fetches plants for a savedlocation
     val plants by myPlantsViewModel.plants.collectAsStateWithLifecycle()
-
 
     //reloads rain data whenever selected location changes
     LaunchedEffect(selectedLocation) {

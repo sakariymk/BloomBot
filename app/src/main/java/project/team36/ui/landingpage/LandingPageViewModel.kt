@@ -15,8 +15,79 @@ import kotlin.jvm.java
 import project.team36.data.mcp.HybridAiRepository
 import project.team36.model.ai.AiRecommendationResponse
 
+//ViewModel to edit UI and connect with the data
+class LandingPageViewModel(
+    private val weatherRepository: MetWeatherRepository,
+    private val aiRepository: HybridAiRepository
+) : ViewModel() {
 
+    private val _uiState = MutableStateFlow(LandingPageUiState())
+    val uiState: StateFlow<LandingPageUiState> = _uiState.asStateFlow()
 
+    //fetches ai advice for given location
+    fun fetchAiAdvice(location: SavedLocation) {
+        _uiState.value = _uiState.value.copy(isAiLoading = true, aiResponse = null)
+        viewModelScope.launch {
+            val response = aiRepository.getPlantRecommendations(location)
+            _uiState.value = _uiState.value.copy(isAiLoading = false, aiResponse = response)
+        }
+    }
+
+    fun dismissAiAdvice() {
+        _uiState.value = _uiState.value.copy(aiResponse = null)
+    }
+
+    fun showInfoDialog() {
+        _uiState.value = _uiState.value.copy(showInfoDialog = true)
+    }
+
+    fun dismissInfoDialog() {
+        _uiState.value = _uiState.value.copy(showInfoDialog = false)
+    }
+
+    //fetches weather forecasts and MetAlerts for all saved locations (using couroutine)
+    fun loadDataForLocations(locations: List<SavedLocation>) {
+        //uses courotine so all weather data can be fetched at the same time
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isWeatherLoading = true, isAlertsLoading = true)
+
+            //fetches all alerts once so it can be reused for all the saved locations
+            val allAlerts = runCatching { weatherRepository.getAllAlerts() }.getOrDefault(emptyList())
+
+            val alertsMap = mutableMapOf<Long, List<WeatherAlert>>()
+            val forecastsMap = mutableMapOf<Long, WeatherUiState?>()
+
+            //goes through each saved location and fetches data for it
+            locations.forEach { location ->
+                val lat = location.lat ?: 0.0
+                val lon = location.lon ?: 0.0
+
+                //filters those alerts that are relevant for this locations coordinates
+                val relevantAlerts = allAlerts.filter { alert ->
+                    alert.polygons.any { polygon ->
+                        weatherRepository.isPointInPolygon(lat, lon, polygon)
+                    }
+                }
+                alertsMap[location.id] = relevantAlerts
+
+                //gets and parses weather forecast
+                val rawForecast = runCatching {
+                    weatherRepository.getForecast(lat, lon)
+                }.getOrNull()
+                forecastsMap[location.id] = rawForecast
+                    ?.let { weatherRepository.getParsedForecast(it) }
+                    ?.toUiState()
+            }
+
+            _uiState.value = _uiState.value.copy(
+                locationForecasts = forecastsMap,
+                locationAlerts = alertsMap,
+                isWeatherLoading = false,
+                isAlertsLoading = false
+            )
+        }
+    }
+}
 
 data class WeatherUiState(
     val temperature: String,
@@ -103,79 +174,6 @@ private fun WeatherForecast.toUiState() = WeatherUiState(
     iconName = weatherSymbol
 )
 
-
-class LandingPageViewModel(
-    private val weatherRepository: MetWeatherRepository,
-    private val aiRepository: HybridAiRepository
-) : ViewModel() {
-
-    private val _uiState = MutableStateFlow(LandingPageUiState())
-    val uiState: StateFlow<LandingPageUiState> = _uiState.asStateFlow()
-
-    //fetches ai advice for given location
-    fun fetchAiAdvice(location: SavedLocation) {
-        _uiState.value = _uiState.value.copy(isAiLoading = true, aiResponse = null)
-        viewModelScope.launch {
-            val response = aiRepository.getPlantRecommendations(location)
-            _uiState.value = _uiState.value.copy(isAiLoading = false, aiResponse = response)
-        }
-    }
-
-    fun dismissAiAdvice() {
-        _uiState.value = _uiState.value.copy(aiResponse = null)
-    }
-
-    fun showInfoDialog() {
-        _uiState.value = _uiState.value.copy(showInfoDialog = true)
-    }
-
-    fun dismissInfoDialog() {
-        _uiState.value = _uiState.value.copy(showInfoDialog = false)
-    }
-
-    //fetches weather forecasts and Metalerts for all saved locations (using couroutine)
-    fun loadDataForLocations(locations: List<SavedLocation>) {
-        //uses courotine so all weather data can be fetched at the same time
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isWeatherLoading = true, isAlertsLoading = true)
-
-            //fetches all alerts once so it can be reused for all of the saved locations
-            val allAlerts = runCatching { weatherRepository.getAllAlerts() }.getOrDefault(emptyList())
-
-            val alertsMap = mutableMapOf<Long, List<WeatherAlert>>()
-            val forecastsMap = mutableMapOf<Long, WeatherUiState?>()
-
-            //goes through each saved location and fetches data for it
-            locations.forEach { location ->
-                val lat = location.lat ?: 0.0
-                val lon = location.lon ?: 0.0
-
-                //filters those alerts that are relevant for this locations coordinates
-                val relevantAlerts = allAlerts.filter { alert ->
-                    alert.polygons.any { polygon ->
-                        weatherRepository.isPointInPolygon(lat, lon, polygon)
-                    }
-                }
-                alertsMap[location.id] = relevantAlerts
-
-                //gets and parses weather forecast
-                val rawForecast = runCatching {
-                    weatherRepository.getForecast(lat, lon)
-                }.getOrNull()
-                forecastsMap[location.id] = rawForecast
-                    ?.let { weatherRepository.getParsedForecast(it) }
-                    ?.toUiState()
-            }
-
-            _uiState.value = _uiState.value.copy(
-                locationForecasts = forecastsMap,
-                locationAlerts = alertsMap,
-                isWeatherLoading = false,
-                isAlertsLoading = false
-            )
-        }
-    }
-}
 
 class LandingPageViewModelFactory(
     private val weatherRepository: MetWeatherRepository,

@@ -56,7 +56,11 @@ import androidx.core.content.edit
 import project.team36.ui.myplants.MyPlantsViewModel
 import project.team36.data.mcp.WeatherAlert
 import project.team36.R
+import project.team36.ui.myplaces.EmptyLocationCard
 
+/*Opening screen for the app. On first time open, a guide is opened that can later be accessed as well.
+* Shows weather for location and plants that need water, as well as AI-button.
+*/
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun LandingPageScreen(
@@ -71,6 +75,7 @@ fun LandingPageScreen(
     val savedLocations by locationsViewModel.savedLocations.collectAsStateWithLifecycle()
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     var showNoNetworkDialog by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(true) }
 
     //tracks whether the user has seen the onboarding info or not
     val context = LocalContext.current
@@ -103,17 +108,26 @@ fun LandingPageScreen(
     //requests location permission
     LaunchedEffect(Unit) { locationPermission.launchPermissionRequest() }
 
-    //cancels launchedEffect block early if there are no saved locations
-    //fetches data for saved locations
-    //sets selectedLocation to first tab when the screen loads in,
-    // so recommended plants can display for this garden right away
+    /*cancels launchedEffect block early if there are no saved locations
+    * fetches data for saved locations
+    * sets selectedLocation to first tab when the screen loads in,
+    * so recommended plants can display for this garden right away
+    * And loads precipitation for location
+    */
     LaunchedEffect(savedLocations) {
-        //nothing to load if there are no saved locations
-        if (savedLocations.isEmpty()) return@LaunchedEffect
+        if (savedLocations.isEmpty()) {
+            isLoading = false
+            return@LaunchedEffect
+        }
         landingPageViewModel.loadDataForLocations(savedLocations)
         if (locationsViewModel.selectedLocation.value == null) {
             locationsViewModel.selectLocation(savedLocations[0])
         }
+        val location = locationsViewModel.selectedLocation.value ?: savedLocations[0]
+        val lat = location.lat ?: return@LaunchedEffect
+        val lon = location.lon ?: return@LaunchedEffect
+        myPlantsViewModel.loadPrecipitationForLocation(lat, lon)
+        isLoading = false
     }
 
     Scaffold(
@@ -149,12 +163,22 @@ fun LandingPageScreen(
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
         ) {
-            if (savedLocations.isEmpty()) {
-                Text(
-                    text = "Ingen lagrede hager ennå.",
-                    modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onBackground
+            //Show loading indicator while data from database is loading
+            if (isLoading){
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 100.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+            //Show an empty card if no places are saved, that directs to map
+            else if (savedLocations.isEmpty()) {
+                EmptyLocationCard (
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    onAddPlaceClick = { navController.navigate("map") }
                 )
             } else {
                 //horizontally scrollable tab row, for saved locations
@@ -330,7 +354,7 @@ fun LandingPageScreen(
                                                 color = MaterialTheme.colorScheme.onSurface
                                             )
                                             val recommendText =
-                                                uiState.aiResponse!!.plantAdvice.firstOrNull()?.Recommend
+                                                uiState.aiResponse!!.plantAdvice.firstOrNull()?.recommend
                                             if (!recommendText.isNullOrEmpty()) {
                                                 Spacer(modifier = Modifier.height(8.dp))
                                                 Text(

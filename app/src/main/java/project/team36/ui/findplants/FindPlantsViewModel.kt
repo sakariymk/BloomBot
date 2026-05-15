@@ -15,6 +15,7 @@ import project.team36.model.location.SavedPlant
 import project.team36.ui.plant.PlantDetails
 import project.team36.ui.plant.toPlantDetails
 
+//ViewModel to edit UI and connect with the data
 class FindPlantsViewModel (
     private val plantRepository: PlantRepository,
     private val locationRepository: LocationRepository

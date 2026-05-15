@@ -6,6 +6,7 @@ import project.team36.data.local.dao.SavedPlantDao
 import project.team36.model.location.SavedLocation
 import project.team36.model.location.SavedPlant
 
+// Repository for managing all edits to the database
 class LocationRepository(
     private val locationDao: SavedLocationDao,
     private val savedPlantDao: SavedPlantDao

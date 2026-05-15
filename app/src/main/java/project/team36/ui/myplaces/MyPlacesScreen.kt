@@ -54,6 +54,7 @@ import project.team36.model.location.SavedLocation
 import project.team36.ui.map.LocationsViewModel
 import project.team36.ui.navigation.BottomNavBar
 
+//Screen to give a display of all saved places
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MyPlacesScreen (
@@ -121,11 +122,11 @@ fun MyPlacesScreen (
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
                 .padding(innerPadding)
-                .padding(horizontal = 16.dp)
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 if (savedLocations.isEmpty()) {
                     EmptyLocationCard (
+                        modifier = Modifier.padding(horizontal = 16.dp),
                         onAddPlaceClick = { navController.navigate("map") }
                     )
                 } else {
@@ -151,10 +152,11 @@ fun MyPlacesScreen (
 // Card displayed when app has no saved locations
 @Composable
 fun EmptyLocationCard(
+    modifier: Modifier = Modifier,
     onAddPlaceClick: () -> Unit
 ){
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .border(
                 width = 2.dp,

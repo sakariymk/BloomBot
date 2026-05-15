@@ -1,5 +1,6 @@
 package project.team36.data.klima.frost
 
+import android.util.Log
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -10,7 +11,9 @@ import kotlinx.serialization.json.Json
 import project.team36.model.frost.ObservationResponse
 import project.team36.model.frost.SourceResponse
 import project.team36.model.frost.Source
+import java.time.Instant
 
+// Data source to get information from Frost API
 val client = HttpClient(io.ktor.client.engine.android.Android) {
     install(ContentNegotiation) {
         json(Json {
@@ -20,8 +23,10 @@ val client = HttpClient(io.ktor.client.engine.android.Android) {
     }
 }
 
+//Find the nearest station, or return null if none are found
+// Doesn't use IFI proxy server towards the API as the TA's said it was not needed
 suspend fun getNearestStation(lat: Double, lon: Double, clientId: String): Source? {
-    val url = "https://https://in2000-frostproxy.ifi.uio.no/frost.met.no/sources/v0.jsonld"
+    val url = "https://frost.met.no/sources/v0.jsonld"
 
     return try {
         val response = client.get(url) {
@@ -37,91 +42,16 @@ suspend fun getNearestStation(lat: Double, lon: Double, clientId: String): Sourc
             // Returns the first station in the list
             sourceResponse.data.firstOrNull()
         } else {
-            println("Errors from API: ${response.status}")
+            Log.e("FROST", "Errors from API: ${response.status}")
             null
         }
     } catch (e: Exception) {
-        println("Did not fetch data: ${e.message}")
+        Log.e("FROST", "Did not fetch data: ${e.message}")
         null
     }
 }
 
-suspend fun getTemperatures(stationId: String, clientId: String): Double? {
-    val url = "https://frost.met.no/observations/v0.jsonld"
-
-    return try {
-        val response = client.get(url) {
-            basicAuth(clientId, "")
-            parameter("sources", stationId)
-            parameter("elements", "air_temperature")
-            parameter("referencetime", "latest")
-        }
-
-        if (response.status == HttpStatusCode.OK) {
-            val observationResponse: ObservationResponse = response.body()
-            val value = observationResponse.data.firstOrNull()?.observations?.firstOrNull()?.value
-            println("Fected value: $value")
-            value
-        } else {
-            null
-        }
-    } catch (e: Exception) {
-        println("Did not manage to fetch temperatues: ${e.message}")
-        null
-    }
-}
-
-suspend fun getPrecipitation(stationId : String, clientId : String, date : String) : Double ? {
-    val url = "https://frost.met.no/observations/v0.jsonld"
-
-    return try {
-        val response = client.get(url) {
-            basicAuth(clientId, "")
-            parameter("sources", stationId)
-            parameter("elements", "sum(precipitation_amount P1D)")
-            parameter("referencetime", date)
-        }
-
-        if (response.status == HttpStatusCode.OK) {
-            val observationResponse : ObservationResponse = response.body()
-            val value = observationResponse.data.firstOrNull()?.observations?.firstOrNull()?.value
-            println("Fetched precipitation $value mm at $stationId")
-            value
-        } else {
-            null
-        }
-    } catch (e : Exception) {
-        println("Did not manage to fetch precipitation amount : ${e.message}")
-        null
-    }
-
-}
-
-
-suspend fun getDurationSunShine(stationId : String, clientId : String, date : String) : Double ? {
-    val url = "https://frost.met.no/observations/v0.jsonld"
-
-    return try {
-        val response = client.get(url) {
-            basicAuth(clientId, "")
-            parameter("sources", stationId)
-            parameter("elements", "sum(duration_of_sunshine P1D)")
-            parameter("referencetime", date)
-        }
-
-        if (response.status == HttpStatusCode.OK) {
-            val observationResponse: ObservationResponse = response.body()
-            val value = observationResponse.data.firstOrNull()?.observations?.firstOrNull()?.value
-            println("Fetched $value hours of sunshine at $stationId")
-            value
-        } else {
-            null
-        }
-    } catch (e: Exception) {
-        println("Did not manage to fetch hours of sunshine : ${e.message}")
-        null
-    }
-}
+//Get precipitation for location since a plant was last watered until now.
 suspend fun getPrecipitationSinceLastUsed(
     lat: Double,
     lon: Double,
@@ -130,13 +60,14 @@ suspend fun getPrecipitationSinceLastUsed(
 ): Map<String, Double>? {
     val station = getNearestStation(lat, lon, clientId) ?: return null
     val url = "https://frost.met.no/observations/v0.jsonld"
+    val now = Instant.now().toString().substringBefore(".") + "Z"
 
     return try {
         val response = client.get(url) {
             basicAuth(clientId, "")
             parameter("sources", station.id)
             parameter("elements", "sum(precipitation_amount PT1H)")
-            parameter("referencetime", "$lastWatered/now")
+            parameter("referencetime", "$lastWatered/$now")
         }
         if (response.status == HttpStatusCode.OK) {
             val observationResponse: ObservationResponse = response.body()
@@ -145,9 +76,11 @@ suspend fun getPrecipitationSinceLastUsed(
                 .mapValues { (_, obs) ->
                     obs.flatMap { it.observations }.sumOf { it.value }
                 }
-        } else null
+        } else {
+            null
+        }
     } catch (e: Exception) {
-        println("Error fetching precipitation: ${e.message}")
+        Log.e("FROST", "Exception: ${e.message}")
         null
     }
 }

@@ -16,6 +16,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import project.team36.R
 import project.team36.ui.map.LocationsViewModel
 
+// Sets the values for nav-bar so it can be edited from one place for all screens
 @Composable
 fun BottomNavBar(navController: NavController, locationsViewModel : LocationsViewModel) {
     val currentRoute by navController.currentBackStackEntryAsState()

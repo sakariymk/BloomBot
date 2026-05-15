@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import project.team36.R
 
-//Onboarding dialog gives a tutorial for how to use the app
+//Onboarding dialog gives a tutorial for how to use the app for new users
 @Composable
 fun OnboardingDialog(
     onDismiss: () -> Unit,
