@@ -38,7 +38,7 @@ Bloombot is a gardening app and plant diary made for hobby gardeners in Norway. 
 
 ## 📦 How to run the app
 
-1. **Download Android Studio** - [Guide](https://developer.android.com/studio/install)
+1. **Download Android Studio and make sure it is Panda 4 release** - Android Studio needs to be in the Panda 4 version (because the AGP version in the project is 9.2.1, [link](https://developer.android.com/studio/releases). [Guide for installation](https://developer.android.com/studio/install)
 2. **Clone the project to Android studio and open it** - clone the project via GitHub [Guide](https://www.geeksforgeeks.org/git/how-to-clone-android-project-from-github-in-android-studio/)
 
 5. **Permissions** - The app needs location if the user wants to save locations based on live location. The app will ask for location permissions, so make sure that your emulator or physical device has live location enabled.
@@ -102,8 +102,29 @@ Bloombot is a gardening app and plant diary made for hobby gardeners in Norway. 
 
 - **Kotlinx Coroutines Test** - For testing code that uses coroutines.
 
+<br>
 
-&nbsp;
+## ⚠️Warnings in the code
+
+### build.gradle.kts, line 17
+  - "Not targeting the latest versions of Android; compatibility modes apply. Consider testing and updating this version. Consult the `android.os.Build.VERSION_CODES` javadoc for details."
+
+Android 17 (API level 37) is indeed out, but the release is still in beta. We decided to keep it to 36 because that is the latest stable release, as per Android's documentation: https://developer.android.com/tools/releases/platforms and https://developer.android.com/tools/releases/platform-tools (as per May 2026).
+
+
+
+<br>
+
+## Sources for plant data and climate zones
+We got permission from **Det norske hageselskap** to use data about their climate zones from their website https://klimasonekart.no/
+
+For collecting data about plants, we used these websites:
+- Rhs plants is the UK’s leading gardening charity: https://www.rhs.org.uk/plants
+
+- Planteportalen, which is a website containting extensive information about over 1900 plants https://planteportalen.no/
+- Plantasjen is one of the leading retailers of plants in the nordics, and have a lot of information about plant care: https://plantasjen.no/no
+
+
 ## Picture sources
 
 Weather icons taken from Norwegian Meteorological Institute GitHub repository.
