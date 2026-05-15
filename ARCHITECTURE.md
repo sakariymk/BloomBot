@@ -181,9 +181,10 @@ We have some technical debt such as some larger screens like LandingPageScreen c
 
 Currently, the application utilizes a CSV file to store and retrieve data. While this approach is sufficient for a limited number of plants, this introduces some technical debt regarding scalability and performance. Reading a large CSV file into memory as a list of objects can lead to high RAM usage, potentially causing out of memory error if we decide to add a large amount of new plants. To solve this technical debt, the plant data should be migrated from the CSV format into a database. 
 
-Another technical debt is that every time we add new images for plants all app data have to be wiped out in the emulator. That is because the addition changes the structure of the data that Room expects. The database points to the wrong image ID which is saved as an Int, which will cause the app to crash. To solve this technical debt, the name of the images should get saved as a String. By doing this, the app data doesnt have to be wiped out because the name of the file remains the same even if they get new IDs internally. 
+Another technical debt is that we are using`FallBackToDestructiveMigration` in our Room database. In production code this could not be used because all data is wiped from the Database when updated. The solution would be to use `AutoMigration`.
 
 ## Maintenance and further development
+The application is built on Android Studio with Kotlin using Jetpack Compose. It is built around MET APIs such as LocationForcast, MetAlerts and Frost and the use of MCP-client with Claude as the AI-motor. We have used an additional API from MapBox to display the map on the app. Locationforecast and METAlerts provide real-time and predictive weather data. Frost provides historical precipitation data using dynamic time intervals `sum(precipitation_amount PT1H)`. 
 
 
 
