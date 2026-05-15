@@ -130,7 +130,6 @@ class PlantInfo {
 }
 
 class FrostDataSource{
-    getPrecipitation(stationId : String, clientId : String, date : String)
     getNearestStation(lat: Double, lon: Double, clientId: String): Source
     getPrecipitationSinceLastUsed(
     lat: Double,
