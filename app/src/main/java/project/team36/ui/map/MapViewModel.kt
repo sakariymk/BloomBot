@@ -147,7 +147,7 @@ class MapViewModel(
                 }
             )
             //delay to give time for the climate zone to be loaded in
-            delay(700)
+            delay(900)
             val zone = getClimateZone(lng = lon, lat = lat)
 
             savedLocationsRepository.insertLocation(
