@@ -28,7 +28,7 @@ class FindPlantsViewModel (
         _plants.value = plantRepository.initiatePlants().map { it.toPlantDetails() }
     }
 
-    //når bruker har valgt plante og lokasjon legges det inn i databasen
+    // When user har chosen a plant and location, it's saved to the database
     fun addPlant(plant: PlantDetails, location: SavedLocation) {
         viewModelScope.launch {
             locationRepository.insertPlant(
@@ -50,7 +50,7 @@ class FindPlantsViewModel (
             )
         }
     }
-    //Laste inn anbefalte og ikke anbefalte planter fra plantRepository
+    // Loads recommended and not recommended plants
     fun loadRecommendedPlants(location: SavedLocation) {
         viewModelScope.launch {
             locationRepository.getPlantsForLocation(location.id)
@@ -66,13 +66,11 @@ class FindPlantsViewModel (
                 }
         }
     }
-    // Tømme visning for planter dersom lagret sted slettes
     fun clearPlants() {
         _plants.value = emptyList()
         _notRecommendedPlants.value = emptyList()
     }
 }
-
 
 class FindPlantsViewModelFactory(
     private val plantRepository: PlantRepository,

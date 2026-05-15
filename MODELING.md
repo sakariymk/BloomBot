@@ -1,3 +1,5 @@
+
+## Sequence diagram
 ```mermaid
 ---
 title: Add plant to a saved garden
@@ -25,6 +27,7 @@ sequenceDiagram
     Database-->>LocationRepository: OK
     PlantDetailsScreen->>MyPlantsScreen: navigate(myPlants)
 ```
+## Sequence diagram
 ```mermaid
 ---
 title: Bloombot - get AI advice for selected garden
@@ -69,3 +72,6 @@ sequenceDiagram
     LandingPageViewModel-->>LandingPageScreen: uiState.aiResponse updated
     LandingPageScreen-->>User: Show Bloombot-dialog
 ```
+## Use case diagram
+
+![use_case_diagram](https://github.uio.no/user-attachments/assets/b6e98998-13a7-4bfa-8215-8a809c3db293)

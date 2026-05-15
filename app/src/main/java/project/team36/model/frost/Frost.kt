@@ -3,6 +3,7 @@ package project.team36.model.frost
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+// Wrapper for a paginated list of weather stations returned by the API
 @Serializable
 data class SourceResponse(
     val data: List<Source>,
@@ -10,36 +11,25 @@ data class SourceResponse(
     val apiVersion: String? = null
 )
 
+// Model for a weatherstation
 @Serializable
 data class Source(
     val id: String,
     val name: String,
     val geometry: Point,
-    val masl: Double? = null, // Endret til Double for å tåle desimaler
+    val masl: Double? = null,
     val municipality: String? = null,
     val county: String? = null
 )
 
+// GeoJSON-style coordinate holder for a station's geographic position
 @Serializable
 data class Point(
     @SerialName("@type") val type: String? = null,
     val coordinates: List<Double>
 )
 
-@Serializable
-data class TimeSeries (
-    val sourceId : String,
-    val elementId : String,
-    val validFrom : String? = null,
-    val validTo : String? = null,
-    val unit : String? = null
-)
-
-@Serializable
-data class TimeSeriesResponse (
-    val data : List <TimeSeries>
-)
-
+// A station's recorded data at a specific point in time, containing one or more measured values
 @Serializable
 data class Observation (
     val sourceId : String,

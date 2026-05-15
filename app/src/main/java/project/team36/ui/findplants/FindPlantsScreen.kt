@@ -53,10 +53,8 @@ import project.team36.ui.plant.SimplePlantCard
 import project.team36.ui.navigation.BottomNavBar
 
 /*
-Skjerm som viser anbefalte og ikke anbefalte planter basert på herdighetssone på valgt lokasjon
-Bruker kan bytte valgt lokasjon for å få nye anbefalinger til planter. Det er også mulig å legge til planter
-som ikke er anbefalt.
-Når bruker trykker på plante, åpnes PlantDetailsScreen, derfra kan de legge til plante i sin hage.
+Screen that shows recommended and not-recommended plants based on climate zones.
+User can change chosen location to get different recommendations.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,8 +73,7 @@ fun FindPlantsScreen(
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     val tabs = listOf("Anbefalte planter", "Andre planter")
 
-    //Laster inn anbefalte planter, eller tømmer view om det ikke er noen steder lagret eller ingen hage valgt
-    // SelectedLocation settes allerede fra landingpage, så listen genereres for sist viste hage
+    // Loads in recommended plants
     LaunchedEffect(selectedLocation, savedLocations) {
         if (savedLocations.isEmpty() || selectedLocation == null) {
             findPlantsViewModel.clearPlants()
@@ -100,7 +97,7 @@ fun FindPlantsScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
                 ),
-                windowInsets = WindowInsets(0) //gjør at appen ikke legger til mye mellomrom på toppen av skjermen
+                windowInsets = WindowInsets(0)
             )
         },
         bottomBar = { BottomNavBar(navController = navController, locationsViewModel) }
@@ -181,7 +178,7 @@ fun FindPlantsScreen(
                                 )
                             }
                         }
-                        //Viser planter som passer eller ikke passer
+                        // Shows plants that fit or do not fit
                         items(displayedPlants) { plant ->
                             SimplePlantCard(
                                 plant = plant,
@@ -194,7 +191,7 @@ fun FindPlantsScreen(
                 }
             }
 
-            // Chip + FAB flytende over innhold
+            // Chip + FAB floating over content
             Column(
                 horizontalAlignment = Alignment.End,
                 modifier = Modifier
@@ -220,7 +217,7 @@ fun FindPlantsScreen(
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
-                // Knapp for å endre hage og få anbefalinger for ny hage
+                // Button to change garden
                 ExtendedFloatingActionButton(
                     onClick = { showSwitchLocationDialog.value = true },
                     icon = { Icon(Icons.Default.SwapHoriz, contentDescription = "Bytt hage") },

@@ -5,7 +5,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test
-import org.mockito.Mockito.mock
+import io.mockk.mockk
 import project.team36.data.ai.ClaudeApi
 import project.team36.data.mcp.HybridAiRepository
 import project.team36.data.local.LocationRepository
@@ -15,32 +15,21 @@ import project.team36.model.ai.ClaudeResponse
 import project.team36.model.ai.ContentBlock
 import project.team36.model.location.SavedLocation
 
-/**
- * Formål og funksjon:
- * Dette er en enhetstest (Unit Test) for HybridAiRepository. Formålet her er å teste
- * logikken vår, spesielt at JSON-parsingen fungerer nøyaktig som den skal.
- * * Relevante filer:
- * - HybridAiRepository: Selve klassen vi tester funksjonaliteten til.
- * - AiRecommendationModels: Dataklassene vi sjekker at JSON-teksten oversettes til.
- */
+
 class HybridAiRepositoryTest {
 
+    // Verifies that a well-formed JSON response from Claude is correctly parsed into a recommendation object
     @Test
     fun testGetPlantRecommendations_ParsesJsonCorrectly(): Unit = runBlocking {
         println("Starter test av JSON-parsing i HybridAiRepository...")
 
-        // Vi oppretter falske versjoner (mocks) av databasen og MCP-klienten ved hjelp av Mockito.
-        // Dette gjør vi fordi en ren JUnit-test ikke har tilgang til en ekte Android-enhet for å kjøre Room-databasen.
-        val mockMcpClient = mock(MetMcpClient::class.java)
-        val mockLocationRepo = mock(LocationRepository::class.java)
+        val mockMcpClient = mockk<MetMcpClient>()
+        val mockLocationRepo = mockk<LocationRepository>()
 
-        // Vi bygger en "falsk" ClaudeApi (et anonymt objekt) som later som den er Anthropic sin server.
         val fakeClaudeApi = object : ClaudeApi {
             override suspend fun sendMessage(apiKey: String, request: ClaudeRequest): ClaudeResponse {
-                // Dette er den fiktive JSON-strengen vi later som AI-en genererte og sendte til oss.
                 val fakeJson = """
                     {
-                      "weatherSummary": "15°C og sol. Perfekt hagevær!",
                       "plantAdvice": [
                         { "plantName": "Rose", "advice": "Husk å vanne rikelig i dag." }
                       ],
@@ -48,8 +37,6 @@ class HybridAiRepositoryTest {
                     }
                 """.trimIndent()
 
-                // Vi pakker JSON-strengen inn i en ClaudeResponse med stop_reason = "end_turn".
-                // Dette forteller repositoryet vårt at AI-en er ferdig med å tenke og ikke trenger flere verktøy.
                 return ClaudeResponse(
                     content = listOf(ContentBlock(type = "text", text = fakeJson)),
                     stop_reason = "end_turn"
@@ -57,7 +44,6 @@ class HybridAiRepositoryTest {
             }
         }
 
-        // Vi initialiserer selve repositoryet vi vil teste, og mater inn de falske byggeklossene våre.
         val repository = HybridAiRepository(
             claudeApi = fakeClaudeApi,
             mcpClient = mockMcpClient,
@@ -65,43 +51,34 @@ class HybridAiRepositoryTest {
             claudeApiKey = "test-key"
         )
 
-        // Vi oppretter en fiktiv lokasjon som kreves som parameter for å kjøre funksjonen vi tester.
         val testLocation = SavedLocation(id = 1L, name = "Testhagen", lat = 59.9, lon = 10.7, address = "", zone = 1)
-
-        // Vi kjører den faktiske logikken i HybridAiRepository for å se hva den returnerer.
         val response = repository.getPlantRecommendations(testLocation)
-
-        // Vi sjekker at vi faktisk fikk tilbake et objekt (altså at JSON-parsingen IKKE krasjet og returnerte null).
         assertNotNull("JSON-parsingen feilet, returnerte null!", response)
 
-        // Hvis vi kom så langt, printer vi ut verdiene for å bekrefte at dataene ble lagt på riktig plass.
         response?.let {
             println("--- Test results ---")
-            println("Vær: ${it.weatherSummary}")
             println("Første planteråd: ${it.plantAdvice[0].plantName} - ${it.plantAdvice[0].advice}")
             println("---------------------")
 
-            // Vi kjører strenge tester for å sikre at dataklassene våre fikk nøyaktig de verdiene vi forventet fra JSON-strengen.
-            assertEquals("15°C og sol. Perfekt hagevær!", it.weatherSummary)
             assertEquals(1, it.plantAdvice.size)
             assertEquals("Rose", it.plantAdvice[0].plantName)
             assertEquals("Husk å vanne rikelig i dag.", it.plantAdvice[0].advice)
             assertEquals(2, it.generalTasks.size)
+            assertEquals("Rak løv", it.generalTasks[0])
+            assertEquals("Sjekk for ugress", it.generalTasks[1])
         }
     }
+
+    // Verifies that the repository returns null when Claude responds with plain text instead of valid JSON
     @Test
     fun testClaudeHallucination_InvalidJsonReturnsNull(): Unit = runBlocking {
         println("Starter test av AI-hallusinasjon (ugyldig JSON)...")
 
-        // Vi oppretter de samme falske databasene og klientene
-        val mockMcpClient = mock(MetMcpClient::class.java)
-        val mockLocationRepo = mock(LocationRepository::class.java)
+        val mockMcpClient = mockk<MetMcpClient>()
+        val mockLocationRepo = mockk<LocationRepository>()
 
-        // Vi bygger en ClaudeApi som med vilje ignorerer systemprompten vår
-        // og returnerer vanlig samtale-tekst i stedet for et strukturert JSON-objekt.
         val hallucinatingClaudeApi = object : ClaudeApi {
             override suspend fun sendMessage(apiKey: String, request: ClaudeRequest): ClaudeResponse {
-                // Ren tekst uten JSON-struktur (mangler krøllparanteser, lister osv.)
                 val badJson = "Hei! Det er en nydelig dag ute. Et godt tips er å vanne rosene dine i dag."
 
                 return ClaudeResponse(
@@ -111,7 +88,6 @@ class HybridAiRepositoryTest {
             }
         }
 
-        // Vi initialiserer repositoryet med den "dårlige" AI-en
         val repository = HybridAiRepository(
             claudeApi = hallucinatingClaudeApi,
             mcpClient = mockMcpClient,
@@ -119,19 +95,12 @@ class HybridAiRepositoryTest {
             claudeApiKey = "test-key"
         )
 
-        // Fiktiv lokasjon for testen
         val testLocation = SavedLocation(id = 1L, name = "Krasjhagen", lat = 59.9, lon = 10.7, address = "", zone = 1)
-
-        // Vi kaller funksjonen. Parseren (jsonParser) vil prøve å lese "Hei! Det er...",
-        // innse at det ikke er gyldig JSON, kaste en exception, og try/catch-blokken
-        // skal da fange feilen og returnere null.
         val response = repository.getPlantRecommendations(testLocation)
 
-        println("--- Test results ---")
-        println("Fikk svar fra repository: $response")
-        println("---------------------")
 
-        // Sjekker at svaret faktisk ble null, og at appen vår håndterte AI-feilen elegant
+        println("Fikk svar fra repository: $response")
+
         assertNull("Repositoryet skal returnere null når AI-en svarer med ugyldig JSON format.", response)
     }
 }

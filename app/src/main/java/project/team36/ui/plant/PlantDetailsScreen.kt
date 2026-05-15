@@ -158,12 +158,14 @@ fun PlantDetailsScreen(
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 PlantInfoCard(title = "Plantingsmåned") {
-                    Text("Dette er de ideelle månedene å plante denne planten.", color = MaterialTheme.colorScheme.onSurface)
+                    Text("Dette er de ideelle månedene å plante denne planten.",
+                        color = MaterialTheme.colorScheme.onSurface)
                     PlantingMonthBar(plantingMonth = plant.plantingMonth)
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 PlantInfoCard(title = "Herdighetssone") {
-                    Text("Herdighetssone sier noe om hvor planten vil trives best med tanke på lokalklima.", color = MaterialTheme.colorScheme.onSurface)
+                    Text("Herdighetssone sier noe om hvor planten vil trives best med tanke på lokalklima.",
+                        color = MaterialTheme.colorScheme.onSurface)
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -226,7 +228,8 @@ fun PlantDetailsScreen(
                     Text("Jorden planten trives aller best i når det gjelder struktur, sammensetning, næringsinnhold og surhetsgrad. Valg av jordtype avhenger av plantens behov, men generelt trives de fleste planter i en luftig, næringsrik jord med god drenering ",
                         color = MaterialTheme.colorScheme.onSurface
                     )
-                    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         plant.soil.forEach { soilType ->
                             OutlinedButton(
                                 onClick = {},
@@ -260,7 +263,10 @@ fun PlantInfoCard(title: String, content: @Composable ColumnScope.() -> Unit) {
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Text(title, color = MaterialTheme.colorScheme.onSurface, fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+            Text(title,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.SemiBold)
             content()
         }
     }

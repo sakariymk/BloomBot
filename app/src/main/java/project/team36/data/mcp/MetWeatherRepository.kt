@@ -27,11 +27,7 @@ class MetWeatherRepository(private val mcpClient: MetMcpClient) {
 
     //For forecast on WeatherCards on LandingPage, to show forecast for the current hour
     fun getParsedForecast(text: String): WeatherForecast? {
-        /*  Split the response in blocks for each hour
-            ?= Lookahead, looks at the pattern without discarding the pattern
-            ## matches the title
-            The rest matches a capital letter and two regular letters for the weekday
-        */
+
         val blocks = text.split(Regex("(?=## [A-Z][a-z]{2} [A-Z][a-z]{2})"))
             .filter { it.contains("Weather symbol:") }
 
@@ -117,7 +113,7 @@ class MetWeatherRepository(private val mcpClient: MetMcpClient) {
         for (i in 0 until polygon.size) {
             val p1 = polygon[i]
             val p2 =
-                polygon[(i + 1) % polygon.size] // Dette håndterer lukking av polygonet automatisk
+                polygon[(i + 1) % polygon.size]
 
             if (((p1.first > lat) != (p2.first > lat)) &&
                 (lon < (p2.second - p1.second) * (lat - p1.first) / (p2.first - p1.first) + p1.second)

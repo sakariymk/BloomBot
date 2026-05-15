@@ -18,6 +18,7 @@ import project.team36.model.plant.SoilType
     )],
     indices = [Index(value = ["locationId"])]
 )
+// Saved Location model for plants
 data class SavedPlant(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val locationId: Long,

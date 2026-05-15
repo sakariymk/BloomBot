@@ -4,7 +4,8 @@ import androidx.room.TypeConverter
 import project.team36.model.plant.LightType
 import project.team36.model.plant.SoilType
 
-// konvertere Set av soiltype osv, i stedet for å ha egne tabeller for disse
+
+// Converts Sets of soiltype etc to make it compatible with saving in the DB
 
 class Converters {
     @TypeConverter

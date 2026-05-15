@@ -19,7 +19,7 @@ interface SavedLocationDao {
     @Update
     suspend fun update(location: SavedLocation)
 
-    //For å hente locations som kan vises på kartet og der man ellers trenger å vise alle
+    //Gets locations that can be displayed on the map or for other use cases where that is needed
     @Query("SELECT * FROM saved_location")
     fun getAllLocations(): Flow<List<SavedLocation>>
 }

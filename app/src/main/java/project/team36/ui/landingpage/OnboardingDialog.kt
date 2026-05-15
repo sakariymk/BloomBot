@@ -39,8 +39,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import project.team36.R
 
-//Dialog som vises første gangen appen kjøres, og er tilgjengelig via toppappbar på landingpage senere.
-//Gir en rask introduksjon til appen, og sender bruker til Mine Steder, der hen blir oppfordret til å legge til første hage.
+//Onboarding dialog gives a tutorial for how to use the app
 @Composable
 fun OnboardingDialog(
     onDismiss: () -> Unit,
@@ -71,7 +70,7 @@ fun OnboardingDialog(
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
-                // Hopp over-knapp for å gi mulighet til å skippe tutorial
+                // Skip button if user wishes to not go through onboarding
                 Box(modifier = Modifier.fillMaxWidth()) {
                     TextButton(
                         onClick = onDismiss,
@@ -81,7 +80,7 @@ fun OnboardingDialog(
                     }
                 }
 
-                // Illustrasjon
+                // Illustration
                 Image(
                     painter = painterResource(id = step.imageRes),
                     contentDescription = null,
@@ -97,7 +96,7 @@ fun OnboardingDialog(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Animerte steg-prikker for progresjon
+                    // Animated step dots
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         steps.indices.forEach { index ->
                             Box(
@@ -113,7 +112,7 @@ fun OnboardingDialog(
                         }
                     }
 
-                    // Tittel
+                    // Title
                     Text(
                         text = step.title,
                         style = MaterialTheme.typography.titleLarge,
@@ -122,7 +121,7 @@ fun OnboardingDialog(
                         color = MaterialTheme.colorScheme.onSurface
                     )
 
-                    // Beskrivelse
+                    // Description
                     Text(
                         text = step.description,
                         style = MaterialTheme.typography.bodyMedium,
@@ -132,7 +131,7 @@ fun OnboardingDialog(
 
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    // Knapper
+                    // Next-button
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -152,13 +151,15 @@ fun OnboardingDialog(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = if (isLastStep) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary //Color(0xFFB8D9B0)
+                                containerColor = if (isLastStep) MaterialTheme.colorScheme.primary
+                                else MaterialTheme.colorScheme.secondary //Color(0xFFB8D9B0)
                             ),
 
                         ) {
                             Text(
                                 text = if (isLastStep) "Kom i gang!" else "Neste",
-                                color = if (isLastStep) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondary,
+                                color = if (isLastStep) MaterialTheme.colorScheme.onPrimary
+                                else MaterialTheme.colorScheme.onSecondary,
                                 fontWeight = FontWeight.Bold
                             )
                         }

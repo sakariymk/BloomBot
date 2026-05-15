@@ -14,7 +14,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 
-//MCP-client oppsett fra https://github.com/modelcontextprotocol/kotlin-sdk
+//MCP-client structure from https://github.com/modelcontextprotocol/kotlin-sdk
 class MetMcpClient {
     private val httpClient = HttpClient(Android) { install(SSE) }
     private var isConnected = false
@@ -45,7 +45,7 @@ class MetMcpClient {
         }
     }
 
-    //Hente forecast som tekst
+    //Fetch forecast as text
     suspend fun getForecast(latitude: Double, longitude: Double): String {
         val result = client.callTool(
             CallToolRequest(
@@ -61,7 +61,7 @@ class MetMcpClient {
         return (result.content.firstOrNull() as? TextContent)?.text ?: ""
     }
 
-    //Hente alerts som tekst
+    //Get alerts as text
     suspend fun getAlerts(): String {
         connect()
         val alertResult = client.callTool(

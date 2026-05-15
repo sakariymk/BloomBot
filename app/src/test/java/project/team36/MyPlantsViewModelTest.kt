@@ -25,6 +25,8 @@ class MyPlantsViewModelTest {
     val fakeLocationsViewModel = mockk<LocationsViewModel>(relaxed = true)
     val fakeFrostRepo : FrostRepository = mockk<FrostRepository>(relaxed = true)
 
+
+    // Verifies that daysUntilWatering returns the correct remaining days based on last watered date
     @Test
     fun testDaysUntilWatering () {
 
@@ -39,27 +41,27 @@ class MyPlantsViewModelTest {
 
         val result = viewModel.daysUntilWatering(plant)
 
-        println("----Test result----")
         println("Dager til vannig: $result")
         assert(result == 1L) {"Forventet 1 dag til vanning, testresultat: $result"}
     }
 
+    // Verifies that removePlantByName finds the correct plant and calls deletePlant on the repository
     @Test
     fun deletingPlantWithRemovePlantByName() = runBlocking {
         val plant = opprettTestPlante()
 
-        // every-lambdaene sørger for at man ikke får feil i kall til LocationRepository
-        every { fakeLocationsViewModel.selectedLocation } returns MutableStateFlow(null) // returnerer alltid null
-        every { fakeLocationRepo.getPlantsForLocation(any()) } returns flowOf(listOf(plant)) //mocker at SavedPlants-objektet ligger i databasen for en hvilken som helst locationId
+        every { fakeLocationsViewModel.selectedLocation } returns MutableStateFlow(null)
+        every { fakeLocationRepo.getPlantsForLocation(any()) } returns flowOf(listOf(plant))
 
         val myPlantsViewModel = MyPlantsViewModel(fakeLocationRepo, fakeLocationsViewModel, fakeFrostRepo)
 
-        myPlantsViewModel.plants.filter { it.isNotEmpty() }.first() //venter til testplanten er lastet inn i viewmodel
+        myPlantsViewModel.plants.filter { it.isNotEmpty() }.first()
         myPlantsViewModel.removePlantByName("Pelargonia")
 
-        coVerify { fakeLocationRepo.deletePlant(plant) } //bekrefter  at deletePlant blir kalt med riktig plante
+        coVerify { fakeLocationRepo.deletePlant(plant) }
     }
 
+    // Reusable test plant used across multiple tests
     private fun opprettTestPlante() = SavedPlant(
         id = 1,
         locationId = 1,
