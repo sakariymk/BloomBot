@@ -458,4 +458,94 @@ PlantInfo ..> LightType : uses
 PlantDetails ..> SoilType : uses
 PlantDetails ..> LightType : uses
 ```
-<img width="1859" height="8192" alt="Aktivitetsdiagram" src="https://github.uio.no/user-attachments/assets/dd330fd1-2f16-47d4-a056-2afd2766d199" />
+## Activity diagram
+
+- Pre-condition: User opens the app.
+
+- Post-condition: The watering state of the plants is updated in the database, and the UI correctly reflects whether they require attention on the Home Screen.
+
+Main Flow: 
+
+1. The system checks if the user has a saved garden and plants.
+
+2. The system fetches the plants' watering needs and requests historical weather data (precipitation) from the MET Frost API.
+
+3. The weather data shows that it has rained enough (above the specific millimeter threshold) since the last watering date.
+
+4. The system automatically registers the plant as watered.
+
+5. The Home Screen is displayed, and the plant is omitted from the "Daily Tasks" list.
+
+5. The action is completed.
+
+Alternative Flow: 
+
+3.1 The weather data shows that it has not rained enough.
+
+3.2 The system checks if the plant has already been manually registered as watered by the user.
+
+3.3 The plant has not been watered manually.
+
+3.4 The system adds the plant to the user's "Daily Tasks" list on the Home Screen.
+
+3.5 The Home Screen is displayed, prompting the user for action.
+
+
+```mermaid
+
+---
+config:
+  layout: dagre
+---
+flowchart TB
+    %% Her defineres n1 og n2 som rene sirkler direkte i flyten
+    n1(( )) --> Start
+    End --> n2(( ))
+
+    Start(["User opens app"]) --> CheckData{"Has user saved<br>garden and plants?"}
+    CheckData -- No --> Idle(["App waits for user<br>to add content"])
+    CheckData -- Yes --> FetchData["Fetch watering needs from Database<br>&amp; check weather data (MET)"]
+    FetchData --> RainCheck{"Has it rained enough<br>(above specific mm)?"}
+    RainCheck -- Yes --> SkipTask["Register as watered"]
+    RainCheck -- No --> WaterCheck{"Is plant already<br>watered manually?"}
+    WaterCheck -- Yes --> SkipTask
+    WaterCheck -- No --> AddToDaily@{ label: "Add plant to<br>'Daily Tasks'" }
+    SkipTask --> DisplayHome["Display Home Screen"]
+    AddToDaily --> DisplayHome
+    DisplayHome --> UserAction{"How will user<br>register watering?"}
+    UserAction -- Shortcut (Home Screen) --> ClickDailyCard["Clicks plant in<br>Daily Tasks"]
+    UserAction -- Navigation route --> NavMyPlaces@{ label: "Navigates to 'My Places'" }
+    NavMyPlaces --> ClickGarden["Selects a specific garden"]
+    ClickGarden --> ClickPlantProfile@{ label: "Opens the plant's card" }
+    ClickPlantProfile --> ClickWaterButton@{ label: "Clicks 'I have watered' button" }
+    ClickDailyCard --> ExecuteWatering["System registers action"]
+    ClickWaterButton --> ExecuteWatering
+    ExecuteWatering --> UpdateDB@{ label: "Updates local database:<br>Sets new 'lastWatered' date" }
+    UpdateDB --> UpdateUI["UI updates:<br>Plant removed from Daily Tasks"]
+    UpdateUI --> End(["Action completed"])
+
+    AddToDaily@{ shape: rect}
+    NavMyPlaces@{ shape: rect}
+    ClickPlantProfile@{ shape: rect}
+    ClickWaterButton@{ shape: rect}
+    UpdateDB@{ shape: cylinder}
+
+    %% Styling
+    Start:::startEnd
+    CheckData:::decision
+    Idle:::startEnd
+    RainCheck:::decision
+    WaterCheck:::decision
+    UserAction:::decision
+    UpdateDB:::database
+    End:::startEnd
+    
+    %% Gir start- og sluttsirklene den samme mørke fargen som Start/End-knappene
+    n1:::startEnd
+    n2:::startEnd
+
+    classDef startEnd fill:#333,stroke:#333,stroke-width:2px,color:#fff
+    classDef decision fill:#f9d0c4,stroke:#e88a73,stroke-width:2px,color:#000
+    classDef database fill:#d4e6f1,stroke:#5dade2,stroke-width:2px,color:#000
+
+```
