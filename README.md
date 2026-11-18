@@ -1,19 +1,16 @@
 # 🌸 Team 36 - Bloombot 🌸
 
-## 👥 Team members
-- Therese  Siil
-- Solveig Nygård
-- Haris Malik
-- Sakariye Mahamed Kahiye
-- Viktoria Maria Gritsenko-Hofton
-- Sverre Vilhelm Skofteland Schultz
 
+BloomBot was a group project for IN2000 - Software Engineering with Project Work, completed as part of our studies. 
+
+We received an A for this project.
 <br>
 
 ## 🌱 About the app
-<img width="5025" height="3350" alt="bloombot-mockup" src="https://github.uio.no/user-attachments/assets/8f6c68a6-81e4-4cf7-baa8-3e2392e7b05a" />
+<img width="5025" height="3350" alt="BloomBot" src="https://github.com/user-attachments/assets/e96f999c-2495-4b04-a0e2-ba69d476189b" />
 
-Bloombot is a gardening app and plant diary made for hobby gardeners in Norway. The app helps you keep track of all your gardens and the individual plants within them, including logging watering and fertilizing each plant. The app uses weather data from the Meterological Institue Norway.
+Bloombot is a gardening app and plant diary made for hobby gardeners in Norway. The app helps you keep track of all your gardens and the individual plants within them, including logging watering and fertilizing each plant. The app uses weather data from the Meterological Institue Norway. 
+
 
 ### Features
 **Location and plant recommendations**
@@ -48,7 +45,14 @@ Bloombot is a gardening app and plant diary made for hobby gardeners in Norway. 
 7. **Troubleshooting:** If an error occurs, make sure that you're running the latest Android Studio version. Run **Gradle sync**, then **Build -> Clean project.**
 
 
-<br><br>
+## 👥 Team members
+- Therese  Siil
+- Solveig Nygård
+- Haris Malik
+- Sakariye Mahamed Kahiye
+- Viktoria Maria Gritsenko-Hofton
+- Sverre Vilhelm Skofteland Schultz
+
 
 ## 📚 Libaries
 
